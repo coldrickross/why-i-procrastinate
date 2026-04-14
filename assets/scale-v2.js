@@ -68,11 +68,6 @@
     renderColumn(itemsForEl, state.for, "for");
     renderColumn(itemsAgainstEl, state.against, "against");
     recomputeTotalsAndTilt();
-    // After the new items are in the DOM, fit them to the available room.
-    requestAnimationFrame(() => {
-      fitToContainer(itemsForEl);
-      fitToContainer(itemsAgainstEl);
-    });
   }
 
   function renderColumn(container, items, side) {
@@ -94,6 +89,10 @@
     row.className = `v2-item v2-item-${side}`;
     row.dataset.id = item.id;
     row.dataset.weight = item.weight;
+    // Font size comes from the weight directly. Heavier = bigger. No more
+    // "fit to container" shrinking — the column scrolls instead so text
+    // stays legible.
+    row.style.fontSize = `${fontRemForWeight(item.weight).toFixed(3)}rem`;
 
     // If the item has never been named, show an inline input. Otherwise show
     // the text plus a pencil button that flips it back into edit mode.
@@ -133,30 +132,43 @@
     badge.className = "v2-item-weight";
     badge.textContent = item.weight;
 
+    const minusBtn = document.createElement("button");
+    minusBtn.type = "button";
+    minusBtn.className = "v2-item-minus";
+    minusBtn.setAttribute("aria-label", `Make "${item.text}" lighter`);
+    minusBtn.textContent = "\u2212"; // proper minus sign
+
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.className = "v2-item-edit-btn";
-    editBtn.setAttribute("aria-label", `Edit "${item.text}"`);
-    editBtn.textContent = "✎";
+    editBtn.setAttribute("aria-label", `Rename "${item.text}"`);
+    editBtn.textContent = "\u270e"; // pencil
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "v2-item-remove";
+    removeBtn.setAttribute("aria-label", `Remove "${item.text}"`);
+    removeBtn.textContent = "\u00d7"; // ×
 
     row.appendChild(label);
     row.appendChild(badge);
+    row.appendChild(minusBtn);
     row.appendChild(editBtn);
+    row.appendChild(removeBtn);
 
-    row.title = "Click: heavier  ·  Right-click: lighter  ·  ✎ to rename";
+    row.title = "Click to make heavier.  −  lighter  ·  ✎  rename  ·  ×  remove";
 
-    // Left click anywhere on the row (except the edit button): heavier.
+    // Left click anywhere on the row (except one of the buttons): heavier.
     row.addEventListener("click", (e) => {
-      // Don't count a click that was meant for a button inside the row.
       if (e.target.closest("button")) return;
       if (e.target.tagName === "INPUT") return;
       item.weight = Math.min(MAX_WEIGHT, item.weight + 1);
       render();
     });
 
-    // Right click: lighter; remove at 0.
-    row.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
+    // Minus button: one step lighter, remove at 0.
+    minusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       item.weight -= 1;
       if (item.weight <= 0) {
         removeItem(item.id, side);
@@ -165,8 +177,13 @@
       }
     });
 
-    // Dedicated edit button — replaces the old double-click affordance, which
-    // conflicted with fast repeated left-clicks.
+    // Remove button: delete the reason entirely.
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeItem(item.id, side);
+    });
+
+    // Edit button — flip the row back into its input-editing state.
     editBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       item.isNew = true;
@@ -184,45 +201,13 @@
     render();
   }
 
-  // Base font size in rem from a weight value. Heavier reasons want bigger
-  // text; lighter reasons get smaller text. The actual rendered size is this
-  // value multiplied by a per-container fit-scale (see fitToContainer).
-  function baseFontRemForWeight(weight) {
+  // Font size in rem from a weight value. Heavier reasons render bigger so
+  // their visual prominence matches how much they actually matter.
+  function fontRemForWeight(weight) {
     const w = Math.max(1, Math.min(MAX_WEIGHT, weight));
     const min = 0.9, max = 1.7;
     const t = (w - 1) / (MAX_WEIGHT - 1);
     return min + (max - min) * t;
-  }
-
-  // Resize all items in a column so they fit inside the visible pan area.
-  // Bigger weights still render larger than smaller weights — we only scale
-  // the whole set down together until everything fits.
-  function fitToContainer(container) {
-    const items = Array.from(container.querySelectorAll(".v2-item"));
-    if (items.length === 0) return;
-
-    const apply = (scale) => {
-      items.forEach((el) => {
-        const w = Number(el.dataset.weight) || 1;
-        el.style.fontSize = `${(baseFontRemForWeight(w) * scale).toFixed(3)}rem`;
-      });
-    };
-
-    let scale = 1;
-    apply(scale);
-
-    // Iteratively shrink until everything fits inside the container's height.
-    // Capped so a pathological case can't loop forever.
-    let iter = 0;
-    while (
-      container.scrollHeight > container.clientHeight + 1 &&
-      scale > 0.3 &&
-      iter < 60
-    ) {
-      scale *= 0.94;
-      apply(scale);
-      iter++;
-    }
   }
 
   function recomputeTotalsAndTilt() {
@@ -289,11 +274,4 @@
   }
 
   render();
-  // Refit when the SVG scales (e.g. window resize) so font sizes stay sensible.
-  window.addEventListener("resize", () => {
-    requestAnimationFrame(() => {
-      fitToContainer(itemsForEl);
-      fitToContainer(itemsAgainstEl);
-    });
-  });
 })();

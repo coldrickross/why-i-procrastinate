@@ -811,8 +811,19 @@ footer.page-foot a { color: var(--ink); }
   align-content: flex-start;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px; /* leave room for the scrollbar so items don't bump it */
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
+.v2-items::-webkit-scrollbar { width: 6px; }
+.v2-items::-webkit-scrollbar-track { background: transparent; }
+.v2-items::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 999px;
+}
+.v2-items::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 .v2-empty {
   color: var(--muted);
@@ -874,7 +885,9 @@ footer.page-foot a { color: var(--ink); }
   min-width: 160px;
 }
 
-.v2-item-edit-btn {
+.v2-item-edit-btn,
+.v2-item-minus,
+.v2-item-remove {
   width: 22px;
   height: 22px;
   padding: 0;
@@ -882,16 +895,25 @@ footer.page-foot a { color: var(--ink); }
   display: inline-grid;
   place-items: center;
   color: var(--muted);
-  font-size: 0.78em;
+  font-size: 0.85em;
+  line-height: 1;
   background: transparent;
   border: 0;
   cursor: pointer;
   opacity: 0;
   transition: opacity 180ms var(--ease), background 180ms var(--ease), color 180ms var(--ease);
 }
+.v2-item-edit-btn { font-size: 0.78em; }
+.v2-item-remove { font-size: 1em; }
 .v2-item:hover .v2-item-edit-btn,
-.v2-item-edit-btn:focus-visible { opacity: 1; }
-.v2-item-edit-btn:hover { background: var(--cream-deep); color: var(--ink); }
+.v2-item:hover .v2-item-minus,
+.v2-item:hover .v2-item-remove,
+.v2-item-edit-btn:focus-visible,
+.v2-item-minus:focus-visible,
+.v2-item-remove:focus-visible { opacity: 1; }
+.v2-item-edit-btn:hover,
+.v2-item-minus:hover { background: var(--cream-deep); color: var(--ink); }
+.v2-item-remove:hover { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
 
 .v2-add {
   align-self: stretch;
