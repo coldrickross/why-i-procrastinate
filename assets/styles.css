@@ -305,6 +305,107 @@ footer.page-foot a { color: var(--ink); }
   margin-top: 4px;
 }
 
+
+
+.scale-board {
+  margin-top: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.action-row label {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+}
+.action-row input {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+
+.board-instructions {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.reason-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 64px;
+}
+
+.reason-node {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.2;
+  transition: transform 160ms var(--ease), border-color 160ms var(--ease);
+}
+.reason-node.for:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
+}
+.reason-node.against:hover {
+  border-color: var(--terra);
+  transform: translateY(-1px);
+}
+.reason-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.add-reason {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+.add-reason input {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  background: var(--paper);
+}
+.add-reason .add-row {
+  margin-top: 0;
+  width: auto;
+  text-align: center;
+  padding: 10px 18px;
+}
+
 .scale-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -494,7 +595,108 @@ footer.page-foot a { color: var(--ink); }
 /* ---------- responsive ---------- */
 @media (max-width: 720px) {
   .hero { padding-top: 48px; }
-  .scale-columns { grid-template-columns: 1fr; }
+  
+
+.scale-board {
+  margin-top: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.action-row label {
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+}
+.action-row input {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+}
+
+.board-instructions {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.reason-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 64px;
+}
+
+.reason-node {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.2;
+  transition: transform 160ms var(--ease), border-color 160ms var(--ease);
+}
+.reason-node.for:hover {
+  border-color: var(--teal);
+  transform: translateY(-1px);
+}
+.reason-node.against:hover {
+  border-color: var(--terra);
+  transform: translateY(-1px);
+}
+.reason-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.add-reason {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 10px;
+}
+.add-reason input {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  background: var(--paper);
+}
+.add-reason .add-row {
+  margin-top: 0;
+  width: auto;
+  text-align: center;
+  padding: 10px 18px;
+}
+
+.scale-columns { grid-template-columns: 1fr; }
   .cta-bar { flex-direction: column; align-items: flex-start; }
   .cta-bar .btn { align-self: stretch; text-align: center; }
 }
