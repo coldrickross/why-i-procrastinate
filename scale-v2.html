@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scale V2 — Why I Procrastinate</title>
+<meta name="description" content="A fresh scale view to compare what pushes action forward versus what holds it back." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
+    <div class="links">
+      <a href="index.html">Feelings</a>
+      <a href="scale.html">The Scale</a>
+      <a href="scale-v2.html" class="active">Scale V2</a>
+      <a href="worksheet.html">Worksheet</a>
+    </div>
+  </nav>
+
+  <header class="hero hero-v2">
+    <h1>Scale <em>V2</em></h1>
+    <p class="sub">Left-click a weight to make it heavier. Right-click to make it lighter (and remove at 0).</p>
+  </header>
+
+  <main class="wrap">
+    <section class="scale-v2-layout" aria-label="Scale V2 workspace">
+      <div class="v2-side v2-side--for">
+        <h2>For Action</h2>
+        <p class="v2-hint">Use <strong>Insert Action for</strong> to add reasons that push you forward.</p>
+
+        <form class="v2-insert" id="insertForForm" autocomplete="off">
+          <label for="insertForInput">Insert Action for</label>
+          <div class="v2-insert-row">
+            <input id="insertForInput" name="insertFor" type="text" placeholder="e.g. Love for my family" required />
+            <button type="submit">Insert</button>
+          </div>
+        </form>
+
+        <div class="v2-list" id="forList" aria-live="polite"></div>
+      </div>
+
+      <div class="v2-center" aria-label="Scale indicator">
+        <div class="v2-center-label">This tilts with the changes</div>
+        <div class="v2-beam-shell">
+          <div class="v2-beam" id="v2Beam"></div>
+          <div class="v2-pivot"></div>
+        </div>
+        <p class="v2-verdict" id="v2Verdict">Insert items to see which side wins.</p>
+      </div>
+
+      <div class="v2-side v2-side--against">
+        <h2>Against Action</h2>
+        <p class="v2-hint">Add what holds you back. Click/right-click number boxes to adjust weight.</p>
+        <div class="v2-list" id="againstList" aria-live="polite"></div>
+
+        <form class="v2-insert" id="insertAgainstForm" autocomplete="off">
+          <label for="insertAgainstInput">Insert new “Against Action”</label>
+          <div class="v2-insert-row">
+            <input id="insertAgainstInput" name="insertAgainst" type="text" placeholder="e.g. Fear of failure" required />
+            <button type="submit">Insert</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page-foot">
+    <p>Built to help you start. <a href="scale.html">Try the original scale</a>.</p>
+  </footer>
+
+  <script src="assets/scale-v2.js"></script>
+</body>
+</html>
