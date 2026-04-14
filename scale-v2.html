@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Scale V2 — Why I Procrastinate</title>
+<meta name="description" content="A second take on the scale of action. Click items to make them heavier, right-click to make them lighter. Watch the beam tilt with every change." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
+    <div class="links">
+      <a href="index.html">Feelings</a>
+      <a href="scale.html">The Scale</a>
+      <a href="scale-v2.html" class="active">Scale V2</a>
+      <a href="worksheet.html">Worksheet</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <h1>The <em>Scale</em> — V2</h1>
+    <p class="sub">Name an action. Drop reasons on either side. Click to add weight, right-click to take some off.</p>
+  </header>
+
+  <main class="wrap v2-wrap">
+    <section class="v2-action-bar" aria-label="Action being considered">
+      <label class="v2-action-label" for="v2Action">The action</label>
+      <input
+        class="v2-action-input"
+        id="v2Action"
+        type="text"
+        placeholder="Insert Action (e.g. propose to my girlfriend)"
+        autocomplete="off"
+      />
+    </section>
+
+    <section class="v2-legend" aria-label="How it works">
+      <span><b>Left click</b> a reason to make it heavier (bigger).</span>
+      <span><b>Right click</b> to make it lighter. At 0 it disappears.</span>
+    </section>
+
+    <section class="v2-stage" aria-label="Interactive scale">
+      <div class="v2-pan-area v2-pan-for" aria-label="Reasons for action">
+        <div class="v2-pan-heading">
+          <span class="v2-pan-title">For action</span>
+          <span class="v2-pan-total" id="v2ForTotal">0</span>
+        </div>
+        <div class="v2-items" id="v2ItemsFor"></div>
+        <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Insert Action For</button>
+      </div>
+
+      <div class="v2-beam-wrap" aria-hidden="true">
+        <svg class="v2-scale-svg" viewBox="0 0 720 360" role="img" aria-label="A balance scale that tilts based on the weights on each side.">
+          <path class="base" d="M260 340 L460 340 L440 320 L280 320 Z" />
+          <rect class="pillar" x="352" y="60" width="16" height="260" rx="3" />
+          <circle class="rivet" cx="360" cy="60" r="7" />
+
+          <g class="beam" id="v2Beam">
+            <rect class="beam-shape" x="120" y="53" width="480" height="14" rx="7" />
+            <circle class="rivet" cx="360" cy="60" r="5" />
+
+            <g class="pan-group">
+              <line class="rope" x1="120" y1="60" x2="80" y2="140" />
+              <line class="rope" x1="120" y1="60" x2="160" y2="140" />
+              <ellipse class="pan-shadow" cx="120" cy="172" rx="70" ry="6" />
+              <path class="pan for" d="M50 140 Q120 190 190 140 Q180 168 120 176 Q60 168 50 140 Z" />
+            </g>
+
+            <g class="pan-group">
+              <line class="rope" x1="600" y1="60" x2="560" y2="140" />
+              <line class="rope" x1="600" y1="60" x2="640" y2="140" />
+              <ellipse class="pan-shadow" cx="600" cy="172" rx="70" ry="6" />
+              <path class="pan against" d="M530 140 Q600 190 670 140 Q660 168 600 176 Q540 168 530 140 Z" />
+            </g>
+          </g>
+        </svg>
+        <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
+      </div>
+
+      <div class="v2-pan-area v2-pan-against" aria-label="Reasons against action">
+        <div class="v2-pan-heading">
+          <span class="v2-pan-title">Against action</span>
+          <span class="v2-pan-total" id="v2AgainstTotal">0</span>
+        </div>
+        <div class="v2-items" id="v2ItemsAgainst"></div>
+        <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Insert new Against Action</button>
+      </div>
+    </section>
+
+    <section class="explain">
+      <h2>Why a V2?</h2>
+      <p>The first scale used little plus/minus buttons. This one is more physical: every reason is a weight you can grow by clicking on it, or shrink with a right-click. The beam tilts in real time so you feel the decision shifting as you change what's on it.</p>
+      <p>It's the same idea as before — <em>behaviour is a scale</em> — just with a more direct way to play with it.</p>
+    </section>
+
+    <aside class="cta-bar">
+      <div>
+        <h3>Prefer the original?</h3>
+        <p>The first version has suggested chips and worked examples.</p>
+      </div>
+      <a class="btn" href="scale.html">Open the original scale →</a>
+    </aside>
+  </main>
+
+  <footer class="page-foot">
+    <p>Made to get you unstuck. <a href="index.html">Back to feelings</a>.</p>
+  </footer>
+
+  <script src="assets/scale-v2.js"></script>
+</body>
+</html>
