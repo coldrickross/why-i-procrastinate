@@ -65,34 +65,41 @@
       </div>
     </section>
 
-    <section class="scale-board" aria-label="Your custom action scale">
-      <div class="action-row">
-        <label for="actionInput">Action</label>
-        <input id="actionInput" type="text" placeholder="Insert action" />
+    <section class="scale-board sketch" aria-label="Your custom action scale">
+      <div class="action-rail">
+        <span>[</span>
+        <input id="actionInput" type="text" placeholder="Insert Action" />
+        <span>]</span>
       </div>
 
-      <p class="board-instructions">Left click a reason to make it heavier (+1). Right click to make it lighter (-1). If a reason reaches 0, it is removed.</p>
-
-      <div class="scale-columns">
-        <div class="column for">
+      <div class="board-body">
+        <div class="for-zone">
           <h3>For action</h3>
-          <div class="items reason-cloud" id="itemsFor"></div>
-          <form class="add-reason" id="formFor">
-            <input id="newForText" type="text" placeholder='Insert new "for action" reason' />
+          <div class="items reason-cloud for-cloud" id="itemsFor"></div>
+          <form class="add-reason add-for" id="formFor">
+            <input id="newForText" type="text" placeholder='Insert new "for action"' />
             <button class="add-row" id="addFor" type="submit">Insert</button>
           </form>
-          <div class="total">Total weight: <b><span id="forTotalLabel">0</span></b></div>
         </div>
 
-        <div class="column against">
+        <div class="mid-note">THIS TILTS<br/>WITH THE<br/>CHANGES</div>
+
+        <div class="against-zone">
           <h3>Against action</h3>
-          <div class="items reason-cloud" id="itemsAgainst"></div>
-          <form class="add-reason" id="formAgainst">
-            <input id="newAgainstText" type="text" placeholder='Insert new "against action" reason' />
-            <button class="add-row" id="addAgainst" type="submit">Insert</button>
-          </form>
-          <div class="total">Total weight: <b><span id="againstTotalLabel">0</span></b></div>
+          <div class="items reason-cloud against-cloud" id="itemsAgainst"></div>
         </div>
+      </div>
+
+      <aside class="click-rules">Right click to make 1 lighter (or remove after 1 → 0). Left click to make 1 heavier (bigger text).</aside>
+
+      <form class="add-reason add-against-box" id="formAgainst">
+        <input id="newAgainstText" type="text" placeholder='Insert new "Against Action"' />
+        <button class="add-row" id="addAgainst" type="submit">Insert</button>
+      </form>
+
+      <div class="totals-row">
+        <div>For total: <b><span id="forTotalLabel">0</span></b></div>
+        <div>Against total: <b><span id="againstTotalLabel">0</span></b></div>
       </div>
     </section>
 

@@ -4,11 +4,15 @@
 
   const state = {
     action: "",
-    for: [{ id: 1, text: "Love for my future self", weight: 2 }],
-    against: [{ id: 2, text: "Fear of failure", weight: 2 }],
+    for: [{ id: 1, text: "Love for gf", weight: 2 }],
+    against: [
+      { id: 2, text: "Fear failure", weight: 2 },
+      { id: 3, text: "Less money", weight: 3 },
+      { id: 4, text: "Emotional pain", weight: 3 },
+    ],
   };
 
-  let nextId = 3;
+  let nextId = 5;
   const newId = () => nextId++;
 
   const actionInput = document.getElementById("actionInput");
@@ -68,11 +72,11 @@
 
   function renderColumn(container, items, side) {
     container.innerHTML = "";
-    items.forEach((item) => {
+    [...items].sort((a, b) => b.weight - a.weight).forEach((item) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = `reason-node ${side}`;
-      btn.style.fontSize = `${0.82 + item.weight * 0.15}rem`;
+      btn.style.fontSize = `${0.78 + item.weight * 0.18}rem`;
       btn.title = "Left click: +1 weight. Right click: -1 weight (remove at 0).";
 
       const label = document.createElement("span");

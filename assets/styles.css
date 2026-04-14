@@ -309,102 +309,148 @@ footer.page-foot a { color: var(--ink); }
 
 .scale-board {
   margin-top: 24px;
-  background: #fff;
-  border: 1px solid var(--line);
+  background: #f1f1f1;
+  border: 1px solid #d0d2d8;
   border-radius: var(--r-md);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
+  padding: 16px;
 }
 
-.action-row {
+.action-rail {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-family: var(--serif);
+  font-size: 1.05rem;
 }
-.action-row label {
-  font-size: 0.78rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--muted);
-}
-.action-row input {
-  flex: 1;
-  border: 1px solid var(--line);
-  background: var(--paper);
-  border-radius: var(--r-sm);
-  padding: 10px 12px;
+.action-rail input {
+  flex: 0 1 440px;
+  border: 1px solid #bfc4cc;
+  border-radius: 6px;
+  background: #fff;
+  padding: 9px 12px;
 }
 
-.board-instructions {
-  margin: 0 0 14px;
-  color: var(--muted);
-  font-size: 0.9rem;
+.board-body {
+  display: grid;
+  grid-template-columns: 1fr 130px 1.2fr;
+  gap: 14px;
+  align-items: start;
+  margin-top: 8px;
+}
+
+.for-zone,
+.against-zone {
+  background: #fff;
+  border: 1px solid #c7c9cf;
+  border-radius: 12px;
+  padding: 12px;
+}
+.for-zone { border-top: 3px solid var(--teal); }
+.against-zone { border-top: 3px solid var(--terra); }
+
+.for-zone h3,
+.against-zone h3 {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.mid-note {
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
 }
 
 .reason-cloud {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  min-height: 64px;
+  gap: 8px;
+  min-height: 60px;
+}
+
+.against-cloud {
+  display: grid;
+  gap: 8px;
 }
 
 .reason-node {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 28px 10px 12px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: var(--paper);
+  text-align: left;
+  border: 1px solid #c9ccd4;
+  background: #fff;
+  border-radius: 8px;
   color: var(--ink);
   line-height: 1.2;
-  transition: transform 160ms var(--ease), border-color 160ms var(--ease);
+  padding: 8px 30px 8px 10px;
 }
-.reason-node.for:hover {
-  border-color: var(--teal);
-  transform: translateY(-1px);
-}
-.reason-node.against:hover {
-  border-color: var(--terra);
-  transform: translateY(-1px);
-}
+.for-cloud .reason-node { display: inline-flex; }
+.against-cloud .reason-node { width: 100%; }
+.reason-node.for { border-left: 4px solid rgba(91,138,138,.55); }
+.reason-node.against { border-left: 4px solid rgba(200,118,104,.6); }
+.reason-node:hover { transform: translateY(-1px); }
+
 .reason-badge {
   position: absolute;
-  top: 4px;
+  top: 3px;
   right: 4px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 4px;
-  border-radius: 999px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 3px;
   display: grid;
   place-items: center;
-  font-size: 0.68rem;
-  font-weight: 600;
-  border: 1px solid var(--line);
+  font-size: 0.65rem;
+  border: 1px solid #c9ccd4;
   background: #fff;
+}
+
+.click-rules {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 .add-reason {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: 8px;
-  margin-top: 10px;
 }
+
+.add-for { margin-top: 10px; }
+.add-against-box {
+  margin-top: 12px;
+  max-width: 360px;
+}
+
 .add-reason input {
-  border: 1px solid var(--line);
+  border: 1px solid #c9ccd4;
   border-radius: var(--r-sm);
-  padding: 10px 12px;
-  background: var(--paper);
+  background: #fff;
+  padding: 9px 10px;
 }
 .add-reason .add-row {
   margin-top: 0;
   width: auto;
+  padding: 9px 14px;
   text-align: center;
-  padding: 10px 18px;
 }
+
+.totals-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.totals-row b { color: var(--ink); }
 
 .scale-columns {
   display: grid;
