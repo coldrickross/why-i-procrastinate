@@ -116,96 +116,89 @@ footer.page-foot {
 footer.page-foot a { color: var(--ink); }
 
 /* ==========================================================================
-   Page: Emotions (index.html)
+   Page: Feelings flow (index.html)
    ========================================================================== */
-.emotions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
-  margin: 32px 0 48px;
+.feelings-flow {
+  margin: 24px 0 48px;
 }
 
-.emotion {
+.flow-section + .flow-section {
+  margin-top: 24px;
+}
+
+.flow-title {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pill-btn {
+  padding: 11px 16px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.98rem;
+  font-weight: 500;
+  transition: transform 160ms var(--ease), background 180ms var(--ease), border-color 180ms var(--ease), color 180ms var(--ease);
+}
+
+.pill-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(212, 165, 116, 0.55);
+  color: var(--ink);
+}
+
+.pill-btn.is-selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+
+.pill-btn--reason.is-selected {
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
+  color: #fff;
+}
+
+.flow-section.is-hidden {
+  display: none;
+}
+
+.report {
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
-  padding: 0;
   box-shadow: var(--shadow-sm);
-  transition: transform 260ms var(--ease), box-shadow 260ms var(--ease), border-color 260ms var(--ease);
-  overflow: hidden;
-  text-align: left;
-  width: 100%;
-  display: block;
-}
-.emotion:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(212, 165, 116, 0.5);
-}
-.emotion.is-open {
-  border-color: var(--gold);
-  box-shadow: var(--shadow-md);
-  background: #fff;
-}
-.emotion .head {
-  padding: 20px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.emotion .quote {
-  font-family: var(--serif);
-  font-size: 1.2rem;
-  font-weight: 500;
-  line-height: 1.25;
-  color: var(--ink);
-}
-.emotion .quote::before { content: "“"; color: var(--gold-deep); margin-right: 2px; }
-.emotion .quote::after  { content: "”"; color: var(--gold-deep); margin-left: 2px; }
-.emotion .chev {
-  flex: 0 0 auto;
-  width: 28px; height: 28px;
-  border-radius: 999px;
-  display: grid; place-items: center;
-  background: var(--cream-deep);
-  color: var(--ink);
-  transition: transform 300ms var(--ease), background 200ms var(--ease);
-}
-.emotion.is-open .chev {
-  transform: rotate(45deg);
-  background: var(--gold);
-  color: #fff;
-}
-.emotion .chev::before {
-  content: "+";
-  font-size: 20px;
-  line-height: 1;
-  font-weight: 400;
+  padding: 24px 22px;
 }
 
-.emotion .body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 360ms var(--ease);
+.report-block + .report-block {
+  margin-top: 16px;
 }
-.emotion.is-open .body { max-height: 400px; }
-.emotion .body-inner {
-  padding: 0 22px 22px;
-  border-top: 1px dashed var(--line);
-  margin-top: -2px;
-}
-.emotion .label {
-  display: inline-block;
+
+.report-label {
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--gold-deep);
-  margin: 18px 0 6px;
+  margin-bottom: 5px;
   font-weight: 600;
 }
-.emotion .meaning { font-size: 1rem; color: var(--ink-soft); }
-.emotion .strategy { font-size: 1rem; color: var(--ink); }
+
+.report p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.03rem;
+}
 
 .cta-bar {
   margin: 48px 0 0;
