@@ -1,10 +1,18 @@
 // Scale V2 — click to grow a weight, right-click to shrink it.
-// The beam tilts based on the difference between totals.
+// The beam tilts based on the difference between totals. The pans translate
+// up and down with the beam ends but stay perpendicular to the floor.
 
 (function () {
   const MAX_TILT = 14;   // degrees — kept gentle so the boxes stay readable when tilted
   const TILT_K = 1.6;    // degrees per unit of weight difference
   const MAX_WEIGHT = 10; // cap so the UI doesn't explode
+
+  // Geometry constants matching the SVG. Pivot is at (500, 60). Each rope is
+  // anchored at the bottom of the beam (y=66), 300 user-units from the pivot.
+  const PIVOT_X = 500;
+  const PIVOT_Y = 60;
+  const ARM_X = 300;       // horizontal distance from pivot to rope anchor
+  const ANCHOR_OFFSET_Y = 6; // anchor is on the bottom edge of the beam
 
   const state = {
     action: "",
@@ -24,6 +32,8 @@
   const forTotalEl = document.getElementById("v2ForTotal");
   const againstTotalEl = document.getElementById("v2AgainstTotal");
   const beamEl = document.getElementById("v2Beam");
+  const panLeftEl = document.getElementById("v2PanLeft");
+  const panRightEl = document.getElementById("v2PanRight");
   const verdictEl = document.getElementById("v2Verdict");
 
   // Seed example items so the page isn't empty on first load.
@@ -58,6 +68,11 @@
     renderColumn(itemsForEl, state.for, "for");
     renderColumn(itemsAgainstEl, state.against, "against");
     recomputeTotalsAndTilt();
+    // After the new items are in the DOM, fit them to the available room.
+    requestAnimationFrame(() => {
+      fitToContainer(itemsForEl);
+      fitToContainer(itemsAgainstEl);
+    });
   }
 
   function renderColumn(container, items, side) {
@@ -78,7 +93,7 @@
     const row = document.createElement("div");
     row.className = `v2-item v2-item-${side}`;
     row.dataset.id = item.id;
-    row.style.fontSize = fontSizeFor(item.weight);
+    row.dataset.weight = item.weight;
 
     // If the item has never been named, show an inline input. Otherwise show
     // the text plus a pencil button that flips it back into edit mode.
@@ -169,12 +184,45 @@
     render();
   }
 
-  function fontSizeFor(weight) {
-    // Map weight (1..MAX_WEIGHT) to a font size between 0.95rem and 1.9rem.
+  // Base font size in rem from a weight value. Heavier reasons want bigger
+  // text; lighter reasons get smaller text. The actual rendered size is this
+  // value multiplied by a per-container fit-scale (see fitToContainer).
+  function baseFontRemForWeight(weight) {
     const w = Math.max(1, Math.min(MAX_WEIGHT, weight));
-    const min = 0.95, max = 1.9;
+    const min = 0.9, max = 1.7;
     const t = (w - 1) / (MAX_WEIGHT - 1);
-    return `${(min + (max - min) * t).toFixed(3)}rem`;
+    return min + (max - min) * t;
+  }
+
+  // Resize all items in a column so they fit inside the visible pan area.
+  // Bigger weights still render larger than smaller weights — we only scale
+  // the whole set down together until everything fits.
+  function fitToContainer(container) {
+    const items = Array.from(container.querySelectorAll(".v2-item"));
+    if (items.length === 0) return;
+
+    const apply = (scale) => {
+      items.forEach((el) => {
+        const w = Number(el.dataset.weight) || 1;
+        el.style.fontSize = `${(baseFontRemForWeight(w) * scale).toFixed(3)}rem`;
+      });
+    };
+
+    let scale = 1;
+    apply(scale);
+
+    // Iteratively shrink until everything fits inside the container's height.
+    // Capped so a pathological case can't loop forever.
+    let iter = 0;
+    while (
+      container.scrollHeight > container.clientHeight + 1 &&
+      scale > 0.3 &&
+      iter < 60
+    ) {
+      scale *= 0.94;
+      apply(scale);
+      iter++;
+    }
   }
 
   function recomputeTotalsAndTilt() {
@@ -186,10 +234,30 @@
     // Positive rotation = clockwise in SVG → pulls the right (against) side down.
     // Against heavier → against goes down → positive tilt.
     const diff = againstTotal - forTotal;
-    const tilt = clamp(diff * TILT_K, -MAX_TILT, MAX_TILT);
-    beamEl.style.transform = `rotate(${tilt}deg)`;
+    const tiltDeg = clamp(diff * TILT_K, -MAX_TILT, MAX_TILT);
+    const theta = (tiltDeg * Math.PI) / 180;
+
+    beamEl.style.transform = `rotate(${tiltDeg}deg)`;
+
+    // Move each pan to wherever its rope-anchor on the beam ends up after the
+    // rotation, but DON'T rotate the pan itself — it stays perpendicular to
+    // the floor, like a real hanging pan held by ropes.
+    const left = anchorDisplacement(-ARM_X, ANCHOR_OFFSET_Y, theta);
+    const right = anchorDisplacement(ARM_X, ANCHOR_OFFSET_Y, theta);
+    panLeftEl.style.transform = `translate(${left.dx}px, ${left.dy}px)`;
+    panRightEl.style.transform = `translate(${right.dx}px, ${right.dy}px)`;
 
     updateVerdict(forTotal, againstTotal);
+  }
+
+  // How far an anchor point at offset (offX, offY) from the pivot moves when
+  // the beam rotates by theta radians (SVG convention: y-down, positive = CW).
+  function anchorDisplacement(offX, offY, theta) {
+    const c = Math.cos(theta);
+    const s = Math.sin(theta);
+    const newX = offX * c - offY * s;
+    const newY = offX * s + offY * c;
+    return { dx: newX - offX, dy: newY - offY };
   }
 
   function updateVerdict(f, a) {
@@ -221,4 +289,11 @@
   }
 
   render();
+  // Refit when the SVG scales (e.g. window resize) so font sizes stay sensible.
+  window.addEventListener("resize", () => {
+    requestAnimationFrame(() => {
+      fitToContainer(itemsForEl);
+      fitToContainer(itemsAgainstEl);
+    });
+  });
 })();

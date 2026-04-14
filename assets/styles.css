@@ -741,13 +741,20 @@ footer.page-foot a { color: var(--ink); }
    so the pans can be children of the beam group and tilt with it. */
 .v2-scale-big {
   width: 100%;
-  aspect-ratio: 1000 / 780;
+  aspect-ratio: 1000 / 680;
   display: block;
   overflow: visible;
 }
 .v2-scale-big .beam {
   transform-box: view-box;
   transform-origin: 500px 60px;
+  transition: transform 700ms var(--ease);
+}
+/* Pan groups translate up/down with the beam end, but never rotate, so each
+   pan stays perpendicular to the floor like a real hanging scale pan. */
+.v2-scale-big .pan-group {
+  transform-box: view-box;
+  transform-origin: 0 0;
   transition: transform 700ms var(--ease);
 }
 .v2-scale-big .base { fill: var(--ink); }
@@ -765,10 +772,11 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-md);
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+  overflow: hidden;
   /* Bump base size so text stays legible when the SVG scales down. */
   font-size: 18px;
 }
@@ -799,9 +807,11 @@ footer.page-foot a { color: var(--ink); }
 .v2-items {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-content: flex-start;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .v2-empty {
