@@ -8,24 +8,35 @@
   if (promptEl) promptEl.textContent = FEELING_DATA.prompt;
   if (helperEl) helperEl.textContent = FEELING_DATA.helperText;
 
+  const totalFeelings = FEELING_DATA.feelings.length;
+  const totalReasons = FEELING_DATA.feelings.reduce(
+    (sum, item) => sum + item.reasons.length,
+    0,
+  );
+
   root.innerHTML = `
+    <section class="db-summary" aria-label="Database summary">
+      <strong>Inaction database:</strong> ${totalFeelings} feelings and ${totalReasons} common blockers.
+    </section>
+
     <section>
+      <h2 class="flow-title">Step 1: Pick your feeling</h2>
       <div class="pill-grid" id="feeling-options" role="radiogroup" aria-label="Feelings"></div>
     </section>
 
     <section id="reason-section" class="flow-section is-hidden" aria-live="polite">
-      <h2 class="flow-title">Likely reasons</h2>
+      <h2 class="flow-title">Step 2: Pick the reason</h2>
       <div class="pill-grid" id="reason-options" role="radiogroup" aria-label="Reasons"></div>
     </section>
 
     <section id="report-section" class="flow-section report is-hidden" aria-live="polite">
-      <h2 class="flow-title">Explanation report</h2>
+      <h2 class="flow-title">Step 3: Read and act</h2>
       <div class="report-block">
-        <div class="report-label">Why this can block action</div>
+        <div class="report-label">Why you may feel stuck</div>
         <p id="report-explanation"></p>
       </div>
       <div class="report-block">
-        <div class="report-label">What to do next</div>
+        <div class="report-label">What to do now</div>
         <p id="report-solution"></p>
       </div>
     </section>
