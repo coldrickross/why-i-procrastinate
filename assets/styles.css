@@ -122,6 +122,21 @@ footer.page-foot a { color: var(--ink); }
   margin: 24px 0 48px;
 }
 
+
+.db-summary {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.db-summary strong {
+  color: var(--ink);
+}
+
 .flow-section + .flow-section {
   margin-top: 24px;
 }

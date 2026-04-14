@@ -1,53 +1,98 @@
-// Single source of truth for the site's content.
-// This structure is ready to come from a backend/admin portal.
+// Single source of truth for site content.
 // To override from a backend, set `window.__FEELING_DATA__` before emotions.js loads.
 
 const DEFAULT_FEELING_DATA = {
-  prompt: "How do you feel in this moment?",
+  prompt: "How do you feel right now?",
   helperText:
-    "Choose one feeling. Then pick the reason that fits to see a clear explanation and solution.",
+    "Pick one feeling. Then pick the reason that fits best. You will get a simple why + next step.",
   feelings: [
     {
       id: "overwhelmed",
       label: "Overwhelmed",
       reasons: [
         {
-          id: "too-large",
-          label: "The task feels too large",
+          id: "too-big",
+          label: "The task feels too big",
           explanation:
-            "Your brain cannot see a clear finish line, so the task reads as a threat. When a project is vague or huge, avoidance feels like protection.",
+            "Your brain cannot see where this ends. Big fuzzy tasks can feel scary, so your brain says, 'do it later.'",
           solution:
-            "Use containment. Define a tiny work box (for example, 15 minutes or one subsection only). Write the next visible action in plain language and do only that action.",
+            "Cut it into tiny steps. Do one step that takes 10 minutes or less.",
         },
         {
-          id: "too-many-open-loops",
-          label: "Too many things are open at once",
+          id: "too-many-things",
+          label: "Too many things at once",
           explanation:
-            "Competing priorities create cognitive noise. You are not resisting effort; you are paying a constant switching cost.",
+            "When many tasks fight for attention, your brain gets noisy and tired.",
           solution:
-            "Capture all open loops in one list. Choose a single priority for this session. Park everything else in a 'later' list so your attention can settle.",
+            "Write all tasks in one list. Pick one task for now. Ignore the rest until done.",
+        },
+        {
+          id: "no-plan",
+          label: "No clear plan",
+          explanation:
+            "If you do not know the first move, starting feels risky.",
+          solution:
+            "Write: 'First I will ___.' Make it very small and clear.",
         },
       ],
     },
     {
-      id: "exhausted",
-      label: "Exhausted",
+      id: "tired",
+      label: "Tired",
       reasons: [
         {
-          id: "limited-energy",
-          label: "Limited by energy",
+          id: "low-energy",
+          label: "Low energy",
           explanation:
-            "When energy is low, even simple tasks feel heavy. The problem is not character; your mental battery is underpowered.",
+            "Low energy makes even easy tasks feel heavy.",
           solution:
-            "Reduce scope before effort. Shrink the task to the lowest-energy version you can still complete. If needed, recover first (water, food, short walk, short rest) and restart with one contained step.",
+            "Shrink the task to the easiest version. Do that first.",
         },
         {
-          id: "sleep-debt",
-          label: "Running on sleep debt",
+          id: "poor-sleep",
+          label: "Bad sleep",
           explanation:
-            "Sleep debt weakens planning, memory, and emotion regulation. Procrastination rises because decisions feel harder than usual.",
+            "Bad sleep hurts focus and self-control. Choices feel harder.",
           solution:
-            "Move high-focus tasks to your best energy window. Use checklists instead of memory. Prioritize a recovery night and protect a consistent sleep cutoff.",
+            "Do hard work at your best time of day. Use a checklist. Sleep earlier tonight.",
+        },
+        {
+          id: "burnout",
+          label: "Running on empty",
+          explanation:
+            "If you push too long with no rest, your mind starts to shut down.",
+          solution:
+            "Take a short reset: water, stretch, 10-minute walk. Then do one small task.",
+        },
+      ],
+    },
+    {
+      id: "anxious",
+      label: "Anxious",
+      reasons: [
+        {
+          id: "fear-fail",
+          label: "Fear of failing",
+          explanation:
+            "You may wait so you can avoid seeing a bad result.",
+          solution:
+            "Make a 'bad first draft.' Done is better than perfect.",
+        },
+        {
+          id: "fear-judged",
+          label: "Fear of what people think",
+          explanation:
+            "If you expect judgment, delay feels safer.",
+          solution:
+            "Share with one safe person first. Get one small piece of feedback.",
+        },
+        {
+          id: "fear-unclear",
+          label: "Not sure what is expected",
+          explanation:
+            "Unclear rules make your brain feel danger.",
+          solution:
+            "Ask one clear question. Then do the first step with the answer.",
         },
       ],
     },
@@ -56,20 +101,28 @@ const DEFAULT_FEELING_DATA = {
       label: "Sad",
       reasons: [
         {
-          id: "low-belief",
-          label: "Low belief that this will help",
+          id: "nothing-matters",
+          label: "It feels pointless",
           explanation:
-            "Sadness can flatten reward signals. If progress does not feel meaningful, your motivation system downshifts.",
+            "Sad moods can turn down your sense of reward.",
           solution:
-            "Pick one action with an immediate, visible win. Track completion (not perfection). Use gentle accountability with a friend or note to yourself.",
+            "Pick a task with a fast win. Check it off so your brain sees progress.",
         },
         {
-          id: "emotionally-heavy",
-          label: "Emotionally heavy day",
+          id: "heavy-heart",
+          label: "Carrying emotional weight",
           explanation:
-            "You may be carrying emotional load unrelated to the task. The task becomes a symbol of pressure, not just work.",
+            "Hard feelings use mental energy that work also needs.",
           solution:
-            "Name the feeling first, then lower the bar. Commit to a short starter block and stop after that if needed. Progress counts even when capacity is limited.",
+            "Name the feeling in one sentence. Then do a 5-minute starter task.",
+        },
+        {
+          id: "alone",
+          label: "Feeling alone",
+          explanation:
+            "When you feel alone, it is harder to keep going.",
+          solution:
+            "Ask a friend to check in later today. Work for 10 minutes before the check-in.",
         },
       ],
     },
@@ -78,42 +131,238 @@ const DEFAULT_FEELING_DATA = {
       label: "Bored",
       reasons: [
         {
-          id: "no-stakes",
-          label: "The task has no clear stakes",
+          id: "no-meaning",
+          label: "No clear reason to care",
           explanation:
-            "Without consequence or meaning, your brain seeks stronger stimulation elsewhere.",
+            "If the task feels useless, your brain looks for fun instead.",
           solution:
-            "Add a stake: deadline, public commitment, or measurable target. Tie the task to one personal outcome you actually care about.",
+            "Link the task to one real goal you care about.",
         },
         {
-          id: "monotony",
-          label: "The format is monotonous",
+          id: "too-repetitive",
+          label: "Too repetitive",
           explanation:
-            "Repetition without variation drains attention quickly, even when the task matters.",
+            "Doing the same thing over and over can drain attention.",
           solution:
-            "Change the format: timebox a sprint, add music, switch location, or gamify with a points target. Keep the work the same, change the delivery.",
+            "Change the format: timer sprint, new place, or music.",
+        },
+        {
+          id: "too-easy",
+          label: "Not challenging enough",
+          explanation:
+            "If it is too easy, your brain may not stay engaged.",
+          solution:
+            "Turn it into a game. Set a score or time goal.",
         },
       ],
     },
     {
-      id: "happy",
-      label: "Happy",
+      id: "frustrated",
+      label: "Frustrated",
       reasons: [
         {
-          id: "distraction-by-reward",
-          label: "Pulled toward easier rewards",
+          id: "stuck-problem",
+          label: "Stuck on one problem",
           explanation:
-            "A good mood can lead to choosing instant fun over meaningful effort, especially when the task has friction.",
+            "Getting stuck can make you want to quit the whole task.",
           solution:
-            "Stack rewards after progress. Complete one focused work block first, then use leisure as a deliberate reward.",
+            "Skip that part for now. Do the next part you can do.",
         },
         {
-          id: "underestimating-effort",
-          label: "Underestimating the effort needed",
+          id: "too-many-errors",
+          label: "Too many mistakes",
           explanation:
-            "Optimism can hide the true size of the task. You assume you'll do it later 'easily,' so you delay starting.",
+            "Many mistakes in a row can make effort feel useless.",
           solution:
-            "Do a quick reality check: list steps and estimate time honestly. Start immediately on step one before the plan stays theoretical.",
+            "Slow down. Fix one mistake at a time with a short checklist.",
+        },
+        {
+          id: "blocked-tools",
+          label: "Tools or systems are hard",
+          explanation:
+            "When your tools fight you, starting feels painful.",
+          solution:
+            "Set up your tools first. Make a 'ready to work' setup routine.",
+        },
+      ],
+    },
+    {
+      id: "confused",
+      label: "Confused",
+      reasons: [
+        {
+          id: "dont-know-how",
+          label: "I do not know how",
+          explanation:
+            "A missing skill can feel like a wall.",
+          solution:
+            "Learn just one small part. Then use it right away.",
+        },
+        {
+          id: "too-much-info",
+          label: "Too much information",
+          explanation:
+            "Too many inputs can freeze decision-making.",
+          solution:
+            "Pick one trusted source and ignore the rest for now.",
+        },
+        {
+          id: "unclear-goal",
+          label: "Goal is unclear",
+          explanation:
+            "If success is blurry, action is hard.",
+          solution:
+            "Write what 'done' looks like in one simple sentence.",
+        },
+      ],
+    },
+    {
+      id: "guilty",
+      label: "Guilty",
+      reasons: [
+        {
+          id: "already-late",
+          label: "I already delayed too long",
+          explanation:
+            "Shame can make you avoid the task even more.",
+          solution:
+            "Drop blame. Start with one repair action right now.",
+        },
+        {
+          id: "let-someone-down",
+          label: "I let someone down",
+          explanation:
+            "Fear of facing people can block action.",
+          solution:
+            "Send a short honest update. Then do the next small step.",
+        },
+        {
+          id: "all-or-nothing",
+          label: "I think it must be perfect",
+          explanation:
+            "All-or-nothing thinking turns small progress into 'not enough.'",
+          solution:
+            "Use the rule: any progress counts today.",
+        },
+      ],
+    },
+    {
+      id: "angry",
+      label: "Angry",
+      reasons: [
+        {
+          id: "resent-task",
+          label: "I do not want to do this",
+          explanation:
+            "If a task feels forced, your brain pushes back.",
+          solution:
+            "Give yourself a choice: do it now fast, or schedule it at a fixed time.",
+        },
+        {
+          id: "angry-person",
+          label: "Conflict with someone",
+          explanation:
+            "Conflict can take over your thoughts and focus.",
+          solution:
+            "Write down the issue. Park it. Do a short work sprint first.",
+        },
+        {
+          id: "unfair",
+          label: "This feels unfair",
+          explanation:
+            "Unfair tasks can lower motivation.",
+          solution:
+            "Find one part you can control and act on that part.",
+        },
+      ],
+    },
+    {
+      id: "restless",
+      label: "Restless",
+      reasons: [
+        {
+          id: "cant-sit",
+          label: "I cannot sit still",
+          explanation:
+            "Body tension makes long focus hard.",
+          solution:
+            "Use 10-minute work sprints with 2-minute movement breaks.",
+        },
+        {
+          id: "phone-pull",
+          label: "Phone and apps keep pulling me",
+          explanation:
+            "Fast rewards from screens can beat slow task rewards.",
+          solution:
+            "Put phone in another room during one work block.",
+        },
+        {
+          id: "novelty-seeking",
+          label: "I keep jumping to new ideas",
+          explanation:
+            "New ideas feel exciting, so old tasks get dropped.",
+          solution:
+            "Keep an idea parking list. Return to your current task.",
+        },
+      ],
+    },
+    {
+      id: "scared",
+      label: "Scared",
+      reasons: [
+        {
+          id: "big-consequence",
+          label: "Big consequences",
+          explanation:
+            "When stakes feel huge, your brain may freeze.",
+          solution:
+            "Break the task into safe mini-steps. Do step one only.",
+        },
+        {
+          id: "new-unknown",
+          label: "This is new to me",
+          explanation:
+            "New things feel risky because you cannot predict them yet.",
+          solution:
+            "Do a short test run. Treat it like practice, not final.",
+        },
+        {
+          id: "past-bad",
+          label: "Bad past experience",
+          explanation:
+            "A past failure can make your brain expect pain again.",
+          solution:
+            "Use a different plan this time. Ask for support early.",
+        },
+      ],
+    },
+    {
+      id: "good-mood",
+      label: "Too Comfortable",
+      reasons: [
+        {
+          id: "easy-fun-now",
+          label: "Easy fun is close",
+          explanation:
+            "When you feel good, fun now can beat work later.",
+          solution:
+            "Do one focus block first. Then enjoy your reward.",
+        },
+        {
+          id: "time-illusion",
+          label: "I think I have plenty of time",
+          explanation:
+            "You may delay because the deadline feels far away.",
+          solution:
+            "Set a mini-deadline for today and start now.",
+        },
+        {
+          id: "over-confident",
+          label: "I think it will be easy later",
+          explanation:
+            "Overconfidence can hide real effort.",
+          solution:
+            "List real steps and time. Start step one right away.",
         },
       ],
     },
@@ -122,25 +371,28 @@ const DEFAULT_FEELING_DATA = {
 
 const FEELING_DATA = window.__FEELING_DATA__ || DEFAULT_FEELING_DATA;
 
-// Suggested chips for the scale page. Users can click to drop them on either side.
 const SUGGESTED_FOR = [
-  { text: "I'll feel proud", weight: 3 },
-  { text: "It's healthy", weight: 3 },
-  { text: "Money", weight: 5 },
-  { text: "Praise from others", weight: 3 },
-  { text: "Fear of regret", weight: 4 },
+  { text: "I will feel proud", weight: 3 },
+  { text: "This helps my health", weight: 3 },
+  { text: "This helps my future", weight: 4 },
   { text: "I promised someone", weight: 4 },
-  { text: "It's fun", weight: 3 },
-  { text: "Long-term dream", weight: 5 },
+  { text: "I can earn money", weight: 5 },
+  { text: "I will feel less stress", weight: 4 },
+  { text: "I will learn a skill", weight: 4 },
+  { text: "I can help my family", weight: 5 },
+  { text: "I will sleep better", weight: 3 },
+  { text: "I want self-respect", weight: 4 },
 ];
 
 const SUGGESTED_AGAINST = [
-  { text: "It's uncomfortable", weight: 3 },
-  { text: "I'm tired", weight: 3 },
-  { text: "Boredom", weight: 2 },
-  { text: "Risk of failure", weight: 4 },
-  { text: "Fear of judgement", weight: 4 },
-  { text: "It takes too long", weight: 3 },
-  { text: "I don't know how", weight: 4 },
-  { text: "I'd rather scroll", weight: 3 },
+  { text: "I feel tired", weight: 3 },
+  { text: "It feels hard", weight: 3 },
+  { text: "I might fail", weight: 4 },
+  { text: "People may judge me", weight: 4 },
+  { text: "I do not know how", weight: 4 },
+  { text: "It may take too long", weight: 3 },
+  { text: "I can do it later", weight: 3 },
+  { text: "My phone pulls me", weight: 3 },
+  { text: "I feel stressed", weight: 4 },
+  { text: "I need it perfect", weight: 4 },
 ];
