@@ -2,7 +2,7 @@
 // To override from a backend, set `window.__FEELING_DATA__` before emotions.js loads.
 
 const DEFAULT_FEELING_DATA = {
-  prompt: "How do you feel right now?",
+  prompt: "Why Am I Not Taking Action?",
   helperText:
     "Pick one feeling. Then pick the reason that fits best. You will get a simple why + next step.",
   feelings: [
@@ -303,6 +303,36 @@ const DEFAULT_FEELING_DATA = {
             "New ideas feel exciting, so old tasks get dropped.",
           solution:
             "Keep an idea parking list. Return to your current task.",
+        },
+      ],
+    },
+    {
+      id: "distracted",
+      label: "Distracted",
+      reasons: [
+        {
+          id: "notification-loop",
+          label: "Notifications keep interrupting me",
+          explanation:
+            "Each interruption resets your attention, so it feels hard to get momentum.",
+          solution:
+            "Silence alerts for one focus block and keep only one tab or app open.",
+        },
+        {
+          id: "open-loops",
+          label: "Too many unfinished tasks in my head",
+          explanation:
+            "Open mental loops create background noise and make your current task feel harder.",
+          solution:
+            "Do a quick brain dump, then choose one task and one next action.",
+        },
+        {
+          id: "unclear-priority",
+          label: "I keep switching because priorities are unclear",
+          explanation:
+            "When everything feels equally important, your brain keeps scanning instead of committing.",
+          solution:
+            "Pick today's top priority and work on it for 15 minutes before switching.",
         },
       ],
     },

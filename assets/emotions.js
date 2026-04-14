@@ -15,12 +15,8 @@
   );
 
   root.innerHTML = `
-    <section class="db-summary" aria-label="Database summary">
-      <strong>Inaction database:</strong> ${totalFeelings} feelings and ${totalReasons} common blockers.
-    </section>
-
-    <section>
-      <h2 class="flow-title">Step 1: Pick your feeling</h2>
+    <section class="flow-section">
+      <h2 class="flow-title">Step 1: What are you feeling in this moment?</h2>
       <div class="pill-grid" id="feeling-options" role="radiogroup" aria-label="Feelings"></div>
     </section>
 
@@ -48,6 +44,11 @@
   const reportSection = root.querySelector("#report-section");
   const reportExplanation = root.querySelector("#report-explanation");
   const reportSolution = root.querySelector("#report-solution");
+  const footerSummary = document.getElementById("db-summary-footer");
+
+  if (footerSummary) {
+    footerSummary.innerHTML = `<strong>Inaction Database:</strong> ${totalFeelings} feelings and ${totalReasons} common blockers.`;
+  }
 
   let selectedFeelingId = null;
   let selectedReasonId = null;

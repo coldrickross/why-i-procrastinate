@@ -137,6 +137,12 @@ footer.page-foot a { color: var(--ink); }
   color: var(--ink);
 }
 
+.db-summary--footer {
+  display: inline-block;
+  margin: 0 0 14px;
+  text-align: left;
+}
+
 .flow-section + .flow-section {
   margin-top: 24px;
 }
