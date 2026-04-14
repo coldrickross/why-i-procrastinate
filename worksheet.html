@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reset Worksheet — Why I Procrastinate</title>
+<meta name="description" content="A gentle, simple worksheet to reset your identity and action plan." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
+    <div class="links">
+      <a href="index.html">Feelings</a>
+      <a href="scale.html">The Scale</a>
+      <a href="worksheet.html" class="active">Worksheet</a>
+    </div>
+  </nav>
+
+  <header class="hero worksheet-hero">
+    <h1>Simple Reset Worksheet</h1>
+    <p class="sub">This is meant to be easy to use. You do not need to be perfect. Just fill one step at a time.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="worksheet-intro" aria-label="Worksheet intro">
+      <h2>Your only job</h2>
+      <p>Be honest. Be kind to yourself. Keep going.</p>
+    </section>
+
+    <section id="worksheetSteps" class="worksheet-steps" aria-label="Worksheet steps"></section>
+
+    <section class="worksheet-report-card" aria-label="Generate report">
+      <h2>Create your custom report</h2>
+      <p>When you click this, we'll build a report from your answers and include a 4-week daily tracker grid starting today.</p>
+      <button id="buildReportBtn" class="btn-primary" type="button">Generate my report</button>
+      <div id="reportOutput" class="report-output" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="page-foot">
+    <p>Small steps count. <a href="scale.html">Use the action scale</a> too.</p>
+  </footer>
+
+  <script src="assets/worksheet.js"></script>
+</body>
+</html>

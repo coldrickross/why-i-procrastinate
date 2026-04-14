@@ -506,3 +506,168 @@ footer.page-foot a { color: var(--ink); }
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   Page: Worksheet (worksheet.html)
+   ========================================================================== */
+
+.worksheet-hero {
+  padding-bottom: 30px;
+}
+
+.worksheet-intro,
+.step-card,
+.worksheet-report-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.worksheet-intro {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.worksheet-intro h2 {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.worksheet-intro p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.worksheet-steps {
+  display: grid;
+  gap: 12px;
+}
+
+.step-card {
+  padding: 16px;
+}
+
+.step-title {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.step-hint {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.step-input {
+  width: 100%;
+  min-height: 104px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  padding: 12px;
+  resize: vertical;
+}
+
+.step-input:focus {
+  outline: 2px solid rgba(91, 138, 138, 0.3);
+  border-color: var(--teal);
+}
+
+.timer {
+  margin: 0 0 10px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.worksheet-report-card {
+  margin-top: 20px;
+  padding: 20px;
+}
+
+.worksheet-report-card h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.worksheet-report-card p {
+  color: var(--muted);
+  margin: 6px 0 12px;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--cream);
+}
+
+.btn-primary:hover {
+  background: var(--ink-soft);
+}
+
+.btn-secondary {
+  margin-top: 12px;
+  background: var(--gold);
+  color: var(--ink);
+}
+
+.report-output {
+  margin-top: 16px;
+}
+
+.preview-head h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.preview-head p {
+  margin: 4px 0 10px;
+  color: var(--muted);
+}
+
+.preview-block {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.preview-block h4 {
+  margin: 0 0 6px;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.preview-block p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--ink-soft);
+}
+
+.preview-block table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+
+.preview-block th,
+.preview-block td {
+  border: 1px solid var(--line);
+  padding: 6px;
+  font-size: 0.9rem;
+}
