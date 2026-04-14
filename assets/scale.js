@@ -3,6 +3,7 @@
 (function () {
   const MAX_TILT = 22; // degrees
   const TILT_K = 2.2;  // degrees per weight-unit of difference
+  const STORAGE_KEY = "why-i-procrastinate-scale-v1";
 
   const state = {
     for: [],     // { id, text, weight }
@@ -25,10 +26,9 @@
   const verdict = document.getElementById("verdict");
   const chipsForEl = document.getElementById("chipsFor");
   const chipsAgainstEl = document.getElementById("chipsAgainst");
+  const resetBtn = document.getElementById("resetScale");
 
-  // --- seed a couple of placeholder items so the UI isn't empty
-  state.for.push({ id: newId(), text: "", weight: 3 });
-  state.against.push({ id: newId(), text: "", weight: 3 });
+  loadState();
 
   // --- build suggestion chips
   if (typeof SUGGESTED_FOR !== "undefined") {
@@ -58,6 +58,12 @@
     state.against.push({ id: newId(), text: "", weight: 3 });
     render({ focusLast: "against" });
   });
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      resetState();
+      render();
+    });
+  }
 
   function render(opts = {}) {
     renderColumn(itemsForEl, state.for, "for");
@@ -77,6 +83,7 @@
     beam.style.transform = `rotate(${tilt}deg)`;
 
     updateVerdict(forTotal, againstTotal);
+    saveState();
 
     if (opts.focusLast) {
       const col = opts.focusLast === "for" ? itemsForEl : itemsAgainstEl;
@@ -164,6 +171,7 @@
     const tilt = clamp(diff * TILT_K, -MAX_TILT, MAX_TILT);
     beam.style.transform = `rotate(${tilt}deg)`;
     updateVerdict(forTotal, againstTotal);
+    saveState();
   }
 
   function updateVerdict(f, a) {
@@ -205,6 +213,50 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        resetState();
+        return;
+      }
+      const parsed = JSON.parse(saved);
+      const forList = sanitizeItems(parsed.for);
+      const againstList = sanitizeItems(parsed.against);
+      if (!forList.length && !againstList.length) {
+        resetState();
+      } else {
+        state.for = forList;
+        state.against = againstList;
+        const ids = [...forList, ...againstList].map((x) => x.id);
+        nextId = ids.length ? Math.max(...ids) + 1 : 1;
+      }
+    } catch (_err) {
+      resetState();
+    }
+  }
+
+  function saveState() {
+    const payload = JSON.stringify({ for: state.for, against: state.against });
+    localStorage.setItem(STORAGE_KEY, payload);
+  }
+
+  function resetState() {
+    state.for = [{ id: newId(), text: "", weight: 3 }];
+    state.against = [{ id: newId(), text: "", weight: 3 }];
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  function sanitizeItems(arr) {
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .map((item) => ({
+        id: Number(item.id) || newId(),
+        text: typeof item.text === "string" ? item.text.slice(0, 240) : "",
+        weight: clamp(Number(item.weight) || 1, 1, 10),
+      }));
   }
 
   render();
