@@ -23,7 +23,7 @@
 
   <header class="hero">
     <h1>The <em>Scale</em> — V2</h1>
-    <p class="sub">Name an action. Drop reasons on either side. Click to add weight, right-click to take some off.</p>
+    <p class="sub">Name an action. Drop reasons on either side. Click to add weight, right-click to take some off. The beam really holds them.</p>
   </header>
 
   <main class="wrap v2-wrap">
@@ -39,56 +39,60 @@
     </section>
 
     <section class="v2-legend" aria-label="How it works">
-      <span><b>Left click</b> a reason to make it heavier (bigger).</span>
+      <span><b>Left click</b> a reason to make it heavier.</span>
       <span><b>Right click</b> to make it lighter. At 0 it disappears.</span>
+      <span>Use the <b>✎</b> button to rename.</span>
     </section>
 
     <section class="v2-stage" aria-label="Interactive scale">
-      <div class="v2-pan-area v2-pan-for" aria-label="Reasons for action">
-        <div class="v2-pan-heading">
-          <span class="v2-pan-title">For action</span>
-          <span class="v2-pan-total" id="v2ForTotal">0</span>
-        </div>
-        <div class="v2-items" id="v2ItemsFor"></div>
-        <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Insert Action For</button>
-      </div>
+      <div class="v2-scale-holder">
+        <svg class="v2-scale-big" viewBox="0 0 1000 780" role="img" aria-label="A balance scale that literally holds your reasons. Each pan tilts with the weight on it.">
+          <!-- Static stand -->
+          <path class="base" d="M370 756 L630 756 L608 724 L392 724 Z" />
+          <rect class="pillar" x="492" y="60" width="16" height="664" rx="4" />
+          <circle class="rivet" cx="500" cy="60" r="8" />
 
-      <div class="v2-beam-wrap" aria-hidden="true">
-        <svg class="v2-scale-svg" viewBox="0 0 720 360" role="img" aria-label="A balance scale that tilts based on the weights on each side.">
-          <path class="base" d="M260 340 L460 340 L440 320 L280 320 Z" />
-          <rect class="pillar" x="352" y="60" width="16" height="260" rx="3" />
-          <circle class="rivet" cx="360" cy="60" r="7" />
-
+          <!-- Tilting beam + pans -->
           <g class="beam" id="v2Beam">
-            <rect class="beam-shape" x="120" y="53" width="480" height="14" rx="7" />
-            <circle class="rivet" cx="360" cy="60" r="5" />
+            <rect class="beam-shape" x="100" y="53" width="800" height="14" rx="7" />
+            <circle class="rivet" cx="500" cy="60" r="5" />
 
+            <!-- For side (left) -->
             <g class="pan-group">
-              <line class="rope" x1="120" y1="60" x2="80" y2="140" />
-              <line class="rope" x1="120" y1="60" x2="160" y2="140" />
-              <ellipse class="pan-shadow" cx="120" cy="172" rx="70" ry="6" />
-              <path class="pan for" d="M50 140 Q120 190 190 140 Q180 168 120 176 Q60 168 50 140 Z" />
+              <line class="rope" x1="200" y1="66" x2="80" y2="168" />
+              <line class="rope" x1="200" y1="66" x2="320" y2="168" />
+              <foreignObject x="40" y="160" width="320" height="560">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-for">
+                  <div class="v2-pan-heading">
+                    <span class="v2-pan-title">For</span>
+                    <span class="v2-pan-total" id="v2ForTotal">0</span>
+                  </div>
+                  <div class="v2-items" id="v2ItemsFor"></div>
+                  <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Add reason</button>
+                </div>
+              </foreignObject>
             </g>
 
+            <!-- Against side (right) -->
             <g class="pan-group">
-              <line class="rope" x1="600" y1="60" x2="560" y2="140" />
-              <line class="rope" x1="600" y1="60" x2="640" y2="140" />
-              <ellipse class="pan-shadow" cx="600" cy="172" rx="70" ry="6" />
-              <path class="pan against" d="M530 140 Q600 190 670 140 Q660 168 600 176 Q540 168 530 140 Z" />
+              <line class="rope" x1="800" y1="66" x2="680" y2="168" />
+              <line class="rope" x1="800" y1="66" x2="920" y2="168" />
+              <foreignObject x="640" y="160" width="320" height="560">
+                <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-against">
+                  <div class="v2-pan-heading">
+                    <span class="v2-pan-title">Against</span>
+                    <span class="v2-pan-total" id="v2AgainstTotal">0</span>
+                  </div>
+                  <div class="v2-items" id="v2ItemsAgainst"></div>
+                  <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Add reason</button>
+                </div>
+              </foreignObject>
             </g>
           </g>
         </svg>
-        <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
       </div>
 
-      <div class="v2-pan-area v2-pan-against" aria-label="Reasons against action">
-        <div class="v2-pan-heading">
-          <span class="v2-pan-title">Against action</span>
-          <span class="v2-pan-total" id="v2AgainstTotal">0</span>
-        </div>
-        <div class="v2-items" id="v2ItemsAgainst"></div>
-        <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Insert new Against Action</button>
-      </div>
+      <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
     </section>
 
     <section class="explain">

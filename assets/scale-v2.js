@@ -2,8 +2,8 @@
 // The beam tilts based on the difference between totals.
 
 (function () {
-  const MAX_TILT = 22;   // degrees
-  const TILT_K = 2.2;    // degrees per unit of weight difference
+  const MAX_TILT = 14;   // degrees — kept gentle so the boxes stay readable when tilted
+  const TILT_K = 1.6;    // degrees per unit of weight difference
   const MAX_WEIGHT = 10; // cap so the UI doesn't explode
 
   const state = {
@@ -81,7 +81,7 @@
     row.style.fontSize = fontSizeFor(item.weight);
 
     // If the item has never been named, show an inline input. Otherwise show
-    // the text (still editable via double-click) and the weight badge.
+    // the text plus a pencil button that flips it back into edit mode.
     if (item.isNew || !item.text) {
       const input = document.createElement("input");
       input.type = "text";
@@ -118,20 +118,28 @@
     badge.className = "v2-item-weight";
     badge.textContent = item.weight;
 
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "v2-item-edit-btn";
+    editBtn.setAttribute("aria-label", `Edit "${item.text}"`);
+    editBtn.textContent = "✎";
+
     row.appendChild(label);
     row.appendChild(badge);
+    row.appendChild(editBtn);
 
-    row.title = "Left-click: heavier   ·   Right-click: lighter   ·   Double-click: edit";
+    row.title = "Click: heavier  ·  Right-click: lighter  ·  ✎ to rename";
 
-    // Left click: heavier
+    // Left click anywhere on the row (except the edit button): heavier.
     row.addEventListener("click", (e) => {
-      // Ignore clicks that bubble up from the edit input (shouldn't happen in this branch, but safe).
+      // Don't count a click that was meant for a button inside the row.
+      if (e.target.closest("button")) return;
       if (e.target.tagName === "INPUT") return;
       item.weight = Math.min(MAX_WEIGHT, item.weight + 1);
       render();
     });
 
-    // Right click: lighter; remove at 0
+    // Right click: lighter; remove at 0.
     row.addEventListener("contextmenu", (e) => {
       e.preventDefault();
       item.weight -= 1;
@@ -142,8 +150,9 @@
       }
     });
 
-    // Double click: edit text
-    row.addEventListener("dblclick", (e) => {
+    // Dedicated edit button — replaces the old double-click affordance, which
+    // conflicted with fast repeated left-clicks.
+    editBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       item.isNew = true;
       render();
