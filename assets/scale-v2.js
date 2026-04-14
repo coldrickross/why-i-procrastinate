@@ -1,6 +1,6 @@
-// Scale V2 — click to grow a weight, right-click to shrink it.
-// The beam tilts based on the difference between totals. The pans translate
-// up and down with the beam ends but stay perpendicular to the floor.
+// Scale V2 — click a reason to grow it, use the buttons to shrink, rename or
+// remove. The beam tilts based on the difference between totals. The pans
+// translate up and down with the beam ends but stay perpendicular to the floor.
 
 (function () {
   const MAX_TILT = 14;   // degrees — kept gentle so the boxes stay readable when tilted
@@ -9,13 +9,43 @@
 
   // Geometry constants matching the SVG. Pivot is at (500, 60). Each rope is
   // anchored at the bottom of the beam (y=66), 300 user-units from the pivot.
-  const PIVOT_X = 500;
-  const PIVOT_Y = 60;
-  const ARM_X = 300;       // horizontal distance from pivot to rope anchor
-  const ANCHOR_OFFSET_Y = 6; // anchor is on the bottom edge of the beam
+  const ARM_X = 300;          // horizontal distance from pivot to rope anchor
+  const ANCHOR_OFFSET_Y = 6;  // anchor is on the bottom edge of the beam
+
+  // Preset example scenario on first load: deciding whether to apply for jobs.
+  // Balanced weights so the scale starts near-level, inviting exploration.
+  const DEFAULT_ACTION = "Apply for jobs";
+  const SEED_FOR = [
+    { text: "Want a better role", weight: 3 },
+    { text: "Need more income", weight: 3 },
+    { text: "Learn new skills", weight: 2 },
+  ];
+  const SEED_AGAINST = [
+    { text: "Fear of rejection", weight: 3 },
+    { text: "Writing applications is tedious", weight: 3 },
+    { text: "Impostor syndrome", weight: 2 },
+  ];
+
+  // Suggested chips — general enough to work with most actions.
+  const SUGGESTIONS_FOR = [
+    { text: "I'll feel proud", weight: 3 },
+    { text: "It helps my future", weight: 4 },
+    { text: "I'll earn money", weight: 4 },
+    { text: "I'll learn a skill", weight: 3 },
+    { text: "I want self-respect", weight: 3 },
+    { text: "I promised someone", weight: 4 },
+  ];
+  const SUGGESTIONS_AGAINST = [
+    { text: "I feel tired", weight: 3 },
+    { text: "It feels hard", weight: 3 },
+    { text: "I might fail", weight: 4 },
+    { text: "People may judge me", weight: 3 },
+    { text: "I don't know how", weight: 3 },
+    { text: "It takes too long", weight: 3 },
+  ];
 
   const state = {
-    action: "",
+    action: DEFAULT_ACTION,
     for: [],     // { id, text, weight }
     against: [],
   };
@@ -29,19 +59,36 @@
   const itemsAgainstEl = document.getElementById("v2ItemsAgainst");
   const addForBtn = document.getElementById("v2AddFor");
   const addAgainstBtn = document.getElementById("v2AddAgainst");
+  const resetBtn = document.getElementById("v2Reset");
   const forTotalEl = document.getElementById("v2ForTotal");
   const againstTotalEl = document.getElementById("v2AgainstTotal");
   const beamEl = document.getElementById("v2Beam");
   const panLeftEl = document.getElementById("v2PanLeft");
   const panRightEl = document.getElementById("v2PanRight");
   const verdictEl = document.getElementById("v2Verdict");
+  const chipsForEl = document.getElementById("v2ChipsFor");
+  const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
 
   // Seed example items so the page isn't empty on first load.
-  // These mirror the sketch.
-  state.for.push({ id: newId(), text: "Love for GF", weight: 2 });
-  state.against.push({ id: newId(), text: "Fear failure", weight: 2 });
-  state.against.push({ id: newId(), text: "Less money", weight: 3 });
-  state.against.push({ id: newId(), text: "Emotional pain", weight: 1 });
+  actionInput.value = DEFAULT_ACTION;
+  SEED_FOR.forEach((s) => state.for.push({ id: newId(), text: s.text, weight: s.weight }));
+  SEED_AGAINST.forEach((s) => state.against.push({ id: newId(), text: s.text, weight: s.weight }));
+
+  // Build suggestion chips.
+  SUGGESTIONS_FOR.forEach((s) => chipsForEl.appendChild(makeChip(s, "for")));
+  SUGGESTIONS_AGAINST.forEach((s) => chipsAgainstEl.appendChild(makeChip(s, "against")));
+
+  function makeChip(s, side) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = `chip ${side}`;
+    b.textContent = s.text;
+    b.addEventListener("click", () => {
+      state[side].push({ id: newId(), text: s.text, weight: s.weight });
+      render();
+    });
+    return b;
+  }
 
   actionInput.addEventListener("input", (e) => {
     state.action = e.target.value;
@@ -49,6 +96,12 @@
 
   addForBtn.addEventListener("click", () => addItem("for"));
   addAgainstBtn.addEventListener("click", () => addItem("against"));
+
+  resetBtn.addEventListener("click", () => {
+    state.for = [];
+    state.against = [];
+    render();
+  });
 
   function addItem(side) {
     const item = { id: newId(), text: "", weight: 1, isNew: true };
@@ -89,10 +142,9 @@
     row.className = `v2-item v2-item-${side}`;
     row.dataset.id = item.id;
     row.dataset.weight = item.weight;
-    // Font size comes from the weight directly. Heavier = bigger. No more
-    // "fit to container" shrinking — the column scrolls instead so text
-    // stays legible.
-    row.style.fontSize = `${fontRemForWeight(item.weight).toFixed(3)}rem`;
+    // Every item renders at the same font size now — the weight badge already
+    // communicates how heavy each reason is, and a fixed size keeps the edit
+    // buttons reachable no matter how long the label is.
 
     // If the item has never been named, show an inline input. Otherwise show
     // the text plus a pencil button that flips it back into edit mode.
@@ -199,15 +251,6 @@
   function removeItem(id, side) {
     state[side] = state[side].filter((x) => x.id !== id);
     render();
-  }
-
-  // Font size in rem from a weight value. Heavier reasons render bigger so
-  // their visual prominence matches how much they actually matter.
-  function fontRemForWeight(weight) {
-    const w = Math.max(1, Math.min(MAX_WEIGHT, weight));
-    const min = 0.9, max = 1.7;
-    const t = (w - 1) / (MAX_WEIGHT - 1);
-    return min + (max - min) * t;
   }
 
   function recomputeTotalsAndTilt() {
