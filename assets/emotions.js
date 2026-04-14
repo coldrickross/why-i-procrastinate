@@ -2,12 +2,9 @@
 
 (function () {
   const grid = document.getElementById("emotions");
-  const filterInput = document.getElementById("emotionFilter");
-  const countEl = document.getElementById("emotionCount");
   if (!grid || typeof EMOTIONS === "undefined") return;
 
   const frag = document.createDocumentFragment();
-  const cards = [];
 
   EMOTIONS.forEach((e, i) => {
     const card = document.createElement("button");
@@ -36,31 +33,10 @@
       card.setAttribute("aria-expanded", open ? "true" : "false");
     });
 
-    cards.push({ data: e, node: card });
     frag.appendChild(card);
   });
 
   grid.appendChild(frag);
-  updateCount(cards.length, cards.length);
-
-  if (filterInput) {
-    filterInput.addEventListener("input", () => {
-      const q = filterInput.value.trim().toLowerCase();
-      let visible = 0;
-      cards.forEach((c) => {
-        const haystack = `${c.data.thought} ${c.data.meaning} ${c.data.strategy}`.toLowerCase();
-        const show = !q || haystack.includes(q);
-        c.node.hidden = !show;
-        if (show) visible += 1;
-      });
-      updateCount(visible, cards.length);
-    });
-  }
-
-  function updateCount(visible, total) {
-    if (!countEl) return;
-    countEl.textContent = visible === total ? `Showing all ${total} feelings.` : `Showing ${visible} of ${total} feelings.`;
-  }
 
   function escapeHtml(str) {
     return String(str)
