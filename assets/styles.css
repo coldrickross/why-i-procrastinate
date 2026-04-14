@@ -125,6 +125,28 @@ footer.page-foot a { color: var(--ink); }
   margin: 32px 0 48px;
 }
 
+.emotion-tools {
+  margin-top: 12px;
+}
+.emotion-tools label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+}
+.emotion-tools input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fffdf8;
+}
+.emotion-tools p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .emotion {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -290,6 +312,20 @@ footer.page-foot a { color: var(--ink); }
   color: var(--muted);
   margin-top: 4px;
 }
+
+.scale-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+}
+.btn-secondary {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-weight: 600;
+}
+.btn-secondary:hover { border-color: var(--gold); }
 
 .scale-columns {
   display: grid;
