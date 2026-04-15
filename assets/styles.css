@@ -875,6 +875,12 @@ footer.page-foot a { color: var(--ink); }
   font-weight: 500;
   color: var(--ink);
   overflow-wrap: anywhere;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
   align-self: center;
 }
 
