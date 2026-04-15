@@ -677,7 +677,7 @@ footer.page-foot a { color: var(--ink); }
    ========================================================================== */
 
 .v2-wrap {
-  max-width: 1080px;
+  max-width: 1360px;
 }
 
 .hero.v2-hero {
@@ -690,7 +690,7 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-sm);
-  padding: 14px 18px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -715,7 +715,7 @@ footer.page-foot a { color: var(--ink); }
   border: 0;
   outline: 0;
   font-family: var(--serif);
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   font-weight: 500;
   color: var(--ink);
   padding: 4px 0;
@@ -737,13 +737,13 @@ footer.page-foot a { color: var(--ink); }
 .v2-legend b { color: var(--ink); font-weight: 600; }
 
 .v2-stage {
-  margin: 0 0 32px;
+  margin: 12px 0 32px;
 }
 
 .v2-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 2.35fr) minmax(220px, 0.85fr);
+  gap: 18px;
   align-items: start;
 }
 
@@ -757,12 +757,28 @@ footer.page-foot a { color: var(--ink); }
   top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-md);
-  padding: 18px 16px;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+  padding: 14px;
+}
+
+.v2-side-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.v2-side-title em {
+  font-style: italic;
+  color: var(--gold-deep);
+  font-weight: 400;
 }
 
 /* The whole scale — beam, pillar, base, AND the pans — live inside one SVG
@@ -988,7 +1004,7 @@ footer.page-foot a { color: var(--ink); }
   max-width: none;
   text-align: left;
   font-family: var(--serif);
-  font-size: 1.1rem;
+  font-size: 0.98rem;
   color: var(--ink);
   min-height: 1.4em;
 }
@@ -999,12 +1015,12 @@ footer.page-foot a { color: var(--ink); }
   margin-top: 2px;
 }
 .v2-reset {
-  padding: 8px 18px;
+  padding: 7px 14px;
   border-radius: 999px;
   background: transparent;
   color: var(--muted);
   border: 1px solid var(--line);
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   font-weight: 500;
   transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
 }
@@ -1023,6 +1039,10 @@ footer.page-foot a { color: var(--ink); }
 
   .v2-side-panel {
     position: static;
+  }
+
+  .v2-side-title {
+    text-align: center;
   }
 
   .v2-pan { font-size: 22px; padding: 12px; }
