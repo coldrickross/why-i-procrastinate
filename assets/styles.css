@@ -929,19 +929,11 @@ footer.page-foot a { color: var(--ink); }
 .iaw-problem-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 .iaw-problem-field {
   display: grid;
   gap: 6px;
-}
-.iaw-problem-field:nth-child(1),
-.iaw-problem-field:nth-child(4) {
-  grid-column: 1 / -1;
-}
-@media (max-width: 640px) {
-  .iaw-problem-grid { grid-template-columns: 1fr; }
-  .iaw-problem-field:nth-child(n) { grid-column: auto; }
 }
 .iaw-problem-field-label {
   font-family: var(--sans);

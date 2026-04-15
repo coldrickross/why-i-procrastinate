@@ -26,15 +26,34 @@
     { id: "current-problems",  phase: "feel",      title: "Problems caused by your current actions",
       prompt: "List any problems your current actions are causing. Add as many as feel true — or skip this step entirely. Each problem has four small prompts to help you think it through.",
       example: "Take your time — five minutes of honesty here is worth an hour of planning later.",
-      type: "problem-list", timerSeconds: 300 },
+      type: "problem-list", timerSeconds: 300,
+      entryLabel: "Problem",
+      fields: [
+        { key: "problem",  label: "Problem",                      placeholder: "What is the problem?",        rows: 2 },
+        { key: "stops",    label: "What it stops you from doing", placeholder: "What does it keep you from?", rows: 2 },
+        { key: "duration", label: "How long it's been a problem", placeholder: "Weeks, months, years…",        rows: 1 },
+        { key: "feeling",  label: "How it makes you feel",        placeholder: "Name the feelings honestly.",  rows: 2 },
+      ] },
     { id: "positive-outcomes", phase: "feel",      title: "Positive outcomes if you fix this behaviour",
-      prompt: "Include immediate + long-term outcomes and how each one feels.",
+      prompt: "List the good things you'd gain. Add as many as feel true — or skip this step entirely.",
       example: "Imagine the first week, the first month, the first year. Let yourself want it.",
-      type: "textarea", timerSeconds: 300 },
+      type: "problem-list", timerSeconds: 300,
+      entryLabel: "Outcome",
+      fields: [
+        { key: "outcome", label: "Positive outcome",             placeholder: "What good thing would happen?", rows: 2 },
+        { key: "allows",  label: "What it would allow you to do", placeholder: "What doors does it open?",      rows: 2 },
+        { key: "feeling", label: "How you'd feel about it",       placeholder: "Name the feelings honestly.",   rows: 2 },
+      ] },
     { id: "future-problems",   phase: "feel",      title: "If nothing changes — 6 months, 1 year, 2 years",
-      prompt: "Write it all down. Turn this into a mood board somewhere visible.",
+      prompt: "Write down the consequences if nothing changes. Add as many as feel true — or skip this step entirely.",
       example: "Don't soften it. Future-you deserves an honest warning.",
-      type: "textarea", timerSeconds: 120 },
+      type: "problem-list", timerSeconds: 120,
+      entryLabel: "Problem",
+      fields: [
+        { key: "problem", label: "Problem",                                 placeholder: "What's the consequence?",  rows: 2 },
+        { key: "impact",  label: "Impact / what it stops you from doing",   placeholder: "What does it cost you?",   rows: 2 },
+        { key: "feeling", label: "How you'll feel",                         placeholder: "Name the feelings honestly.", rows: 2 },
+      ] },
     { id: "ssmart",            phase: "structure", title: "Create one SSMART task",
       prompt: "Small, Specific, Measurable, Attainable, Relevant, Time-bound. Just one.",
       example: "Example: Walk 20 minutes at 7am, Monday to Friday.",
@@ -72,16 +91,14 @@
     steps.map((s) => [s.id, s.type === "problem-list" ? [] : ""])
   );
 
-  // Fields that make up a single entry in a problem-list step.
-  const PROBLEM_FIELDS = [
-    { key: "problem",  label: "Problem",                      placeholder: "What is the problem?",                rows: 2 },
-    { key: "stops",    label: "What it stops you from doing", placeholder: "What does it keep you from?",         rows: 2 },
-    { key: "duration", label: "How long it's been a problem", placeholder: "Weeks, months, years…",               rows: 1 },
-    { key: "feeling",  label: "How it makes you feel",        placeholder: "Name the feelings honestly.",         rows: 2 },
-  ];
-  const emptyProblem = () => PROBLEM_FIELDS.reduce((a, f) => (a[f.key] = "", a), {});
-  const problemIsEmpty = (p) => PROBLEM_FIELDS.every((f) => !(p[f.key] || "").trim());
-  const problemListIsEmpty = (arr) => !Array.isArray(arr) || arr.every(problemIsEmpty);
+  // Problem-list steps define their own `fields` array — keys/labels vary
+  // between "problems", "outcomes", etc. so we read them from the step.
+  const getFields = (step) => step.fields || [];
+  const entryLabelOf = (step) => step.entryLabel || "Item";
+  const emptyEntry = (step) => getFields(step).reduce((a, f) => (a[f.key] = "", a), {});
+  const entryIsEmpty = (step, p) => getFields(step).every((f) => !((p && p[f.key]) || "").trim());
+  const problemListIsEmpty = (step, arr) =>
+    !Array.isArray(arr) || arr.every((p) => entryIsEmpty(step, p));
   const timerState = new Map();
   let currentIndex = 0;
 
@@ -179,7 +196,7 @@
 
   function answerIsEmpty(step) {
     const v = answers[step.id];
-    if (step.type === "problem-list") return problemListIsEmpty(v);
+    if (step.type === "problem-list") return problemListIsEmpty(step, v);
     return !String(v || "").trim();
   }
 
@@ -204,8 +221,8 @@
     if (step.type === "problem-list") {
       const items = Array.from(root.querySelectorAll(".iaw-problem"));
       answers[stepId] = items.map((item) => {
-        const entry = emptyProblem();
-        PROBLEM_FIELDS.forEach((f) => {
+        const entry = emptyEntry(step);
+        getFields(step).forEach((f) => {
           const el = item.querySelector(`[data-field="${f.key}"]`);
           if (el) entry[f.key] = el.value;
         });
@@ -219,9 +236,10 @@
     }
   }
 
-  function renderProblemItem(entry, index) {
-    const fields = PROBLEM_FIELDS.map((f) => {
-      const id = `problem-${index}-${f.key}`;
+  function renderProblemItem(step, entry, index) {
+    const label = entryLabelOf(step);
+    const fields = getFields(step).map((f) => {
+      const id = `${step.id}-${index}-${f.key}`;
       const value = escapeHtml(entry[f.key] || "");
       const control = f.rows > 1
         ? `<textarea id="${id}" class="iaw-problem-input" data-field="${f.key}" rows="${f.rows}" placeholder="${escapeHtml(f.placeholder)}">${value}</textarea>`
@@ -237,8 +255,8 @@
     return `
       <li class="iaw-problem" data-problem-index="${index}">
         <header class="iaw-problem-head">
-          <span class="iaw-problem-num">Problem ${index + 1}</span>
-          <button type="button" class="iaw-problem-remove" data-action="remove" aria-label="Remove problem ${index + 1}">Remove</button>
+          <span class="iaw-problem-num">${escapeHtml(label)} ${index + 1}</span>
+          <button type="button" class="iaw-problem-remove" data-action="remove" aria-label="Remove ${escapeHtml(label.toLowerCase())} ${index + 1}">Remove</button>
         </header>
         <div class="iaw-problem-grid">${fields}</div>
       </li>
@@ -247,7 +265,7 @@
 
   function wireProblemList(listRoot, step) {
     const tryStartTimer = () => {
-      if (step.timerSeconds && !timerState.has(step.id) && !problemListIsEmpty(answers[step.id])) {
+      if (step.timerSeconds && !timerState.has(step.id) && !problemListIsEmpty(step, answers[step.id])) {
         startTimer(step.id, step.timerSeconds);
       }
     };
@@ -266,7 +284,7 @@
         e.preventDefault();
         persistCurrentInputs();
         const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
-        list.push(emptyProblem());
+        list.push(emptyEntry(step));
         answers[step.id] = list;
         rerenderProblemList(listRoot, step, { focusIndex: list.length - 1 });
         return;
@@ -279,7 +297,7 @@
         const index = Number(item.dataset.problemIndex);
         const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
         list.splice(index, 1);
-        if (list.length === 0) list.push(emptyProblem());
+        if (list.length === 0) list.push(emptyEntry(step));
         answers[step.id] = list;
         rerenderProblemList(listRoot, step, { focusIndex: Math.max(0, index - 1) });
         updatePath();
@@ -290,7 +308,7 @@
   function rerenderProblemList(listRoot, step, { focusIndex } = {}) {
     const list = answers[step.id];
     const ol = listRoot.querySelector(".iaw-problems");
-    ol.innerHTML = list.map((entry, i) => renderProblemItem(entry, i)).join("");
+    ol.innerHTML = list.map((entry, i) => renderProblemItem(step, entry, i)).join("");
     if (focusIndex != null) {
       const target = ol.querySelector(`.iaw-problem[data-problem-index="${focusIndex}"] .iaw-problem-input`);
       if (target) target.focus({ preventScroll: true });
@@ -299,15 +317,15 @@
 
   function renderProblemList(step) {
     const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
-    if (list.length === 0) list.push(emptyProblem());
+    if (list.length === 0) list.push(emptyEntry(step));
     answers[step.id] = list;
 
-    const items = list.map((entry, i) => renderProblemItem(entry, i)).join("");
+    const items = list.map((entry, i) => renderProblemItem(step, entry, i)).join("");
 
     return `
       <div class="iaw-problem-list" data-step-id="${step.id}">
         <ol class="iaw-problems">${items}</ol>
-        <button type="button" class="iaw-problem-add" data-action="add">+ Add another problem</button>
+        <button type="button" class="iaw-problem-add" data-action="add">+ Add another ${escapeHtml(entryLabelOf(step).toLowerCase())}</button>
         <p class="iaw-step-example">${escapeHtml(step.example)}</p>
         <p class="iaw-problem-optional">This step is optional — leave it blank if nothing comes to mind.</p>
       </div>
@@ -490,6 +508,8 @@
         title: resolveStepTitle(step),
         phase: PHASES[step.phase].label,
         type: step.type,
+        entryLabel: entryLabelOf(step),
+        fields: getFields(step),
         value: step.type === "problem-list"
           ? answers[step.id]
           : ((answers[step.id] || "").trim() || "(No response entered)"),
@@ -582,22 +602,24 @@
     if (item.type !== "problem-list") {
       return `<p>${escapeHtml(item.value)}</p>`;
     }
-    const list = Array.isArray(item.value) ? item.value.filter((p) => !problemIsEmpty(p)) : [];
-    if (list.length === 0) return `<p>(No problems listed)</p>`;
-    const entries = list.map((p, idx) => {
-      const rows = PROBLEM_FIELDS.map((f) => {
+    const fields = item.fields || [];
+    const label  = item.entryLabel || "Item";
+    const isEntryEmpty = (p) => fields.every((f) => !((p && p[f.key]) || "").trim());
+    const list = Array.isArray(item.value) ? item.value.filter((p) => !isEntryEmpty(p)) : [];
+    if (list.length === 0) return `<p>(No ${escapeHtml(label.toLowerCase())}s listed)</p>`;
+    return list.map((p, idx) => {
+      const rows = fields.map((f) => {
         const v = (p[f.key] || "").trim();
         if (!v) return "";
         return `<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(v)}</p>`;
       }).join("");
       return `
         <div class="report-problem">
-          <h5>Problem ${idx + 1}</h5>
+          <h5>${escapeHtml(label)} ${idx + 1}</h5>
           ${rows}
         </div>
       `;
     }).join("");
-    return entries;
   }
 
   function createGridDays(startDate, count) {
