@@ -68,6 +68,12 @@
   const verdictEl = document.getElementById("v2Verdict");
   const chipsForEl = document.getElementById("v2ChipsFor");
   const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
+  const toastEl = document.getElementById("v2Toast");
+  const toastMsgEl = document.getElementById("v2ToastMsg");
+  const undoDeleteBtn = document.getElementById("v2UndoDelete");
+
+  let undoState = null;
+  let undoTimer = null;
 
   // Seed example items so the page isn't empty on first load.
   actionInput.value = DEFAULT_ACTION;
@@ -100,8 +106,10 @@
   resetBtn.addEventListener("click", () => {
     state.for = [];
     state.against = [];
+    clearUndo();
     render();
   });
+  undoDeleteBtn.addEventListener("click", restoreDeletedItem);
 
   function addItem(side) {
     const item = { id: newId(), text: "", weight: 1, isNew: true };
@@ -142,6 +150,9 @@
     row.className = `v2-item v2-item-${side}`;
     row.dataset.id = item.id;
     row.dataset.weight = item.weight;
+    row.tabIndex = 0;
+    row.setAttribute("role", "button");
+    row.setAttribute("aria-label", `Increase weight for "${item.text}"`);
     // Every item renders at the same font size now — the weight badge already
     // communicates how heavy each reason is, and a fixed size keeps the edit
     // buttons reachable no matter how long the label is.
@@ -187,33 +198,47 @@
     const minusBtn = document.createElement("button");
     minusBtn.type = "button";
     minusBtn.className = "v2-item-minus";
-    minusBtn.setAttribute("aria-label", `Make "${item.text}" lighter`);
-    minusBtn.textContent = "\u2212"; // proper minus sign
+    minusBtn.setAttribute("aria-label", `Decrease weight for "${item.text}" by 1`);
+    minusBtn.title = "Decrease weight (−1)";
+    minusBtn.textContent = "\u22121"; // −1
 
     const editBtn = document.createElement("button");
     editBtn.type = "button";
     editBtn.className = "v2-item-edit-btn";
     editBtn.setAttribute("aria-label", `Rename "${item.text}"`);
+    editBtn.title = "Rename reason";
     editBtn.textContent = "\u270e"; // pencil
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "v2-item-remove";
     removeBtn.setAttribute("aria-label", `Remove "${item.text}"`);
-    removeBtn.textContent = "\u00d7"; // ×
+    removeBtn.title = "Remove reason";
+    removeBtn.textContent = "Remove";
+
+    const actions = document.createElement("span");
+    actions.className = "v2-item-actions";
 
     row.appendChild(label);
     row.appendChild(badge);
-    row.appendChild(minusBtn);
-    row.appendChild(editBtn);
-    row.appendChild(removeBtn);
+    row.appendChild(actions);
+    actions.appendChild(minusBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(removeBtn);
 
-    row.title = "Click to make heavier.  −  lighter  ·  ✎  rename  ·  ×  remove";
+    row.title = "Click to make heavier";
 
     // Left click anywhere on the row (except one of the buttons): heavier.
     row.addEventListener("click", (e) => {
       if (e.target.closest("button")) return;
       if (e.target.tagName === "INPUT") return;
+      item.weight = Math.min(MAX_WEIGHT, item.weight + 1);
+      render();
+    });
+    row.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      if (e.target.closest("button")) return;
+      e.preventDefault();
       item.weight = Math.min(MAX_WEIGHT, item.weight + 1);
       render();
     });
@@ -232,7 +257,7 @@
     // Remove button: delete the reason entirely.
     removeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      removeItem(item.id, side);
+      removeItem(item.id, side, { trackUndo: true });
     });
 
     // Edit button — flip the row back into its input-editing state.
@@ -248,8 +273,47 @@
     return row;
   }
 
-  function removeItem(id, side) {
+  function removeItem(id, side, options = {}) {
+    const idx = state[side].findIndex((x) => x.id === id);
+    if (idx === -1) return;
+    const removed = state[side][idx];
+    if (options.trackUndo) {
+      undoState = { item: { ...removed }, side, index: idx };
+      showUndoToast(`Removed "${removed.text}"`);
+    }
     state[side] = state[side].filter((x) => x.id !== id);
+    render();
+  }
+
+  function showUndoToast(msg) {
+    toastMsgEl.textContent = msg;
+    toastEl.hidden = false;
+    toastEl.classList.add("is-visible");
+    if (undoTimer) clearTimeout(undoTimer);
+    undoTimer = setTimeout(() => {
+      clearUndo();
+      toastEl.hidden = true;
+      toastEl.classList.remove("is-visible");
+    }, 6000);
+  }
+
+  function clearUndo() {
+    undoState = null;
+    if (undoTimer) {
+      clearTimeout(undoTimer);
+      undoTimer = null;
+    }
+    toastEl.hidden = true;
+    toastEl.classList.remove("is-visible");
+  }
+
+  function restoreDeletedItem() {
+    if (!undoState) return;
+    const { item, side, index } = undoState;
+    const arr = state[side];
+    const safeIndex = Math.max(0, Math.min(index, arr.length));
+    arr.splice(safeIndex, 0, item);
+    clearUndo();
     render();
   }
 

@@ -837,7 +837,7 @@ footer.page-foot a { color: var(--ink); }
 .v2-item {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 6px;
   background: #fff;
@@ -851,6 +851,10 @@ footer.page-foot a { color: var(--ink); }
   line-height: 1.2;
   /* Fixed, readable size for every row regardless of weight. */
   font-size: 0.95rem;
+}
+.v2-item:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 1px;
 }
 .v2-item:hover {
   transform: translateY(-1px);
@@ -882,6 +886,13 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-for .v2-item-weight { background: rgba(91, 138, 138, 0.16); color: var(--teal-deep); }
 .v2-item-against .v2-item-weight { background: rgba(200, 118, 104, 0.16); color: var(--terra-deep); }
 
+.v2-item-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+
 .v2-item-edit {
   width: 100%;
   background: transparent;
@@ -897,33 +908,47 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-edit-btn,
 .v2-item-minus,
 .v2-item-remove {
-  width: 22px;
-  height: 22px;
-  padding: 0;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 8px;
   border-radius: 999px;
   display: inline-grid;
   place-items: center;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
   line-height: 1;
   background: transparent;
   border: 0;
   cursor: pointer;
-  /* Always visible so they're reachable no matter the row length. */
-  opacity: 0.75;
+  opacity: 0;
   transition: opacity 160ms var(--ease), background 180ms var(--ease), color 180ms var(--ease);
 }
-.v2-item-edit-btn { font-size: 0.78rem; }
-.v2-item-remove { font-size: 1rem; }
+.v2-item-minus { min-width: 38px; font-variant-numeric: tabular-nums; }
+.v2-item-edit-btn { font-size: 0.9rem; font-weight: 500; min-width: 34px; }
+.v2-item-remove {
+  margin-left: 8px;
+  color: var(--terra-deep);
+  border: 1px solid rgba(200, 118, 104, 0.25);
+  min-width: 68px;
+}
 .v2-item:hover .v2-item-edit-btn,
 .v2-item:hover .v2-item-minus,
 .v2-item:hover .v2-item-remove,
+.v2-item:focus-within .v2-item-edit-btn,
+.v2-item:focus-within .v2-item-minus,
+.v2-item:focus-within .v2-item-remove,
 .v2-item-edit-btn:focus-visible,
 .v2-item-minus:focus-visible,
 .v2-item-remove:focus-visible { opacity: 1; }
 .v2-item-edit-btn:hover,
 .v2-item-minus:hover { background: var(--cream-deep); color: var(--ink); }
-.v2-item-remove:hover { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
+.v2-item-remove:hover,
+.v2-item-remove:focus-visible {
+  background: rgba(200, 118, 104, 0.18);
+  color: var(--terra-deep);
+  border-color: rgba(200, 118, 104, 0.5);
+}
 
 .v2-add {
   align-self: stretch;
@@ -970,10 +995,53 @@ footer.page-foot a { color: var(--ink); }
   border-color: var(--muted);
 }
 
+.v2-toast-wrap {
+  position: sticky;
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  z-index: 30;
+  pointer-events: none;
+}
+.v2-toast {
+  pointer-events: auto;
+  margin-top: 12px;
+  padding: 8px 10px 8px 14px;
+  border-radius: 999px;
+  background: rgba(26, 29, 46, 0.95);
+  color: var(--paper);
+  box-shadow: var(--shadow-md);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+.v2-toast-undo {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  padding: 4px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.v2-toast-undo:hover,
+.v2-toast-undo:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 /* On narrow screens the SVG would shrink too far and the pan text would be
    barely readable. Bump the pan font and soften the tilt there. */
 @media (max-width: 720px) {
   .v2-pan { font-size: 22px; padding: 12px; }
   .v2-pan-title { font-size: 1.1rem; }
   .v2-pan-total { font-size: 0.9rem; }
+  .v2-item-edit-btn,
+  .v2-item-minus,
+  .v2-item-remove { opacity: 1; }
+}
+
+@media (hover: none) {
+  .v2-item-edit-btn,
+  .v2-item-minus,
+  .v2-item-remove { opacity: 1; }
 }

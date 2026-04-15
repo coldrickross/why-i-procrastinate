@@ -38,7 +38,7 @@
 
     <section class="v2-legend" aria-label="How it works">
       <span><b>Click</b> a reason to make it heavier.</span>
-      <span>Use <b>−</b> to make it lighter, <b>×</b> to remove it, <b>✎</b> to rename.</span>
+      <span>Use <b>−1</b> to make it lighter, <b>✎</b> to rename, and <b>Remove</b> to delete (with undo).</span>
     </section>
 
     <section class="v2-stage" aria-label="Interactive scale">
@@ -97,6 +97,12 @@
         <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
       </div>
     </section>
+    <div class="v2-toast-wrap" aria-live="polite" aria-atomic="true">
+      <div class="v2-toast" id="v2Toast" role="status" hidden>
+        <span class="v2-toast-msg" id="v2ToastMsg"></span>
+        <button class="v2-toast-undo" id="v2UndoDelete" type="button">Undo</button>
+      </div>
+    </div>
 
     <section class="suggested" aria-label="Suggested reasons">
       <h4>Need ideas? Tap to drop a common weight onto the scale.</h4>
