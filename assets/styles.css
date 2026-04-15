@@ -823,7 +823,7 @@ footer.page-foot a { color: var(--ink); }
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2px 4px 2px 0; /* keep hover stroke visible, leave room for scrollbar */
+  padding-right: 4px; /* keep a little room for the scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
