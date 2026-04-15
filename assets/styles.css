@@ -823,7 +823,7 @@ footer.page-foot a { color: var(--ink); }
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 4px; /* leave room for the scrollbar so items don't bump it */
+  padding: 2px 4px 2px 0; /* keep hover stroke visible, leave room for scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
@@ -850,7 +850,7 @@ footer.page-foot a { color: var(--ink); }
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  padding: 6px 8px 6px 12px;
+  padding: 0 8px 0 12px;
   min-height: 64px;
   user-select: none;
   cursor: default;
@@ -871,6 +871,7 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-text {
   flex: 1;
   min-width: 0;
+  padding: 6px 0;
   font-family: var(--serif);
   font-weight: 500;
   color: var(--ink);
