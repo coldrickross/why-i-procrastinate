@@ -54,14 +54,21 @@
         { key: "impact",  label: "Impact / what it stops you from doing",   placeholder: "What does it cost you?",   rows: 2 },
         { key: "feeling", label: "How you'll feel",                         placeholder: "Name the feelings honestly.", rows: 2 },
       ] },
-    { id: "ssmart",            phase: "structure", title: "Create one SSMART task",
-      prompt: "Small, Specific, Measurable, Attainable, Relevant, Time-bound. Just one.",
-      example: "Example: Walk 20 minutes at 7am, Monday to Friday.",
-      type: "textarea" },
-    { id: "task-identity",     phase: "structure", title: "Tie the task to identity",
-      prompt: "Write it as a statement your identity would make, not a wish.",
-      example: "Example: I put my gym clothes on every day, no matter what.",
-      type: "textarea" },
+    { id: "identity-foundation", phase: "structure", title: "Find the smaller identity beneath it",
+      prompt: "Before you can become someone strong and athletic, you first have to become someone who SHOWS UP. Before you can be a great writer, you have to be someone who opens the document. Pick the smaller, truer identity that gets you through the door — everything else grows from it.",
+      example: "Pick one that fits — or write your own.",
+      type: "identity-foundation",
+      options: [
+        "Someone who shows up",
+        "Someone who keeps promises to themselves",
+        "Someone who chooses action over comfort",
+        "Someone who starts, even badly",
+        "Someone who doesn't wait to feel ready",
+      ] },
+    { id: "ssmart",            phase: "structure", title: "Build your SSMART task",
+      prompt: "Small, Specific, Measurable, Attainable, Relevant, Time-bound. Build it piece by piece — then pick the days you'll actually do it.",
+      example: "Example: Walk · 20 minutes · 7am · Mon & Wed.",
+      type: "ssmart-builder" },
     { id: "distractions",      phase: "structure", title: "Remove distractions",
       prompt: "What will you remove, block, mute, or move out of sight?",
       example: "Example: Phone charges in the kitchen. Notifications off after 9pm.",
@@ -87,9 +94,29 @@
   ];
 
   // State ------------------------------------------------------------------
+  const emptySsmart = () => ({
+    action: "",
+    measure: "",
+    time: "",
+    days: [false, false, false, false, false, false, false], // Mon..Sun
+  });
   const answers = Object.fromEntries(
-    steps.map((s) => [s.id, s.type === "problem-list" ? [] : ""])
+    steps.map((s) => {
+      if (s.type === "problem-list") return [s.id, []];
+      if (s.type === "ssmart-builder") return [s.id, emptySsmart()];
+      return [s.id, ""];
+    })
   );
+
+  // Day-of-week helpers (Mon = 0 … Sun = 6)
+  const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const DAY_SHORT  = ["M", "T", "W", "T", "F", "S", "S"];
+  const dayIndexFromDate = (d) => (d.getDay() + 6) % 7;
+  const countSelectedDays = (s) => (s && Array.isArray(s.days) ? s.days.filter(Boolean).length : 0);
+  const selectedDayLabels = (s) =>
+    (s && Array.isArray(s.days) ? s.days : [])
+      .map((on, i) => (on ? DAY_LABELS[i] : null))
+      .filter(Boolean);
 
   // Problem-list steps define their own `fields` array — keys/labels vary
   // between "problems", "outcomes", etc. so we read them from the step.
@@ -197,6 +224,11 @@
   function answerIsEmpty(step) {
     const v = answers[step.id];
     if (step.type === "problem-list") return problemListIsEmpty(step, v);
+    if (step.type === "ssmart-builder") {
+      if (!v) return true;
+      const hasText = [v.action, v.measure, v.time].some((s) => String(s || "").trim());
+      return !hasText && countSelectedDays(v) === 0;
+    }
     return !String(v || "").trim();
   }
 
@@ -228,6 +260,22 @@
         });
         return entry;
       });
+    } else if (step.type === "ssmart-builder") {
+      const current = answers[stepId] || emptySsmart();
+      const action  = root.querySelector('[data-ssmart="action"]');
+      const measure = root.querySelector('[data-ssmart="measure"]');
+      const time    = root.querySelector('[data-ssmart="time"]');
+      if (action)  current.action  = action.value;
+      if (measure) current.measure = measure.value;
+      if (time)    current.time    = time.value;
+      const dayBtns = root.querySelectorAll('[data-ssmart-day]');
+      if (dayBtns.length) {
+        current.days = Array.from(dayBtns).map((b) => b.getAttribute("aria-pressed") === "true");
+      }
+      answers[stepId] = current;
+    } else if (step.type === "identity-foundation") {
+      const input = root.querySelector(".iaw-step-input");
+      if (input) answers[stepId] = input.value;
     } else {
       const input = root.classList.contains("iaw-step-input")
         ? root
@@ -332,6 +380,238 @@
     `;
   }
 
+  // Identity-foundation step ----------------------------------------------
+  function renderIdentityFoundation(step) {
+    const longTerm = (answers["identity"] || "").trim();
+    const current  = answers[step.id] || "";
+    const options  = step.options || [];
+
+    const optionsMarkup = options.map((opt) => {
+      const on = current === opt;
+      return `<button type="button"
+                class="iaw-id-pick ${on ? "is-on" : ""}"
+                data-id-pick
+                aria-pressed="${on ? "true" : "false"}">${escapeHtml(opt)}</button>`;
+    }).join("");
+
+    const longTermLine = longTerm
+      ? `<p class="iaw-foundation-long">Your long-term identity: <strong>${escapeHtml(longTerm)}</strong>.</p>`
+      : `<p class="iaw-foundation-long iaw-foundation-long--muted">You haven't set a long-term identity yet — that's okay, the foundation still applies.</p>`;
+
+    return `
+      <div class="iaw-foundation" data-step-id="${step.id}">
+        ${longTermLine}
+        <p class="iaw-foundation-lead">
+          Big identities are built on top of smaller ones. Before you can be
+          <em>${escapeHtml(longTerm || "that bigger person")}</em>, you first
+          have to be <strong>someone who shows up</strong>. That's the identity
+          we'll actually be training this week.
+        </p>
+        <div class="iaw-id-picks" role="group" aria-label="Foundational identity options">
+          ${optionsMarkup}
+        </div>
+        <label class="iaw-step-label" for="input-${step.id}">Or write your own</label>
+        <input id="input-${step.id}"
+               class="iaw-step-input iaw-step-input--short"
+               type="text"
+               placeholder="Someone who…" />
+        <p class="iaw-step-example">${escapeHtml(step.example || "")}</p>
+      </div>
+    `;
+  }
+
+  function wireIdentityFoundation(root, step) {
+    const input = root.querySelector(".iaw-step-input");
+    const picks = Array.from(root.querySelectorAll("[data-id-pick]"));
+
+    input.value = answers[step.id] || "";
+
+    const syncPicks = () => {
+      const v = input.value.trim();
+      picks.forEach((btn) => {
+        const on = btn.textContent === v;
+        btn.classList.toggle("is-on", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    };
+    syncPicks();
+
+    input.addEventListener("input", () => {
+      answers[step.id] = input.value;
+      syncPicks();
+      updatePath();
+    });
+
+    picks.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const v = btn.textContent;
+        input.value = v;
+        answers[step.id] = v;
+        syncPicks();
+        updatePath();
+        input.focus({ preventScroll: true });
+      });
+    });
+  }
+
+  // SSMART builder step ----------------------------------------------------
+  function dayFeedback(count) {
+    if (count === 0) {
+      return {
+        tone: "neutral",
+        title: "Pick at least one day to start.",
+        body:  "One committed day beats a hopeful week.",
+      };
+    }
+    if (count <= 2) {
+      return {
+        tone: "good",
+        title: `${count} ${count === 1 ? "day" : "days"} — a great starting pace.`,
+        body:  "Small and repeatable wins. You can always add more once this feels boring.",
+      };
+    }
+    if (count === 3) {
+      return {
+        tone: "okay",
+        title: "3 days — okay, but keep your rest days sacred.",
+        body:  "Doable, but the jump from 2 to 3 is where most people quietly overreach. Protect the off days.",
+      };
+    }
+    return {
+      tone: "warn",
+      title: `${count} days — this is probably too much, too fast.`,
+      body:  "If a voice inside is saying “but I CAN do it every day” — that's the exact all-or-nothing thinking that wrecks most attempts. You do it, you miss once, you feel like a failure, you quit. Start with 2. Prove it for two weeks. Then add a day. Boring wins.",
+    };
+  }
+
+  function renderSsmartPreview(s, foundation) {
+    const parts = [];
+    if (s.action)  parts.push(escapeHtml(s.action));
+    if (s.measure) parts.push(`for ${escapeHtml(s.measure)}`);
+    if (s.time)    parts.push(`at ${escapeHtml(s.time)}`);
+    const dayStr = selectedDayLabels(s).join(", ");
+    if (dayStr)    parts.push(`on ${escapeHtml(dayStr)}`);
+    if (!parts.length) {
+      return `<p class="iaw-ssmart-preview-empty">Your task will appear here as you build it.</p>`;
+    }
+    const identLine = foundation
+      ? `<p class="iaw-ssmart-preview-ident">As <strong>${escapeHtml(foundation)}</strong>, I will:</p>`
+      : "";
+    return `
+      ${identLine}
+      <p class="iaw-ssmart-preview-line">${parts.join(" ")}.</p>
+    `;
+  }
+
+  function renderSsmart(step) {
+    const s = answers[step.id] || emptySsmart();
+    const foundation = (answers["identity-foundation"] || "").trim();
+
+    const reminder = foundation
+      ? `<div class="iaw-ident-reminder">
+           <span class="iaw-ident-reminder-label">You're doing this as</span>
+           <strong>${escapeHtml(foundation)}</strong>
+         </div>`
+      : `<div class="iaw-ident-reminder iaw-ident-reminder--muted">
+           <span class="iaw-ident-reminder-label">Tip</span>
+           <span>Head back to the previous step to pick a foundational identity first — it changes how this task feels.</span>
+         </div>`;
+
+    const dayPicker = DAY_SHORT.map((lab, i) => {
+      const on = !!s.days[i];
+      return `<button type="button"
+                class="iaw-day-chip ${on ? "is-on" : ""}"
+                data-ssmart-day="${i}"
+                aria-pressed="${on ? "true" : "false"}"
+                aria-label="${DAY_LABELS[i]}"
+                title="${DAY_LABELS[i]}">${lab}</button>`;
+    }).join("");
+
+    const fb = dayFeedback(countSelectedDays(s));
+
+    return `
+      <div class="iaw-ssmart" data-step-id="${step.id}">
+        ${reminder}
+
+        <div class="iaw-ssmart-fields">
+          <div class="iaw-ssmart-field">
+            <label class="iaw-step-label" for="ssmart-action">Action <span class="iaw-ssmart-hint">(small &amp; specific)</span></label>
+            <input id="ssmart-action" class="iaw-step-input iaw-step-input--short"
+                   data-ssmart="action" type="text"
+                   value="${escapeHtml(s.action || "")}"
+                   placeholder="e.g. Walk" />
+          </div>
+          <div class="iaw-ssmart-field">
+            <label class="iaw-step-label" for="ssmart-measure">Measure <span class="iaw-ssmart-hint">(how much)</span></label>
+            <input id="ssmart-measure" class="iaw-step-input iaw-step-input--short"
+                   data-ssmart="measure" type="text"
+                   value="${escapeHtml(s.measure || "")}"
+                   placeholder="e.g. 20 minutes" />
+          </div>
+          <div class="iaw-ssmart-field">
+            <label class="iaw-step-label" for="ssmart-time">Time of day <span class="iaw-ssmart-hint">(when)</span></label>
+            <input id="ssmart-time" class="iaw-step-input iaw-step-input--short"
+                   data-ssmart="time" type="text"
+                   value="${escapeHtml(s.time || "")}"
+                   placeholder="e.g. 7am" />
+          </div>
+        </div>
+
+        <div class="iaw-day-picker-wrap">
+          <label class="iaw-step-label">Pick the days you'll do it</label>
+          <div class="iaw-day-picker" role="group" aria-label="Days of the week">${dayPicker}</div>
+          <div class="iaw-day-feedback iaw-day-feedback--${fb.tone}" data-ssmart-feedback>
+            <strong>${escapeHtml(fb.title)}</strong>
+            <span>${escapeHtml(fb.body)}</span>
+          </div>
+        </div>
+
+        <div class="iaw-ssmart-preview" data-ssmart-preview>
+          ${renderSsmartPreview(s, foundation)}
+        </div>
+
+        <p class="iaw-step-example">${escapeHtml(step.example || "")}</p>
+      </div>
+    `;
+  }
+
+  function wireSsmart(root, step) {
+    const previewBox = root.querySelector("[data-ssmart-preview]");
+    const feedbackBox = root.querySelector("[data-ssmart-feedback]");
+    const foundation = () => (answers["identity-foundation"] || "").trim();
+
+    const refreshDerived = () => {
+      const s = answers[step.id];
+      previewBox.innerHTML = renderSsmartPreview(s, foundation());
+      const fb = dayFeedback(countSelectedDays(s));
+      feedbackBox.className = `iaw-day-feedback iaw-day-feedback--${fb.tone}`;
+      feedbackBox.innerHTML = `<strong>${escapeHtml(fb.title)}</strong><span>${escapeHtml(fb.body)}</span>`;
+    };
+
+    ["action", "measure", "time"].forEach((key) => {
+      const el = root.querySelector(`[data-ssmart="${key}"]`);
+      if (!el) return;
+      el.addEventListener("input", () => {
+        persistCurrentInputs();
+        refreshDerived();
+        updatePath();
+      });
+    });
+
+    root.querySelectorAll("[data-ssmart-day]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.getAttribute("data-ssmart-day"));
+        const s = answers[step.id] || emptySsmart();
+        s.days[i] = !s.days[i];
+        answers[step.id] = s;
+        btn.setAttribute("aria-pressed", s.days[i] ? "true" : "false");
+        btn.classList.toggle("is-on", s.days[i]);
+        refreshDerived();
+        updatePath();
+      });
+    });
+  }
+
   // Render a single step ---------------------------------------------------
   function renderStep() {
     // Persist previous answer before re-rendering
@@ -345,9 +625,11 @@
     const card = document.createElement("article");
     card.className = `iaw-step-card ${toneClass(step.phase)}`;
 
-    const isInfo    = step.type === "info";
-    const isShort   = step.type === "short";
-    const isProblem = step.type === "problem-list";
+    const isInfo        = step.type === "info";
+    const isShort       = step.type === "short";
+    const isProblem     = step.type === "problem-list";
+    const isFoundation  = step.type === "identity-foundation";
+    const isSsmart      = step.type === "ssmart-builder";
 
     const timerMarkup = step.timerSeconds ? `
       <div class="iaw-timer" id="timer-wrap-${step.id}">
@@ -359,12 +641,27 @@
 
     let bodyMarkup;
     if (isInfo) {
+      const ssmart = answers["ssmart"] || emptySsmart();
+      const today = new Date();
+      const scheduledCount = countSelectedDays(ssmart);
+      const dayStr = selectedDayLabels(ssmart).join(", ");
+      const personalLine = scheduledCount
+        ? `Your chart starts <strong>${humanDate(today)}</strong> and will only ask for a tick on <strong>${escapeHtml(dayStr)}</strong>. Rest days stay empty on purpose.`
+        : `Your chart starts <strong>${humanDate(today)}</strong>. Head back to the SSMART step and pick your days — the chart will update automatically.`;
       bodyMarkup = `
         <div class="iaw-info">
           <p class="iaw-info-lead">A visible chart turns intention into <strong>evidence</strong>. Every tick is proof — to you — of your new identity, and a quiet promise kept to your future self.</p>
-          ${renderAnimatedGrid()}
-          <p class="iaw-info-note">This chart will be included in your report — print it, stick it somewhere hard to ignore, and mark one box each day.</p>
+          ${renderAnimatedGrid(ssmart, today)}
+          <p class="iaw-info-note">${personalLine}</p>
+          <p class="iaw-info-note">This chart will be in your report — print it, stick it somewhere hard to ignore, and mark one box on every scheduled day.</p>
         </div>
+      `;
+    } else if (isFoundation) {
+      bodyMarkup = renderIdentityFoundation(step);
+    } else if (isSsmart) {
+      bodyMarkup = `
+        ${timerMarkup}
+        ${renderSsmart(step)}
       `;
     } else if (isProblem) {
       bodyMarkup = `
@@ -423,6 +720,16 @@
       const listRoot = card.querySelector(".iaw-problem-list");
       wireProblemList(listRoot, step);
       const firstInput = listRoot.querySelector(".iaw-problem-input");
+      if (firstInput) firstInput.focus({ preventScroll: true });
+    } else if (isFoundation) {
+      const root = card.querySelector(".iaw-foundation");
+      wireIdentityFoundation(root, step);
+      const firstPick = root.querySelector(".iaw-id-pick");
+      if (firstPick) firstPick.focus({ preventScroll: true });
+    } else if (isSsmart) {
+      const root = card.querySelector(".iaw-ssmart");
+      wireSsmart(root, step);
+      const firstInput = root.querySelector('[data-ssmart="action"]');
       if (firstInput) firstInput.focus({ preventScroll: true });
     } else {
       const input = card.querySelector(".iaw-step-input");
@@ -516,9 +823,10 @@
       }));
 
     const gridDays = createGridDays(today, 28);
-    reportOutput.innerHTML = renderReportPreview(reportData, gridDays, today);
+    const ssmart = answers["ssmart"] || emptySsmart();
+    reportOutput.innerHTML = renderReportPreview(reportData, gridDays, today, ssmart);
 
-    const downloadable = buildDownloadHtml(reportData, gridDays, today);
+    const downloadable = buildDownloadHtml(reportData, gridDays, today, ssmart);
     const blob = new Blob([downloadable], { type: "text/html;charset=utf-8" });
     const url = URL.createObjectURL(blob);
 
@@ -534,7 +842,7 @@
     reportOutput.appendChild(link);
   });
 
-  function renderReportPreview(data, gridDays, startDate) {
+  function renderReportPreview(data, gridDays, startDate, ssmart) {
     const rows = data
       .map((item) => `
         <div class="preview-block">
@@ -542,11 +850,12 @@
           ${renderReportValue(item, "preview")}
         </div>`)
       .join("");
-    const grid = renderGridTable(gridDays);
+    const grid = renderGridTable(gridDays, ssmart);
+    const dayStr = selectedDayLabels(ssmart).join(", ") || "(no days chosen yet)";
     return `
       <div class="preview-head">
         <h3>Your custom report</h3>
-        <p>Start date: ${humanDate(startDate)} · 4-week tracker included.</p>
+        <p>Start date: ${humanDate(startDate)} · Scheduled: ${escapeHtml(dayStr)} · 4-week tracker included.</p>
       </div>
       ${rows}
       <div class="preview-block">
@@ -556,7 +865,7 @@
     `;
   }
 
-  function buildDownloadHtml(data, gridDays, startDate) {
+  function buildDownloadHtml(data, gridDays, startDate, ssmart) {
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -591,14 +900,27 @@
     </section>`).join("")}
   <section class="block">
     <h2>4-week progress grid</h2>
-    <p>Mark one box each day when you complete your SSMART action.</p>
-    ${renderGridTable(gridDays)}
+    <p>Mark one box on every <strong>scheduled</strong> day when you complete your SSMART action. Rest days are on purpose — don't feel you need to fill them in.</p>
+    ${renderGridTable(gridDays, ssmart)}
   </section>
 </body>
 </html>`;
   }
 
   function renderReportValue(item, _mode) {
+    if (item.type === "ssmart-builder") {
+      const s = item.value || emptySsmart();
+      const hasAny = [s.action, s.measure, s.time].some((v) => String(v || "").trim())
+        || countSelectedDays(s) > 0;
+      if (!hasAny) return `<p>(No SSMART task built yet)</p>`;
+      const dayStr = selectedDayLabels(s).join(", ") || "(no days chosen)";
+      return `
+        <p><strong>Action:</strong> ${escapeHtml(s.action || "—")}</p>
+        <p><strong>Measure:</strong> ${escapeHtml(s.measure || "—")}</p>
+        <p><strong>Time of day:</strong> ${escapeHtml(s.time || "—")}</p>
+        <p><strong>Days:</strong> ${escapeHtml(dayStr)}</p>
+      `;
+    }
     if (item.type !== "problem-list") {
       return `<p>${escapeHtml(item.value)}</p>`;
     }
@@ -634,32 +956,64 @@
     return out;
   }
 
-  function renderGridTable(days) {
-    let html = '<table><thead><tr><th>Week</th><th>Date</th><th>Done?</th></tr></thead><tbody>';
+  function renderGridTable(days, ssmart) {
+    const scheduled = (ssmart && Array.isArray(ssmart.days)) ? ssmart.days : [];
+    const anyScheduled = scheduled.some(Boolean);
+    let html = '<table><thead><tr><th>Week</th><th>Day</th><th>Date</th><th>Done?</th></tr></thead><tbody>';
     days.forEach((day, idx) => {
       const week = Math.floor(idx / 7) + 1;
-      html += `<tr><td>Week ${week}</td><td>${humanDate(day)}</td><td class="box">☐</td></tr>`;
+      const dow = dayIndexFromDate(day);
+      const isOn = anyScheduled ? !!scheduled[dow] : true; // if no days picked, fall back to every day
+      const cell = isOn ? "☐" : "— (rest)";
+      const rowStyle = isOn ? "" : ' style="color:#a19789;background:#faf6ec;"';
+      html += `<tr${rowStyle}><td>Week ${week}</td><td>${escapeHtml(DAY_LABELS[dow])}</td><td>${humanDate(day)}</td><td class="box">${cell}</td></tr>`;
     });
     html += "</tbody></table>";
     return html;
   }
 
   // Animated 4-week chart (used inside the tracking info step) ------------
-  function renderAnimatedGrid() {
+  function renderAnimatedGrid(ssmart, startDate) {
     const rows = 4;
     const cols = 7;
-    const dayNames = ["M", "T", "W", "T", "F", "S", "S"];
+    const startCol = dayIndexFromDate(startDate || new Date()); // Mon=0..Sun=6
+    const days = (ssmart && Array.isArray(ssmart.days))
+      ? ssmart.days
+      : [false, false, false, false, false, false, false];
+    const anyScheduled = days.some(Boolean);
+
     let cells = "";
+    let animIdx = 0;
     for (let r = 0; r < rows; r += 1) {
       for (let c = 0; c < cols; c += 1) {
-        const idx = r * cols + c;
-        cells += `<span class="iaw-chart-cell" style="--i:${idx}" aria-hidden="true"><span class="iaw-chart-tick"></span></span>`;
+        const isPreStart = r === 0 && c < startCol;
+        const isScheduled = days[c];
+        const isStartCell = r === 0 && c === startCol;
+
+        let cls = "iaw-chart-cell";
+        if (isPreStart) cls += " is-prestart";
+        if (!isPreStart && isScheduled) cls += " is-scheduled";
+        if (!isPreStart && !isScheduled) cls += " is-rest";
+        if (isStartCell) cls += " is-start";
+
+        // Only schedule an animation delay for scheduled, on-or-after-start cells.
+        const animate = !isPreStart && isScheduled && anyScheduled;
+        const style = animate ? ` style="--i:${animIdx}"` : "";
+        if (animate) animIdx += 1;
+
+        const inner = animate
+          ? `<span class="iaw-chart-tick"></span>`
+          : (isPreStart ? "" : `<span class="iaw-chart-rest" aria-hidden="true"></span>`);
+        cells += `<span class="${cls}"${style} aria-hidden="true">${inner}</span>`;
       }
     }
-    const header = dayNames.map((d) => `<span class="iaw-chart-head">${d}</span>`).join("");
+    const header = DAY_SHORT.map((d, i) => {
+      const isToday = i === startCol;
+      return `<span class="iaw-chart-head${isToday ? " is-today" : ""}">${d}</span>`;
+    }).join("");
     const weekLabels = [1, 2, 3, 4].map((w) => `<span class="iaw-chart-week">Week ${w}</span>`).join("");
     return `
-      <div class="iaw-chart" role="img" aria-label="Animated preview of a 4-week tracking chart, 28 days">
+      <div class="iaw-chart" role="img" aria-label="Personalised 4-week tracking chart preview, starting today">
         <div class="iaw-chart-weeks">${weekLabels}</div>
         <div class="iaw-chart-body">
           <div class="iaw-chart-head-row">${header}</div>
