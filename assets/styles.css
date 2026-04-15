@@ -512,11 +512,18 @@ footer.page-foot a { color: var(--ink); }
    ========================================================================== */
 
 .worksheet-hero {
-  padding-bottom: 30px;
+  padding-top: 54px;
+  padding-bottom: 20px;
+}
+
+.worksheet-wrap {
+  max-width: 980px;
 }
 
 .worksheet-intro,
-.step-card,
+.worksheet-progress,
+.stage-card,
+.worksheet-why,
 .worksheet-report-card {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -525,14 +532,19 @@ footer.page-foot a { color: var(--ink); }
 }
 
 .worksheet-intro {
-  padding: 20px;
-  margin-bottom: 16px;
+  padding: 22px;
+  margin-bottom: 14px;
 }
 
 .worksheet-intro h2 {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-family: var(--serif);
   font-weight: 500;
+}
+
+.worksheet-intro ol {
+  margin: 0 0 8px;
+  padding-left: 22px;
 }
 
 .worksheet-intro p {
@@ -540,31 +552,113 @@ footer.page-foot a { color: var(--ink); }
   color: var(--muted);
 }
 
-.worksheet-steps {
+.worksheet-progress {
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.stepper-trail {
   display: grid;
-  gap: 12px;
+  gap: 8px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.step-card {
-  padding: 16px;
+.trail-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  border: 1px dashed rgba(26, 29, 46, 0.15);
+  background: #fff;
 }
 
-.step-title {
-  margin: 0 0 4px;
-  font-size: 1.05rem;
+.trail-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  font-weight: 600;
+  transition: all 180ms var(--ease);
+}
+
+.trail-node.is-active {
+  border-style: solid;
+  border-color: rgba(91, 138, 138, 0.35);
+}
+
+.trail-node.is-active .trail-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+}
+
+.trail-node.is-complete .trail-dot {
+  background: var(--gold-deep);
+  border-color: var(--gold-deep);
+  color: #fff;
+}
+
+.trail-text {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.worksheet-stage {
+  margin-bottom: 14px;
+}
+
+.stage-card {
+  padding: 20px;
+}
+
+.stage-kicker {
+  margin: 0;
+  color: var(--gold-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.stage-title {
+  margin: 6px 0 4px;
   font-family: var(--serif);
   font-weight: 500;
 }
 
-.step-hint {
-  margin: 0 0 10px;
+.stage-description {
+  margin: 0 0 12px;
   color: var(--muted);
-  font-size: 0.92rem;
+}
+
+.stage-fields {
+  display: grid;
+  gap: 12px;
+}
+
+.stage-field {
+  display: grid;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.stage-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .step-input {
   width: 100%;
-  min-height: 104px;
+  min-height: 110px;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   background: #fff;
@@ -577,14 +671,28 @@ footer.page-foot a { color: var(--ink); }
   border-color: var(--teal);
 }
 
-.timer {
-  margin: 0 0 10px;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+.worksheet-why {
+  margin-bottom: 14px;
+  padding: 20px;
+}
+
+.worksheet-why h2 {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-weight: 500;
+}
+
+.why-lede {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.worksheet-why ul {
+  margin: 0;
+  padding-left: 20px;
 }
 
 .worksheet-report-card {
-  margin-top: 20px;
   padding: 20px;
 }
 
@@ -606,6 +714,7 @@ footer.page-foot a { color: var(--ink); }
   border-radius: 999px;
   padding: 10px 16px;
   font-weight: 600;
+  transition: transform 140ms var(--ease), background 180ms var(--ease), opacity 140ms var(--ease);
 }
 
 .btn-primary {
@@ -615,12 +724,24 @@ footer.page-foot a { color: var(--ink); }
 
 .btn-primary:hover {
   background: var(--ink-soft);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
   margin-top: 12px;
-  background: var(--gold);
+  background: #ebe7dc;
   color: var(--ink);
+}
+
+.btn-secondary:hover {
+  background: #dfd8c8;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .report-output {
@@ -670,6 +791,16 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   padding: 6px;
   font-size: 0.9rem;
+}
+
+@media (max-width: 760px) {
+  .stepper-trail {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-actions {
+    flex-direction: column;
+  }
 }
 
 /* ==========================================================================
