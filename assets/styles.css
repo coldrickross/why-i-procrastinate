@@ -745,6 +745,7 @@ footer.page-foot a { color: var(--ink); }
   grid-template-columns: minmax(0, 2.35fr) minmax(220px, 0.85fr);
   gap: 18px;
   align-items: start;
+  transition: grid-template-columns 260ms var(--ease), gap 260ms var(--ease);
 }
 
 .v2-scale-holder {
@@ -763,6 +764,57 @@ footer.page-foot a { color: var(--ink); }
   border-radius: var(--r-md);
   box-shadow: var(--shadow-sm);
   padding: 14px;
+}
+
+.v2-panel-toggle {
+  align-self: flex-end;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
+}
+
+.v2-panel-toggle:hover {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
+}
+
+.v2-side-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.v2-stage.is-panel-collapsed .v2-layout {
+  grid-template-columns: minmax(0, 1fr) 54px;
+  gap: 24px;
+}
+
+.v2-stage.is-panel-collapsed .v2-side-panel {
+  align-self: stretch;
+  position: sticky;
+  top: 20px;
+  padding: 10px 8px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.v2-stage.is-panel-collapsed .v2-panel-toggle {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  align-self: center;
+  min-height: 170px;
+  padding: 12px 8px;
+}
+
+.v2-stage.is-panel-collapsed .v2-side-content {
+  display: none;
 }
 
 .v2-side-title {
@@ -1040,6 +1092,31 @@ footer.page-foot a { color: var(--ink); }
 
   .v2-side-panel {
     position: static;
+  }
+
+  .v2-panel-toggle {
+    align-self: center;
+  }
+
+  .v2-stage.is-panel-collapsed .v2-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .v2-stage.is-panel-collapsed .v2-side-panel {
+    padding: 10px 10px 2px;
+    align-items: stretch;
+  }
+
+  .v2-stage.is-panel-collapsed .v2-panel-toggle {
+    writing-mode: horizontal-tb;
+    transform: none;
+    min-height: 0;
+    width: fit-content;
+  }
+
+  .v2-stage.is-panel-collapsed .v2-side-content {
+    display: flex;
   }
 
   .v2-side-title {
