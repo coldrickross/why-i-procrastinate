@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>The Scale of Action — Why I Procrastinate</title>
-<meta name="description" content="Every behaviour is a scale. Add your for-and-against items and watch the scale tilt in real time." />
+<title>The Scale — Why I Procrastinate</title>
+<meta name="description" content="A second take on the scale of action. Click items to make them heavier, right-click to make them lighter. Watch the beam tilt with every change." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,171 +16,171 @@
     <div class="links">
       <a href="index.html">Feelings</a>
       <a href="scale.html" class="active">The Scale</a>
-      <a href="scale-v2.html">Scale V2</a>
       <a href="worksheet.html">Worksheet</a>
     </div>
   </nav>
 
   <header class="hero">
-    <h1>The <em>Scale</em> of Action</h1>
-    <p class="sub">Every behaviour is decided on a scale. Put your reasons on either side and watch which way it tips.</p>
+    <h1>The <em>Scale</em></h1>
   </header>
 
-  <main class="wrap">
-    <section class="scale-stage" aria-label="Interactive scale">
-      <svg class="scale-svg" viewBox="0 0 720 520" role="img" aria-label="A balance scale. The left pan holds reasons for action; the right pan holds reasons against.">
-        <!-- base -->
-        <path class="base" d="M260 500 L460 500 L440 480 L280 480 Z" />
-        <rect class="pillar" x="352" y="180" width="16" height="300" rx="3" />
-        <!-- fulcrum cap -->
-        <circle class="rivet" cx="360" cy="180" r="7" />
+  <main class="wrap v2-wrap">
+    <section class="v2-action-bar" aria-label="Action being considered">
+      <label class="v2-action-label" for="v2Action">THE ACTION:</label>
+      <input
+        class="v2-action-input"
+        id="v2Action"
+        type="text"
+        placeholder="Insert Action (e.g. Apply for jobs)"
+        autocomplete="off"
+      />
+    </section>
 
-        <g class="beam">
-          <!-- beam shape -->
-          <rect class="beam-shape" x="120" y="173" width="480" height="14" rx="7" />
-          <circle class="rivet" cx="360" cy="180" r="5" />
+    <section class="v2-legend" aria-label="How it works">
+      <span><b>Click</b> a reason to make it heavier.</span>
+      <span>Use <b>−</b> to make it lighter, <b>×</b> to remove it, <b>✎</b> to rename.</span>
+    </section>
 
-          <!-- LEFT: For action -->
-          <g class="pan-group pan-for">
-            <line class="rope" x1="120" y1="180" x2="80" y2="260" />
-            <line class="rope" x1="120" y1="180" x2="160" y2="260" />
-            <ellipse class="pan-shadow" cx="120" cy="292" rx="70" ry="6" />
-            <path class="pan for" d="M50 260 Q120 310 190 260 Q180 288 120 296 Q60 288 50 260 Z" />
-            <text class="pan-label" x="120" y="278" text-anchor="middle" fill="#f6f1e7" font-family="Inter, sans-serif" font-size="13" font-weight="600">
-              <tspan class="pan-total" id="forTotal">0</tspan>
-            </text>
+    <section class="v2-stage" aria-label="Interactive scale">
+      <div class="v2-scale-holder">
+        <svg class="v2-scale-big" viewBox="0 0 1000 680" role="img" aria-label="A balance scale that literally holds your reasons. The beam tilts while the pans move up and down, staying perpendicular to the floor like real hanging pans.">
+          <!-- Static stand -->
+          <path class="base" d="M370 676 L630 676 L608 652 L392 652 Z" />
+          <rect class="pillar" x="492" y="60" width="16" height="592" rx="4" />
+
+          <!-- Rewards side (left): translates up/down with the beam end, but stays upright -->
+          <g class="pan-group pan-group-left" id="v2PanLeft">
+            <line class="rope" x1="200" y1="66" x2="60" y2="178" />
+            <line class="rope" x1="200" y1="66" x2="340" y2="178" />
+            <foreignObject x="60" y="170" width="280" height="360">
+              <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-for">
+                <div class="v2-pan-heading">
+                  <span class="v2-pan-title">Rewards</span>
+                  <span class="v2-pan-total" id="v2ForTotal">0</span>
+                </div>
+                <div class="v2-items" id="v2ItemsFor"></div>
+                <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Add reason</button>
+              </div>
+            </foreignObject>
           </g>
 
-          <!-- RIGHT: Against action -->
-          <g class="pan-group pan-against">
-            <line class="rope" x1="600" y1="180" x2="560" y2="260" />
-            <line class="rope" x1="600" y1="180" x2="640" y2="260" />
-            <ellipse class="pan-shadow" cx="600" cy="292" rx="70" ry="6" />
-            <path class="pan against" d="M530 260 Q600 310 670 260 Q660 288 600 296 Q540 288 530 260 Z" />
-            <text class="pan-label" x="600" y="278" text-anchor="middle" fill="#f6f1e7" font-family="Inter, sans-serif" font-size="13" font-weight="600">
-              <tspan class="pan-total" id="againstTotal">0</tspan>
-            </text>
+          <!-- Costs side (right): translates up/down with the beam end, but stays upright -->
+          <g class="pan-group pan-group-right" id="v2PanRight">
+            <line class="rope" x1="800" y1="66" x2="660" y2="178" />
+            <line class="rope" x1="800" y1="66" x2="940" y2="178" />
+            <foreignObject x="660" y="170" width="280" height="360">
+              <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-against">
+                <div class="v2-pan-heading">
+                  <span class="v2-pan-title">Costs</span>
+                  <span class="v2-pan-total" id="v2AgainstTotal">0</span>
+                </div>
+                <div class="v2-items" id="v2ItemsAgainst"></div>
+                <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Add reason</button>
+              </div>
+            </foreignObject>
           </g>
-        </g>
 
-        <!-- ground line -->
-        <line x1="80" y1="500" x2="640" y2="500" stroke="rgba(26,29,46,0.12)" stroke-width="1" />
-      </svg>
+          <!-- Tilting beam — rotates around the pivot -->
+          <g class="beam" id="v2Beam">
+            <rect class="beam-shape" x="100" y="53" width="800" height="14" rx="7" />
+            <circle class="rivet" cx="500" cy="60" r="5" />
+          </g>
 
-      <div class="verdict" id="verdict" aria-live="polite">
-        Add a few reasons on each side.
-        <small>The scale tips toward whichever side is heavier.</small>
+          <!-- Pivot rivet sits on top of the beam, stays fixed -->
+          <circle class="rivet" cx="500" cy="60" r="8" />
+        </svg>
+      </div>
+
+      <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
+
+      <div class="v2-actions">
+        <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
       </div>
     </section>
 
-    <section class="scale-columns" aria-label="Your reasons">
-      <div class="column for">
-        <h3>For action</h3>
-        <p class="hint">What pulls you toward doing it? (pros, rewards, fears of not acting)</p>
-        <div class="items" id="itemsFor"></div>
-        <button class="add-row" id="addFor" type="button">+ Add a reason for action</button>
-        <div class="total">Total weight: <b><span id="forTotalLabel">0</span></b></div>
-      </div>
-
-      <div class="column against">
-        <h3>Against action</h3>
-        <p class="hint">What holds you back? (costs, fears, discomfort, distractions)</p>
-        <div class="items" id="itemsAgainst"></div>
-        <button class="add-row" id="addAgainst" type="button">+ Add a reason against action</button>
-        <div class="total">Total weight: <b><span id="againstTotalLabel">0</span></b></div>
-      </div>
-    </section>
-
-    <section class="suggested" aria-label="Suggested words">
+    <section class="suggested" aria-label="Suggested reasons">
       <h4>Need ideas? Tap to drop a common weight onto the scale.</h4>
-      <p class="hint">Click a chip to add it to that side. You can edit or remove it afterwards.</p>
+      <p class="hint">Click a chip to add it to that side. You can edit, resize, or remove it afterwards.</p>
       <span class="chip-label">Toward action</span>
-      <div class="chip-row" id="chipsFor"></div>
+      <div class="chip-row" id="v2ChipsFor"></div>
       <span class="chip-label">Away from action</span>
-      <div class="chip-row" id="chipsAgainst"></div>
+      <div class="chip-row" id="v2ChipsAgainst"></div>
     </section>
 
     <section class="explain">
       <h2>How the scale works</h2>
-      <p>Every time you decide whether to do something, your brain is running a quiet little comparison. It piles up every reason <em>for</em> acting on one side, every reason <em>against</em> on the other, and goes with whichever side is heavier.</p>
-      <p>If you're not taking action, the scale just isn't tilted toward action <em>yet</em>. That's it. It's not a character flaw — it's arithmetic. Procrastination is just the side marked "against" having a bit more weight on it right now.</p>
-      <p>So the question stops being "why am I so lazy?" and becomes something much more useful: <strong>what's on each side of my scale, and how do I change what's there?</strong> Add weight to "for". Take weight off "against". That's the whole game.</p>
+      <p>Every time you decide whether to do something, your brain is running a quiet little comparison. It piles up every potential <em>reward</em> on one side, every possible <em>cost</em> on the other, and goes with whichever side is heavier.</p>
+      <p>If you're not taking action, the scale just isn't tilted toward action <em>yet</em>. That's it. It's not a character flaw — it's arithmetic. Procrastination is just the costs side carrying a bit more weight right now.</p>
+      <p>So the question stops being "why am I so lazy?" and becomes something much more useful: <strong>what's on each side of my scale, and how do I change what's there?</strong> Add weight to rewards. Take weight off costs. That's the whole game.</p>
     </section>
 
     <section class="explain">
       <h2>Three quick examples</h2>
-      <p>Imagine someone asks you to run a marathon tomorrow. You hate running. Watch how the scale changes depending on what else is on it.</p>
+      <p>Imagine someone asks you to run a marathon tomorrow. You hate running. The discomfort of the run (the red weight) never changes — only what's on the other side does.</p>
 
       <div class="examples">
         <figure class="example">
           <svg viewBox="0 0 200 150" aria-hidden="true">
-            <!-- tilt: against wins slightly -->
-            <g transform="rotate(8, 100, 55)">
+            <!-- tilt: against wins — moderate right-down -->
+            <g transform="rotate(10, 100, 55)">
               <rect x="20" y="50" width="160" height="6" rx="3" fill="#1a1d2e" />
-              <circle cx="40" cy="80" r="14" fill="#5b8a8a" />
-              <circle cx="160" cy="80" r="18" fill="#c87668" />
-              <line x1="40" y1="53" x2="40" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
-              <line x1="160" y1="53" x2="160" y2="62" stroke="#1a1d2e" stroke-width="1.5" />
+              <line x1="40" y1="56" x2="40" y2="70" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="40" cy="80" r="10" fill="#5b8a8a" />
+              <line x1="160" y1="56" x2="160" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="160" cy="84" r="18" fill="#c87668" />
             </g>
             <rect x="96" y="58" width="8" height="70" fill="#1a1d2e" />
             <path d="M70 132 L130 132 L124 140 L76 140 Z" fill="#1a1d2e" />
           </svg>
           <h5>"I want to be fit"</h5>
-          <p>A nice-to-have on the "for" side. Not enough to beat the pain of running 42&nbsp;km. You don't go.</p>
+          <p>A nice-to-have on the rewards side. Not enough to beat the pain of running 42&nbsp;km. You don't go.</p>
         </figure>
 
         <figure class="example">
           <svg viewBox="0 0 200 150" aria-hidden="true">
-            <!-- tilt: for wins heavily -->
-            <g transform="rotate(-16, 100, 55)">
+            <!-- tilt: for wins — left goes down -->
+            <g transform="rotate(-14, 100, 55)">
               <rect x="20" y="50" width="160" height="6" rx="3" fill="#1a1d2e" />
-              <circle cx="40" cy="80" r="26" fill="#5b8a8a" />
-              <circle cx="160" cy="80" r="14" fill="#c87668" />
-              <line x1="40" y1="53" x2="40" y2="56" stroke="#1a1d2e" stroke-width="1.5" />
-              <line x1="160" y1="53" x2="160" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <line x1="40" y1="56" x2="40" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="40" cy="86" r="22" fill="#5b8a8a" />
+              <line x1="160" y1="56" x2="160" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="160" cy="84" r="18" fill="#c87668" />
             </g>
             <rect x="96" y="58" width="8" height="70" fill="#1a1d2e" />
             <path d="M70 132 L130 132 L124 140 L76 140 Z" fill="#1a1d2e" />
           </svg>
           <h5>Someone offers $1,000,000</h5>
-          <p>A giant weight lands on "for". The discomfort of the run hasn't changed, but the scale now tips hard. You're lacing up.</p>
+          <p>A giant weight lands on rewards. The discomfort of the run hasn't changed, but the scale now tips hard. You're lacing up.</p>
         </figure>
 
         <figure class="example">
           <svg viewBox="0 0 200 150" aria-hidden="true">
-            <!-- tilt: for wins maximally -->
-            <g transform="rotate(-24, 100, 55)">
+            <!-- tilt: for wins massively -->
+            <g transform="rotate(-22, 100, 55)">
               <rect x="20" y="50" width="160" height="6" rx="3" fill="#1a1d2e" />
-              <circle cx="40" cy="80" r="32" fill="#5b8a8a" />
-              <circle cx="160" cy="80" r="12" fill="#c87668" />
-              <line x1="40" y1="53" x2="40" y2="48" stroke="#1a1d2e" stroke-width="1.5" />
-              <line x1="160" y1="53" x2="160" y2="68" stroke="#1a1d2e" stroke-width="1.5" />
+              <line x1="40" y1="56" x2="40" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="40" cy="90" r="26" fill="#5b8a8a" />
+              <line x1="160" y1="56" x2="160" y2="66" stroke="#1a1d2e" stroke-width="1.5" />
+              <circle cx="160" cy="84" r="18" fill="#c87668" />
             </g>
             <rect x="96" y="58" width="8" height="70" fill="#1a1d2e" />
             <path d="M70 132 L130 132 L124 140 L76 140 Z" fill="#1a1d2e" />
           </svg>
           <h5>Your family is threatened</h5>
-          <p>Now "for" has a world-ending weight on it. Nothing else matters. You run — and you don't even think about it.</p>
+          <p>Now rewards has a world-ending weight on it. Nothing else matters. You run — and you don't even think about it.</p>
         </figure>
       </div>
 
       <p>Same person, same marathon, same legs. The only thing that changed was what's on the scale. That's what you're working with every single day.</p>
     </section>
 
-    <aside class="cta-bar">
-      <div>
-        <h3>Stuck on a specific feeling?</h3>
-        <p>Each common excuse is just one weight. Find yours and the strategy to match.</p>
-      </div>
-      <a class="btn" href="index.html">See the feelings →</a>
-    </aside>
+
   </main>
 
   <footer class="page-foot">
     <p>Made to get you unstuck. <a href="index.html">Back to feelings</a>.</p>
   </footer>
 
-  <script src="assets/data.js"></script>
-  <script src="assets/scale.js"></script>
+  <script src="assets/scale-v2.js"></script>
 </body>
 </html>

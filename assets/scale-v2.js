@@ -16,12 +16,12 @@
   // Balanced weights so the scale starts near-level, inviting exploration.
   const DEFAULT_ACTION = "Apply for jobs";
   const SEED_FOR = [
-    { text: "Want a better role", weight: 3 },
+    { text: "Current work hours are too long", weight: 3 },
     { text: "Need more income", weight: 3 },
     { text: "Learn new skills", weight: 2 },
   ];
   const SEED_AGAINST = [
-    { text: "Fear of rejection", weight: 3 },
+    { text: "Fear of rejection", weight: 6 },
     { text: "Writing applications is tedious", weight: 3 },
     { text: "Impostor syndrome", weight: 2 },
   ];

@@ -687,9 +687,11 @@ footer.page-foot a { color: var(--ink); }
   box-shadow: var(--shadow-sm);
   padding: 14px 18px;
   display: flex;
-  align-items: baseline;
-  gap: 14px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 18px;
+  text-align: center;
 }
 
 .v2-action-label {
@@ -698,11 +700,10 @@ footer.page-foot a { color: var(--ink); }
   text-transform: uppercase;
   color: var(--gold-deep);
   font-weight: 600;
-  flex-shrink: 0;
 }
 
 .v2-action-input {
-  flex: 1;
+  width: min(560px, 100%);
   background: transparent;
   border: 0;
   outline: 0;
@@ -712,6 +713,7 @@ footer.page-foot a { color: var(--ink); }
   color: var(--ink);
   padding: 4px 0;
   border-bottom: 1px dashed var(--line);
+  text-align: center;
 }
 .v2-action-input:focus { border-bottom-color: var(--gold); }
 .v2-action-input::placeholder { color: #a59f92; font-style: italic; }
@@ -806,8 +808,8 @@ footer.page-foot a { color: var(--ink); }
 
 .v2-items {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 8px;
   align-content: flex-start;
   flex: 1;
   min-height: 0;
@@ -833,7 +835,9 @@ footer.page-foot a { color: var(--ink); }
 }
 
 .v2-item {
-  display: inline-flex;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
   align-items: center;
   gap: 6px;
   background: #fff;
@@ -858,9 +862,11 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-against:hover { border-color: var(--terra); border-left-color: var(--terra); }
 
 .v2-item-text {
+  min-width: 0;
   font-family: var(--serif);
   font-weight: 500;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .v2-item-weight {
@@ -877,6 +883,7 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-against .v2-item-weight { background: rgba(200, 118, 104, 0.16); color: var(--terra-deep); }
 
 .v2-item-edit {
+  width: 100%;
   background: transparent;
   border: 0;
   outline: 0;
@@ -884,7 +891,7 @@ footer.page-foot a { color: var(--ink); }
   font-size: 1rem;
   font-weight: 500;
   color: var(--ink);
-  min-width: 160px;
+  min-width: 0;
 }
 
 .v2-item-edit-btn,
