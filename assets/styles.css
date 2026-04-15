@@ -788,7 +788,7 @@ footer.page-foot a { color: var(--ink); }
   gap: 8px;
   overflow: hidden;
   /* Bump base size so text stays legible when the SVG scales down. */
-  font-size: 18px;
+  font-size: 19px;
 }
 .v2-pan-for { border-top: 5px solid var(--teal); }
 .v2-pan-against { border-top: 5px solid var(--terra); }
@@ -823,7 +823,7 @@ footer.page-foot a { color: var(--ink); }
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 4px; /* leave room for the scrollbar so items don't bump it */
+  padding-right: 4px; /* keep a little room for the scrollbar */
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
 }
@@ -851,16 +851,17 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   padding: 0 8px 0 12px;
-  min-height: 48px;
+  min-height: 56px;
   user-select: none;
   cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
   line-height: 1.2;
+  overflow: hidden;
   /* Fixed, readable size for every row regardless of weight. */
-  font-size: 0.95rem;
+  font-size: 1.08rem;
 }
 .v2-item:hover {
-  transform: translateY(-1px);
+  transform: none;
   box-shadow: var(--shadow-sm);
 }
 .v2-item-for { border-left: 3px solid var(--teal); }
@@ -871,16 +872,24 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-text {
   flex: 1;
   min-width: 0;
+  padding: 6px 0;
   font-family: var(--serif);
   font-weight: 500;
   color: var(--ink);
   overflow-wrap: anywhere;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  max-height: calc(1.15em * 3);
+  overflow: hidden;
   align-self: center;
 }
 
 .v2-item-weight {
   font-family: var(--sans);
-  font-size: 0.72em;
+  font-size: 0.8em;
   font-weight: 600;
   background: var(--cream);
   color: var(--ink-soft);
