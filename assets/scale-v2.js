@@ -219,11 +219,15 @@
     removeBtn.setAttribute("aria-label", `Remove "${item.text}"`);
     removeBtn.textContent = "\u00d7"; // ×
 
+    const controls = document.createElement("div");
+    controls.className = "v2-item-controls";
+    controls.appendChild(plusBtn);
+    controls.appendChild(minusBtn);
+    controls.appendChild(removeBtn);
+
     row.appendChild(label);
     row.appendChild(badge);
-    row.appendChild(plusBtn);
-    row.appendChild(minusBtn);
-    row.appendChild(removeBtn);
+    row.appendChild(controls);
 
     // Double-click the label to rename.
     label.addEventListener("dblclick", (e) => {
@@ -242,15 +246,11 @@
       render();
     });
 
-    // Minus button: one step lighter, remove at 0.
+    // Minus button: one step lighter, but never below 1.
     minusBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      item.weight -= 1;
-      if (item.weight <= 0) {
-        removeItem(item.id, side);
-      } else {
-        render();
-      }
+      item.weight = Math.max(1, item.weight - 1);
+      render();
     });
 
     // Remove button: delete the reason entirely.

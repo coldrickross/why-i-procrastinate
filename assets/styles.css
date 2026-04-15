@@ -842,11 +842,11 @@ footer.page-foot a { color: var(--ink); }
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  padding: 6px 6px 6px 12px;
+  padding: 0 8px 0 12px;
+  min-height: 48px;
   user-select: none;
   cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
-  animation: fadeUp 220ms var(--ease);
   line-height: 1.2;
   /* Fixed, readable size for every row regardless of weight. */
   font-size: 0.95rem;
@@ -867,6 +867,7 @@ footer.page-foot a { color: var(--ink); }
   font-weight: 500;
   color: var(--ink);
   overflow-wrap: anywhere;
+  align-self: center;
 }
 
 .v2-item-weight {
@@ -878,9 +879,24 @@ footer.page-foot a { color: var(--ink); }
   border-radius: 999px;
   padding: 1px 8px;
   font-variant-numeric: tabular-nums;
+  align-self: center;
 }
 .v2-item-for .v2-item-weight { background: rgba(91, 138, 138, 0.16); color: var(--teal-deep); }
 .v2-item-against .v2-item-weight { background: rgba(200, 118, 104, 0.16); color: var(--terra-deep); }
+
+.v2-item-controls {
+  align-self: stretch;
+  display: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 30px;
+  gap: 0;
+  margin-left: 6px;
+  margin-right: -8px;
+  border-left: 1px solid var(--line);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  overflow: hidden;
+  background: #f9f8f4;
+}
 
 .v2-item-edit {
   width: 100%;
@@ -898,16 +914,15 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-plus,
 .v2-item-minus,
 .v2-item-remove {
-  width: 22px;
-  height: 22px;
+  width: 100%;
+  height: 100%;
   padding: 0;
-  border-radius: 999px;
-  /* Hidden until hover — fully removed from layout so the row stays clean
-     and the text gets the full width when no buttons are showing. */
-  display: none;
+  border-radius: 0;
+  display: inline-grid;
   place-items: center;
-  color: var(--muted);
-  font-size: 0.85rem;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
   line-height: 1;
   background: transparent;
   border: 0;
@@ -916,20 +931,17 @@ footer.page-foot a { color: var(--ink); }
 }
 .v2-item-edit-btn { font-size: 0.78rem; }
 .v2-item-remove { font-size: 1rem; }
-.v2-item:hover .v2-item-edit-btn,
-.v2-item:hover .v2-item-plus,
-.v2-item:hover .v2-item-minus,
-.v2-item:hover .v2-item-remove,
-.v2-item:focus-within .v2-item-edit-btn,
-.v2-item:focus-within .v2-item-plus,
-.v2-item:focus-within .v2-item-minus,
-.v2-item:focus-within .v2-item-remove {
-  display: inline-grid;
+.v2-item-plus { background: rgba(91, 138, 138, 0.18); color: var(--teal-deep); }
+.v2-item-minus { background: rgba(212, 165, 116, 0.22); color: #946437; }
+.v2-item-remove { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
+.v2-item:hover .v2-item-controls,
+.v2-item:focus-within .v2-item-controls {
+  display: grid;
 }
 .v2-item-edit-btn:hover,
-.v2-item-plus:hover,
-.v2-item-minus:hover { background: var(--cream-deep); color: var(--ink); }
-.v2-item-remove:hover { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
+.v2-item-plus:hover { background: var(--teal); color: #fff; }
+.v2-item-minus:hover { background: var(--gold-deep); color: #fff; }
+.v2-item-remove:hover { background: var(--terra); color: #fff; }
 
 .v2-add {
   align-self: stretch;
