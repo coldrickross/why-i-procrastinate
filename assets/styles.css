@@ -816,13 +816,13 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-md);
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   overflow: hidden;
   /* Bump base size so text stays legible when the SVG scales down. */
-  font-size: 18px;
+  font-size: 20px;
 }
 .v2-pan-for { border-top: 5px solid var(--teal); }
 .v2-pan-against { border-top: 5px solid var(--terra); }
@@ -834,7 +834,7 @@ footer.page-foot a { color: var(--ink); }
 }
 .v2-pan-title {
   font-family: var(--serif);
-  font-size: 1.25rem;
+  font-size: 1.42rem;
   font-weight: 500;
 }
 .v2-pan-total {
@@ -851,7 +851,7 @@ footer.page-foot a { color: var(--ink); }
 .v2-items {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   align-content: flex-start;
   flex: 1;
   min-height: 0;
@@ -885,13 +885,13 @@ footer.page-foot a { color: var(--ink); }
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   padding: 0 8px 0 12px;
-  min-height: 48px;
+  min-height: 56px;
   user-select: none;
   cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
   line-height: 1.2;
   /* Fixed, readable size for every row regardless of weight. */
-  font-size: 0.95rem;
+  font-size: 1.08rem;
 }
 .v2-item:hover {
   transform: translateY(-1px);
@@ -914,12 +914,12 @@ footer.page-foot a { color: var(--ink); }
 
 .v2-item-weight {
   font-family: var(--sans);
-  font-size: 0.72em;
+  font-size: 0.78em;
   font-weight: 600;
   background: var(--cream);
   color: var(--ink-soft);
   border-radius: 999px;
-  padding: 1px 8px;
+  padding: 2px 10px;
   font-variant-numeric: tabular-nums;
   align-self: center;
 }
@@ -987,13 +987,14 @@ footer.page-foot a { color: var(--ink); }
 
 .v2-add {
   align-self: stretch;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: var(--r-sm);
   border: 1px dashed var(--line);
   background: transparent;
   color: var(--muted);
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.02rem;
   transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
 }
 .v2-add-for:hover { background: rgba(91, 138, 138, 0.08); color: var(--teal-deep); border-color: var(--teal); }
