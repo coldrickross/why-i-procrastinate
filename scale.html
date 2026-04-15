@@ -25,20 +25,10 @@
   </header>
 
   <main class="wrap v2-wrap">
-    <section class="v2-action-bar" aria-label="Action being considered">
-      <label class="v2-action-label" for="v2Action">THE ACTION:</label>
-      <input
-        class="v2-action-input"
-        id="v2Action"
-        type="text"
-        placeholder="Insert Action (e.g. Apply for jobs)"
-        autocomplete="off"
-      />
-    </section>
-
     <section class="v2-stage" aria-label="Interactive scale">
-      <div class="v2-scale-holder">
-        <svg class="v2-scale-big" viewBox="0 0 1000 680" role="img" aria-label="A balance scale that literally holds your reasons. The beam tilts while the pans move up and down, staying perpendicular to the floor like real hanging pans.">
+      <div class="v2-layout">
+        <div class="v2-scale-holder">
+          <svg class="v2-scale-big" viewBox="0 0 1000 680" role="img" aria-label="A balance scale that literally holds your reasons. The beam tilts while the pans move up and down, staying perpendicular to the floor like real hanging pans.">
           <!-- Static stand -->
           <path class="base" d="M370 676 L630 676 L608 652 L392 652 Z" />
           <rect class="pillar" x="492" y="60" width="16" height="592" rx="4" />
@@ -83,13 +73,27 @@
 
           <!-- Pivot rivet sits on top of the beam, stays fixed -->
           <circle class="rivet" cx="500" cy="60" r="8" />
-        </svg>
-      </div>
+          </svg>
+        </div>
 
-      <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
+        <aside class="v2-side-panel" aria-label="Action details and outcome">
+          <section class="v2-action-bar" aria-label="Action being considered">
+            <label class="v2-action-label" for="v2Action">THE ACTION:</label>
+            <input
+              class="v2-action-input"
+              id="v2Action"
+              type="text"
+              placeholder="Insert Action (e.g. Apply for jobs)"
+              autocomplete="off"
+            />
+          </section>
 
-      <div class="v2-actions">
-        <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
+          <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
+
+          <div class="v2-actions">
+            <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
+          </div>
+        </aside>
       </div>
     </section>
 
