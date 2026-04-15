@@ -845,7 +845,7 @@ footer.page-foot a { color: var(--ink); }
   border-radius: var(--r-sm);
   padding: 6px 6px 6px 12px;
   user-select: none;
-  cursor: pointer;
+  cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
   animation: fadeUp 220ms var(--ease);
   line-height: 1.2;
@@ -895,6 +895,7 @@ footer.page-foot a { color: var(--ink); }
 }
 
 .v2-item-edit-btn,
+.v2-item-plus,
 .v2-item-minus,
 .v2-item-remove {
   width: 22px;
@@ -909,21 +910,34 @@ footer.page-foot a { color: var(--ink); }
   background: transparent;
   border: 0;
   cursor: pointer;
-  /* Always visible so they're reachable no matter the row length. */
-  opacity: 0.75;
+  /* Hidden until hover — revealed as a group so the row stays clean. */
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 160ms var(--ease), background 180ms var(--ease), color 180ms var(--ease);
 }
 .v2-item-edit-btn { font-size: 0.78rem; }
 .v2-item-remove { font-size: 1rem; }
 .v2-item:hover .v2-item-edit-btn,
+.v2-item:hover .v2-item-plus,
 .v2-item:hover .v2-item-minus,
 .v2-item:hover .v2-item-remove,
 .v2-item-edit-btn:focus-visible,
+.v2-item-plus:focus-visible,
 .v2-item-minus:focus-visible,
-.v2-item-remove:focus-visible { opacity: 1; }
+.v2-item-remove:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
 .v2-item-edit-btn:hover,
+.v2-item-plus:hover,
 .v2-item-minus:hover { background: var(--cream-deep); color: var(--ink); }
 .v2-item-remove:hover { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
+
+/* Freeze the scale animation while hovering an item so controls stay put. */
+.v2-scale-big.v2-interacting .beam,
+.v2-scale-big.v2-interacting .pan-group {
+  transition: none;
+}
 
 .v2-add {
   align-self: stretch;

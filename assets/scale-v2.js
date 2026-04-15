@@ -68,6 +68,10 @@
   const verdictEl = document.getElementById("v2Verdict");
   const chipsForEl = document.getElementById("v2ChipsFor");
   const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
+  const scaleEl = document.querySelector(".v2-scale-big");
+
+  // Timer used to debounce the scale-freeze class when moving between items.
+  let interactTimer = null;
 
   // Seed example items so the page isn't empty on first load.
   actionInput.value = DEFAULT_ACTION;
@@ -179,22 +183,23 @@
     const label = document.createElement("span");
     label.className = "v2-item-text";
     label.textContent = item.text;
+    label.title = "Double-click to rename";
 
     const badge = document.createElement("span");
     badge.className = "v2-item-weight";
     badge.textContent = item.weight;
+
+    const plusBtn = document.createElement("button");
+    plusBtn.type = "button";
+    plusBtn.className = "v2-item-plus";
+    plusBtn.setAttribute("aria-label", `Make "${item.text}" heavier`);
+    plusBtn.textContent = "+";
 
     const minusBtn = document.createElement("button");
     minusBtn.type = "button";
     minusBtn.className = "v2-item-minus";
     minusBtn.setAttribute("aria-label", `Make "${item.text}" lighter`);
     minusBtn.textContent = "\u2212"; // proper minus sign
-
-    const editBtn = document.createElement("button");
-    editBtn.type = "button";
-    editBtn.className = "v2-item-edit-btn";
-    editBtn.setAttribute("aria-label", `Rename "${item.text}"`);
-    editBtn.textContent = "\u270e"; // pencil
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
@@ -204,16 +209,34 @@
 
     row.appendChild(label);
     row.appendChild(badge);
+    row.appendChild(plusBtn);
     row.appendChild(minusBtn);
-    row.appendChild(editBtn);
     row.appendChild(removeBtn);
 
-    row.title = "Click to make heavier.  −  lighter  ·  ✎  rename  ·  ×  remove";
+    // Freeze the scale animation while the mouse is over this row so the
+    // buttons don't drift away mid-click. A brief timer prevents a flash
+    // when moving directly from one item to another.
+    row.addEventListener("mouseenter", () => {
+      clearTimeout(interactTimer);
+      scaleEl.classList.add("v2-interacting");
+    });
+    row.addEventListener("mouseleave", () => {
+      interactTimer = setTimeout(() => scaleEl.classList.remove("v2-interacting"), 0);
+    });
 
-    // Left click anywhere on the row (except one of the buttons): heavier.
-    row.addEventListener("click", (e) => {
-      if (e.target.closest("button")) return;
-      if (e.target.tagName === "INPUT") return;
+    // Double-click the label to rename.
+    label.addEventListener("dblclick", (e) => {
+      e.stopPropagation();
+      item.isNew = true;
+      render();
+      const container = side === "for" ? itemsForEl : itemsAgainstEl;
+      const input = container.querySelector(`.v2-item[data-id="${item.id}"] input.v2-item-edit`);
+      if (input) { input.focus(); input.select(); }
+    });
+
+    // Plus button: one step heavier.
+    plusBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       item.weight = Math.min(MAX_WEIGHT, item.weight + 1);
       render();
     });
@@ -233,16 +256,6 @@
     removeBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       removeItem(item.id, side);
-    });
-
-    // Edit button — flip the row back into its input-editing state.
-    editBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      item.isNew = true;
-      render();
-      const container = side === "for" ? itemsForEl : itemsAgainstEl;
-      const input = container.querySelector(`.v2-item[data-id="${item.id}"] input.v2-item-edit`);
-      if (input) { input.focus(); input.select(); }
     });
 
     return row;
