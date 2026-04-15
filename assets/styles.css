@@ -680,6 +680,11 @@ footer.page-foot a { color: var(--ink); }
   max-width: 1080px;
 }
 
+.hero.v2-hero {
+  padding-top: 44px;
+  padding-bottom: 20px;
+}
+
 .v2-action-bar {
   background: var(--paper);
   border: 1px solid var(--line);
@@ -690,7 +695,9 @@ footer.page-foot a { color: var(--ink); }
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  margin-bottom: 18px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto 18px;
   text-align: center;
 }
 
@@ -703,7 +710,8 @@ footer.page-foot a { color: var(--ink); }
 }
 
 .v2-action-input {
-  width: min(560px, 100%);
+  width: auto;
+  max-width: 100%;
   background: transparent;
   border: 0;
   outline: 0;

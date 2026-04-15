@@ -97,7 +97,16 @@
 
   actionInput.addEventListener("input", (e) => {
     state.action = e.target.value;
+    sizeActionInput();
   });
+
+  function sizeActionInput() {
+    const minChars = 16;
+    const maxChars = 40;
+    const source = actionInput.value.trim() || actionInput.placeholder || "";
+    const chars = Math.min(maxChars, Math.max(minChars, source.length + 1));
+    actionInput.style.width = `${chars}ch`;
+  }
 
   // Attach once to the persistent pan containers (the inner rows get rebuilt
   // on every render, so per-row listeners would break mid-click).
@@ -195,7 +204,6 @@
     const label = document.createElement("span");
     label.className = "v2-item-text";
     label.textContent = item.text;
-    label.title = "Double-click to rename";
 
     const badge = document.createElement("span");
     badge.className = "v2-item-weight";
@@ -334,5 +342,6 @@
     return Math.max(lo, Math.min(hi, v));
   }
 
+  sizeActionInput();
   render();
 })();
