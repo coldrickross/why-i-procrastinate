@@ -10,11 +10,11 @@
     { id: "goal",              phase: "want",      title: "Decide a long-term goal",
       prompt: "One sentence is plenty. Aim at something that would genuinely matter to you.",
       example: "Example: Build a stronger, healthier life.",
-      type: "textarea" },
+      type: "short" },
     { id: "identity",          phase: "want",      title: "Turn your goal into an identity",
       prompt: "Who do you become if this goal is real? Use a noun, not a verb.",
       example: "Examples: Tidy person · Athlete · Person who makes hard choices.",
-      type: "textarea" },
+      type: "short" },
     { id: "facts",             phase: "feel",      title: "State the true facts about where you are today",
       prompt: "Write facts only. No drama. No hiding. Just what is.",
       example: "Example: I sleep at 2am on weekdays. I haven't exercised in 6 weeks.",
@@ -55,10 +55,8 @@
       prompt: "Who sees your effort? How often? Keep self-worth separate from their reaction.",
       example: "Example: Send a thumbs-up in the group chat each morning I walk.",
       type: "textarea" },
-    { id: "tracking",          phase: "structure", title: "Track completion daily",
-      prompt: "Where will your visible chart live? It should be hard to ignore.",
-      example: "Example: A4 grid on the fridge, one tick per day.",
-      type: "textarea" },
+    { id: "tracking",          phase: "structure", title: "Your 4-week progress chart",
+      type: "info" },
     { id: "roadblocks",        phase: "structure", title: "Plan exceptions and roadblocks",
       prompt: "If sick, travelling, or blocked — what is your fallback task?",
       example: "Example: If I can't walk, I do 10 minutes of stretching at home.",
@@ -154,7 +152,8 @@
 
     // Dot states
     Array.from(dotsEl.children).forEach((node, i) => {
-      node.classList.toggle("is-done",    i <  currentIndex && answers[steps[i].id].trim() !== "");
+      const done = i < currentIndex && (steps[i].type === "info" || answers[steps[i].id].trim() !== "");
+      node.classList.toggle("is-done",    done);
       node.classList.toggle("is-touched", i <  currentIndex);
       node.classList.toggle("is-current", i === currentIndex);
     });
@@ -181,6 +180,41 @@
     const card = document.createElement("article");
     card.className = `iaw-step-card ${toneClass(step.phase)}`;
 
+    const isInfo  = step.type === "info";
+    const isShort = step.type === "short";
+
+    const bodyMarkup = isInfo
+      ? `
+        <div class="iaw-info">
+          <p class="iaw-info-lead">A visible chart turns intention into <strong>evidence</strong>. Every tick is proof — to you — of your new identity, and a quiet promise kept to your future self.</p>
+          ${renderAnimatedGrid()}
+          <p class="iaw-info-note">This chart will be included in your report — print it, stick it somewhere hard to ignore, and mark one box each day.</p>
+        </div>
+      `
+      : `
+        ${step.timerSeconds ? `
+          <div class="iaw-timer" id="timer-wrap-${step.id}">
+            <span class="iaw-timer-dot" aria-hidden="true"></span>
+            <span class="iaw-timer-label">Suggested time</span>
+            <span class="iaw-timer-value" id="timer-${step.id}">${formatTime(step.timerSeconds)}</span>
+          </div>
+        ` : ""}
+
+        <label class="iaw-step-label" for="input-${step.id}">Your answer</label>
+        ${isShort
+          ? `<input id="input-${step.id}"
+                    class="iaw-step-input iaw-step-input--short"
+                    data-step-id="${step.id}"
+                    type="text"
+                    placeholder="Write here — no pressure to be perfect." />`
+          : `<textarea id="input-${step.id}"
+                       class="iaw-step-input"
+                       data-step-id="${step.id}"
+                       rows="5"
+                       placeholder="Write here — no pressure to be perfect."></textarea>`}
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      `;
+
     card.innerHTML = `
       <header class="iaw-step-head">
         <div class="iaw-step-badge">
@@ -192,29 +226,15 @@
       </header>
 
       <h2 class="iaw-step-title">${escapeHtml(step.title)}</h2>
-      <p class="iaw-step-prompt">${escapeHtml(step.prompt)}</p>
+      ${step.prompt ? `<p class="iaw-step-prompt">${escapeHtml(step.prompt)}</p>` : ""}
 
-      ${step.timerSeconds ? `
-        <div class="iaw-timer" id="timer-wrap-${step.id}">
-          <span class="iaw-timer-dot" aria-hidden="true"></span>
-          <span class="iaw-timer-label">Suggested time</span>
-          <span class="iaw-timer-value" id="timer-${step.id}">${formatTime(step.timerSeconds)}</span>
-        </div>
-      ` : ""}
-
-      <label class="iaw-step-label" for="input-${step.id}">Your answer</label>
-      <textarea id="input-${step.id}"
-                class="iaw-step-input"
-                data-step-id="${step.id}"
-                rows="5"
-                placeholder="Write here — no pressure to be perfect."></textarea>
-      <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      ${bodyMarkup}
 
       <nav class="iaw-step-nav" aria-label="Step navigation">
         <button class="iaw-btn iaw-btn-ghost" id="iawPrev" type="button" ${currentIndex === 0 ? "disabled" : ""}>
           ← Previous
         </button>
-        <div class="iaw-step-save" id="iawSaveHint" aria-live="polite">Draft kept in this tab</div>
+        <div class="iaw-step-save" id="iawSaveHint" aria-live="polite">${isInfo ? "Included in your report" : "Draft kept in this tab"}</div>
         <button class="iaw-btn iaw-btn-primary" id="iawNext" type="button">
           ${currentIndex === steps.length - 1 ? "Finish" : "Next"} →
         </button>
@@ -223,18 +243,20 @@
 
     stepRoot.appendChild(card);
 
-    // Restore answer
+    // Restore answer / wire input
     const input = card.querySelector(".iaw-step-input");
-    input.value = answers[step.id] || "";
-    input.focus({ preventScroll: true });
+    if (input) {
+      input.value = answers[step.id] || "";
+      input.focus({ preventScroll: true });
 
-    input.addEventListener("input", () => {
-      answers[step.id] = input.value;
-      if (step.timerSeconds && input.value.trim() && !timerState.has(step.id)) {
-        startTimer(step.id, step.timerSeconds);
-      }
-      updatePath();
-    });
+      input.addEventListener("input", () => {
+        answers[step.id] = input.value;
+        if (step.timerSeconds && input.value.trim() && !timerState.has(step.id)) {
+          startTimer(step.id, step.timerSeconds);
+        }
+        updatePath();
+      });
+    }
 
     // If a timer was already running for this step, resume its display
     if (step.timerSeconds && timerState.has(step.id)) {
@@ -299,12 +321,14 @@
     if (inp) answers[inp.dataset.stepId] = inp.value;
 
     const today = new Date();
-    const reportData = steps.map((step, i) => ({
-      number: i + 1,
-      title: step.title,
-      phase: PHASES[step.phase].label,
-      value: (answers[step.id] || "").trim() || "(No response entered)",
-    }));
+    const reportData = steps
+      .filter((step) => step.type !== "info")
+      .map((step, i) => ({
+        number: i + 1,
+        title: step.title,
+        phase: PHASES[step.phase].label,
+        value: (answers[step.id] || "").trim() || "(No response entered)",
+      }));
 
     const gridDays = createGridDays(today, 28);
     reportOutput.innerHTML = renderReportPreview(reportData, gridDays, today);
@@ -406,6 +430,31 @@
     });
     html += "</tbody></table>";
     return html;
+  }
+
+  // Animated 4-week chart (used inside the tracking info step) ------------
+  function renderAnimatedGrid() {
+    const rows = 4;
+    const cols = 7;
+    const dayNames = ["M", "T", "W", "T", "F", "S", "S"];
+    let cells = "";
+    for (let r = 0; r < rows; r += 1) {
+      for (let c = 0; c < cols; c += 1) {
+        const idx = r * cols + c;
+        cells += `<span class="iaw-chart-cell" style="--i:${idx}" aria-hidden="true"><span class="iaw-chart-tick"></span></span>`;
+      }
+    }
+    const header = dayNames.map((d) => `<span class="iaw-chart-head">${d}</span>`).join("");
+    const weekLabels = [1, 2, 3, 4].map((w) => `<span class="iaw-chart-week">Week ${w}</span>`).join("");
+    return `
+      <div class="iaw-chart" role="img" aria-label="Animated preview of a 4-week tracking chart, 28 days">
+        <div class="iaw-chart-weeks">${weekLabels}</div>
+        <div class="iaw-chart-body">
+          <div class="iaw-chart-head-row">${header}</div>
+          <div class="iaw-chart-grid">${cells}</div>
+        </div>
+      </div>
+    `;
   }
 
   // Helpers ----------------------------------------------------------------
