@@ -202,13 +202,6 @@
     minusBtn.title = "Decrease weight (−1)";
     minusBtn.textContent = "\u22121"; // −1
 
-    const editBtn = document.createElement("button");
-    editBtn.type = "button";
-    editBtn.className = "v2-item-edit-btn";
-    editBtn.setAttribute("aria-label", `Rename "${item.text}"`);
-    editBtn.title = "Rename reason";
-    editBtn.textContent = "\u270e"; // pencil
-
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
     removeBtn.className = "v2-item-remove";
@@ -223,7 +216,6 @@
     row.appendChild(badge);
     row.appendChild(actions);
     actions.appendChild(minusBtn);
-    actions.appendChild(editBtn);
     actions.appendChild(removeBtn);
 
     row.title = "Click to make heavier";
@@ -236,6 +228,11 @@
       render();
     });
     row.addEventListener("keydown", (e) => {
+      if (e.key === "F2") {
+        e.preventDefault();
+        beginEdit(item, side);
+        return;
+      }
       if (e.key !== "Enter" && e.key !== " ") return;
       if (e.target.closest("button")) return;
       e.preventDefault();
@@ -260,14 +257,10 @@
       removeItem(item.id, side, { trackUndo: true });
     });
 
-    // Edit button — flip the row back into its input-editing state.
-    editBtn.addEventListener("click", (e) => {
+    // Double-click label to rename without an always-visible edit icon.
+    label.addEventListener("dblclick", (e) => {
       e.stopPropagation();
-      item.isNew = true;
-      render();
-      const container = side === "for" ? itemsForEl : itemsAgainstEl;
-      const input = container.querySelector(`.v2-item[data-id="${item.id}"] input.v2-item-edit`);
-      if (input) { input.focus(); input.select(); }
+      beginEdit(item, side);
     });
 
     return row;
@@ -283,6 +276,14 @@
     }
     state[side] = state[side].filter((x) => x.id !== id);
     render();
+  }
+
+  function beginEdit(item, side) {
+    item.isNew = true;
+    render();
+    const container = side === "for" ? itemsForEl : itemsAgainstEl;
+    const input = container.querySelector(`.v2-item[data-id="${item.id}"] input.v2-item-edit`);
+    if (input) { input.focus(); input.select(); }
   }
 
   function showUndoToast(msg) {
