@@ -70,13 +70,45 @@
       example: "Example: Walk · 20 minutes · 7am · Mon & Wed.",
       type: "ssmart-builder" },
     { id: "distractions",      phase: "structure", title: "Remove distractions",
-      prompt: "What will you remove, block, mute, or move out of sight?",
-      example: "Example: Phone charges in the kitchen. Notifications off after 9pm.",
-      type: "textarea" },
+      prompt: "Every distraction has a tactic. Tap a common one below or add your own, then pick how you'll handle it.",
+      example: "The best tactic is often the laziest one — move the thing, don't rely on willpower.",
+      type: "distraction-board",
+      suggestions: [
+        "Phone", "Instagram", "TikTok", "YouTube",
+        "Email", "Slack / Teams", "News sites", "TV",
+        "Games", "Snacks in reach",
+      ],
+      tactics: [
+        { key: "remove",   label: "Remove",   hint: "Delete or get rid of it." },
+        { key: "block",    label: "Block",    hint: "App limit, site blocker, grayscale." },
+        { key: "mute",     label: "Mute",     hint: "Notifications off, silent mode." },
+        { key: "hide",     label: "Hide",     hint: "Off the home screen, in a drawer." },
+        { key: "relocate", label: "Relocate", hint: "Charge it in another room." },
+      ] },
     { id: "resistance",        phase: "structure", title: "Engineer out environmental resistance",
-      prompt: "Make doing the habit easier by default. Reduce the steps to start.",
-      example: "Example: Lay gym clothes on the chair the night before.",
-      type: "textarea" },
+      prompt: "Friction is the silent killer of habits. Pick the tactics you'll use, then describe what it looks like in your life.",
+      example: "You don't need all of them. One or two, used seriously, is plenty.",
+      type: "friction-reducer",
+      tactics: [
+        { key: "prepare",  title: "Prepare the night before",
+          blurb: "Do tomorrow's first step tonight while motivation is cheap.",
+          placeholder: "e.g. Lay out gym clothes and shoes by the door." },
+        { key: "cue",      title: "Put the cue in plain sight",
+          blurb: "Make the trigger impossible to miss.",
+          placeholder: "e.g. Running shoes next to the kettle." },
+        { key: "stack",    title: "Stack it onto an existing habit",
+          blurb: "After [existing habit], I will [new habit].",
+          placeholder: "e.g. After I pour my morning coffee, I walk for 20 minutes." },
+        { key: "shrink",   title: "Shrink the starting step",
+          blurb: "Make the first 60 seconds ridiculously easy.",
+          placeholder: "e.g. Just put the shoes on and step outside." },
+        { key: "default",  title: "Make it the default",
+          blurb: "Remove the decision. Same time, same route, same version.",
+          placeholder: "e.g. Same 20-min loop, same time, every scheduled day." },
+        { key: "commit",   title: "Pre-commit so future-you can't wriggle out",
+          blurb: "Lock it in before resistance shows up.",
+          placeholder: "e.g. Alarm set. Walking buddy texted the night before." },
+      ] },
     { id: "accountability",    phase: "structure", title: "Add accountability — gently",
       prompt: "Who sees your effort? How often? Keep self-worth separate from their reaction.",
       example: "Example: Send a thumbs-up in the group chat each morning I walk.",
@@ -84,13 +116,28 @@
     { id: "tracking",          phase: "structure", title: "Your 4-week progress chart",
       type: "info" },
     { id: "roadblocks",        phase: "structure", title: "Plan exceptions and roadblocks",
-      prompt: "If sick, travelling, or blocked — what is your fallback task?",
-      example: "Example: If I can't walk, I do 10 minutes of stretching at home.",
-      type: "textarea" },
+      prompt: "Life will get in the way. Decide now — in calm mind — what the tiny fallback looks like so future-you doesn't have to improvise.",
+      example: "The fallback should be small enough that you can't talk yourself out of it.",
+      type: "scenario-plans",
+      scenarios: [
+        { key: "sick",      label: "When I'm sick",            icon: "🤒", placeholder: "e.g. 5 minutes of gentle stretching." },
+        { key: "travel",    label: "When I'm travelling",      icon: "✈️", placeholder: "e.g. 10-min hotel walk or bodyweight squats." },
+        { key: "tired",     label: "When I'm exhausted",       icon: "😴", placeholder: "e.g. Put the shoes on, walk to the corner, come home." },
+        { key: "busy",      label: "When the day gets hijacked", icon: "⏰", placeholder: "e.g. 2-minute version counts. Anything > 0." },
+        { key: "weather",   label: "When the weather blocks me", icon: "🌧️", placeholder: "e.g. Indoor stair loops for 10 minutes." },
+        { key: "low-mood",  label: "When I feel low",          icon: "🌧", placeholder: "e.g. Walk to the door. That's the whole win today." },
+      ] },
     { id: "missed-day",        phase: "structure", title: "If you miss a day",
-      prompt: "Your self-forgiveness script and your restart plan for tomorrow.",
-      example: "Example: 'One day isn't the pattern. Tomorrow I walk at 7am as planned.'",
-      type: "textarea" },
+      prompt: "Missing once is noise. Missing twice is a pattern. Write the script now so you know exactly what to say — and do — on day one after a slip.",
+      example: "Speak to yourself the way you'd speak to a friend you love.",
+      type: "missed-day-plan",
+      mantras: [
+        "One day isn't the pattern — two would be. Today I restart.",
+        "I'm the kind of person who restarts. That's the real identity.",
+        "Missing once is data, not failure.",
+        "The streak was never the point. The person I'm becoming is.",
+        "Day 1 again. That's still a day 1 — and day 1s are powerful.",
+      ] },
   ];
 
   // State ------------------------------------------------------------------
@@ -100,10 +147,27 @@
     time: "",
     days: [false, false, false, false, false, false, false], // Mon..Sun
   });
+  const emptyDistractionBoard = () => [];
+  const emptyFrictionReducer = (step) => {
+    const out = {};
+    (step.tactics || []).forEach((t) => { out[t.key] = { on: false, detail: "" }; });
+    return out;
+  };
+  const emptyScenarioPlans = (step) => {
+    const out = {};
+    (step.scenarios || []).forEach((s) => { out[s.key] = ""; });
+    return out;
+  };
+  const emptyMissedDayPlan = () => ({ mantra: "", restart: "" });
+
   const answers = Object.fromEntries(
     steps.map((s) => {
       if (s.type === "problem-list") return [s.id, []];
       if (s.type === "ssmart-builder") return [s.id, emptySsmart()];
+      if (s.type === "distraction-board") return [s.id, emptyDistractionBoard()];
+      if (s.type === "friction-reducer") return [s.id, emptyFrictionReducer(s)];
+      if (s.type === "scenario-plans") return [s.id, emptyScenarioPlans(s)];
+      if (s.type === "missed-day-plan") return [s.id, emptyMissedDayPlan()];
       return [s.id, ""];
     })
   );
@@ -229,6 +293,21 @@
       const hasText = [v.action, v.measure, v.time].some((s) => String(s || "").trim());
       return !hasText && countSelectedDays(v) === 0;
     }
+    if (step.type === "distraction-board") {
+      return !Array.isArray(v) || v.every((d) => !String(d && d.what || "").trim());
+    }
+    if (step.type === "friction-reducer") {
+      if (!v) return true;
+      return !(step.tactics || []).some((t) => v[t.key] && v[t.key].on);
+    }
+    if (step.type === "scenario-plans") {
+      if (!v) return true;
+      return !(step.scenarios || []).some((s) => String(v[s.key] || "").trim());
+    }
+    if (step.type === "missed-day-plan") {
+      if (!v) return true;
+      return !String(v.mantra || "").trim() && !String(v.restart || "").trim();
+    }
     return !String(v || "").trim();
   }
 
@@ -276,6 +355,39 @@
     } else if (step.type === "identity-foundation") {
       const input = root.querySelector(".iaw-step-input");
       if (input) answers[stepId] = input.value;
+    } else if (step.type === "distraction-board") {
+      const rows = Array.from(root.querySelectorAll(".iaw-distraction"));
+      answers[stepId] = rows.map((row) => ({
+        what:   (row.querySelector('[data-distraction="what"]') || {}).value || "",
+        tactic: row.dataset.tactic || "",
+      }));
+    } else if (step.type === "friction-reducer") {
+      const current = answers[stepId] || emptyFrictionReducer(step);
+      (step.tactics || []).forEach((t) => {
+        const card = root.querySelector(`[data-friction-key="${t.key}"]`);
+        if (!card) return;
+        const on = card.getAttribute("data-on") === "true";
+        const detailEl = card.querySelector('[data-friction-detail]');
+        current[t.key] = {
+          on,
+          detail: detailEl ? detailEl.value : (current[t.key] && current[t.key].detail) || "",
+        };
+      });
+      answers[stepId] = current;
+    } else if (step.type === "scenario-plans") {
+      const current = answers[stepId] || emptyScenarioPlans(step);
+      (step.scenarios || []).forEach((s) => {
+        const el = root.querySelector(`[data-scenario-key="${s.key}"]`);
+        if (el) current[s.key] = el.value;
+      });
+      answers[stepId] = current;
+    } else if (step.type === "missed-day-plan") {
+      const current = answers[stepId] || emptyMissedDayPlan();
+      const mantra  = root.querySelector('[data-missed="mantra"]');
+      const restart = root.querySelector('[data-missed="restart"]');
+      if (mantra)  current.mantra  = mantra.value;
+      if (restart) current.restart = restart.value;
+      answers[stepId] = current;
     } else {
       const input = root.classList.contains("iaw-step-input")
         ? root
@@ -454,6 +566,367 @@
     });
   }
 
+  // Distraction-board step -------------------------------------------------
+  function tacticById(step, key) {
+    return (step.tactics || []).find((t) => t.key === key) || null;
+  }
+
+  function renderDistractionRow(step, entry, index) {
+    const tactics = step.tactics || [];
+    const current = entry.tactic || "";
+    const tacticPills = tactics.map((t) => {
+      const on = current === t.key;
+      return `<button type="button"
+                class="iaw-distraction-tactic ${on ? "is-on" : ""}"
+                data-tactic-pick="${t.key}"
+                aria-pressed="${on ? "true" : "false"}"
+                title="${escapeHtml(t.hint)}">${escapeHtml(t.label)}</button>`;
+    }).join("");
+    return `
+      <li class="iaw-distraction" data-distraction-index="${index}" data-tactic="${escapeHtml(current)}">
+        <div class="iaw-distraction-row">
+          <input class="iaw-distraction-input"
+                 data-distraction="what"
+                 type="text"
+                 value="${escapeHtml(entry.what || "")}"
+                 placeholder="What's the distraction?" />
+          <button type="button" class="iaw-distraction-remove" data-action="remove" aria-label="Remove distraction ${index + 1}">×</button>
+        </div>
+        <div class="iaw-distraction-tactics" role="group" aria-label="Choose a tactic">${tacticPills}</div>
+      </li>
+    `;
+  }
+
+  function renderDistractionBoard(step) {
+    const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
+    answers[step.id] = list;
+
+    const suggestionChips = (step.suggestions || []).map((s) =>
+      `<button type="button" class="iaw-distraction-chip" data-suggest="${escapeHtml(s)}">+ ${escapeHtml(s)}</button>`
+    ).join("");
+
+    const rows = list.map((entry, i) => renderDistractionRow(step, entry, i)).join("");
+    const empty = list.length === 0
+      ? `<p class="iaw-distraction-empty">No distractions yet — tap a suggestion above or add your own.</p>`
+      : "";
+
+    return `
+      <div class="iaw-distraction-board" data-step-id="${step.id}">
+        <p class="iaw-step-label">Common distractions — tap to add</p>
+        <div class="iaw-distraction-chips">${suggestionChips}</div>
+        <div class="iaw-distraction-divider" aria-hidden="true"></div>
+        <ol class="iaw-distraction-list">${rows}</ol>
+        ${empty}
+        <button type="button" class="iaw-distraction-add" data-action="add">+ Add your own</button>
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      </div>
+    `;
+  }
+
+  function wireDistractionBoard(root, step) {
+    const listEl = root.querySelector(".iaw-distraction-list");
+    const emptyMsgSelector = ".iaw-distraction-empty";
+
+    const rerender = ({ focusIndex } = {}) => {
+      const list = answers[step.id] || [];
+      listEl.innerHTML = list.map((entry, i) => renderDistractionRow(step, entry, i)).join("");
+      const existingEmpty = root.querySelector(emptyMsgSelector);
+      if (existingEmpty) existingEmpty.remove();
+      if (list.length === 0) {
+        const p = document.createElement("p");
+        p.className = "iaw-distraction-empty";
+        p.textContent = "No distractions yet — tap a suggestion above or add your own.";
+        listEl.after(p);
+      }
+      if (focusIndex != null) {
+        const target = listEl.querySelector(`.iaw-distraction[data-distraction-index="${focusIndex}"] [data-distraction="what"]`);
+        if (target) target.focus({ preventScroll: true });
+      }
+      updatePath();
+    };
+
+    // Suggestion chips — add a row with that distraction pre-filled
+    root.querySelectorAll("[data-suggest]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        persistCurrentInputs();
+        const list = answers[step.id] || [];
+        list.push({ what: chip.dataset.suggest, tactic: "" });
+        answers[step.id] = list;
+        rerender({ focusIndex: list.length - 1 });
+      });
+    });
+
+    root.querySelector(".iaw-distraction-add").addEventListener("click", () => {
+      persistCurrentInputs();
+      const list = answers[step.id] || [];
+      list.push({ what: "", tactic: "" });
+      answers[step.id] = list;
+      rerender({ focusIndex: list.length - 1 });
+    });
+
+    // Delegate input / tactic pick / remove
+    listEl.addEventListener("input", (e) => {
+      if (!e.target.matches('[data-distraction="what"]')) return;
+      persistCurrentInputs();
+      updatePath();
+    });
+
+    listEl.addEventListener("click", (e) => {
+      const tacticBtn = e.target.closest("[data-tactic-pick]");
+      if (tacticBtn) {
+        const row = tacticBtn.closest(".iaw-distraction");
+        const index = Number(row.dataset.distractionIndex);
+        const list = answers[step.id] || [];
+        if (!list[index]) return;
+        const currentKey = list[index].tactic || "";
+        const nextKey = tacticBtn.dataset.tacticPick;
+        list[index].tactic = currentKey === nextKey ? "" : nextKey;
+        // Keep the input's typed value
+        const whatEl = row.querySelector('[data-distraction="what"]');
+        if (whatEl) list[index].what = whatEl.value;
+        row.dataset.tactic = list[index].tactic;
+        row.querySelectorAll("[data-tactic-pick]").forEach((btn) => {
+          const on = btn.dataset.tacticPick === list[index].tactic;
+          btn.classList.toggle("is-on", on);
+          btn.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        updatePath();
+        return;
+      }
+      const removeBtn = e.target.closest('[data-action="remove"]');
+      if (removeBtn) {
+        persistCurrentInputs();
+        const row = removeBtn.closest(".iaw-distraction");
+        const index = Number(row.dataset.distractionIndex);
+        const list = answers[step.id] || [];
+        list.splice(index, 1);
+        answers[step.id] = list;
+        rerender({ focusIndex: Math.min(index, list.length - 1) });
+      }
+    });
+  }
+
+  // Friction-reducer step --------------------------------------------------
+  function renderFrictionReducer(step) {
+    const state = answers[step.id] || emptyFrictionReducer(step);
+    answers[step.id] = state;
+
+    const cards = (step.tactics || []).map((t) => {
+      const on = !!(state[t.key] && state[t.key].on);
+      const detail = (state[t.key] && state[t.key].detail) || "";
+      return `
+        <div class="iaw-friction-card ${on ? "is-on" : ""}"
+             data-friction-key="${t.key}"
+             data-on="${on ? "true" : "false"}">
+          <button type="button" class="iaw-friction-toggle" data-friction-toggle aria-pressed="${on ? "true" : "false"}">
+            <span class="iaw-friction-check" aria-hidden="true"></span>
+            <span class="iaw-friction-head">
+              <span class="iaw-friction-title">${escapeHtml(t.title)}</span>
+              <span class="iaw-friction-blurb">${escapeHtml(t.blurb)}</span>
+            </span>
+          </button>
+          <div class="iaw-friction-detail-wrap" ${on ? "" : "hidden"}>
+            <textarea class="iaw-friction-detail"
+                      data-friction-detail
+                      rows="2"
+                      placeholder="${escapeHtml(t.placeholder)}">${escapeHtml(detail)}</textarea>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="iaw-friction" data-step-id="${step.id}">
+        <div class="iaw-friction-grid">${cards}</div>
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      </div>
+    `;
+  }
+
+  function wireFrictionReducer(root, step) {
+    root.querySelectorAll("[data-friction-key]").forEach((card) => {
+      const toggle   = card.querySelector("[data-friction-toggle]");
+      const wrap     = card.querySelector(".iaw-friction-detail-wrap");
+      const textarea = card.querySelector("[data-friction-detail]");
+
+      toggle.addEventListener("click", () => {
+        const on = card.getAttribute("data-on") !== "true";
+        card.setAttribute("data-on", on ? "true" : "false");
+        card.classList.toggle("is-on", on);
+        toggle.setAttribute("aria-pressed", on ? "true" : "false");
+        if (wrap) wrap.hidden = !on;
+        persistCurrentInputs();
+        updatePath();
+        if (on && textarea) textarea.focus({ preventScroll: true });
+      });
+
+      if (textarea) {
+        textarea.addEventListener("input", () => {
+          persistCurrentInputs();
+          updatePath();
+        });
+      }
+    });
+  }
+
+  // Scenario-plans step ----------------------------------------------------
+  function renderScenarioPlans(step) {
+    const ssmart = answers["ssmart"] || emptySsmart();
+    const state  = answers[step.id] || emptyScenarioPlans(step);
+    answers[step.id] = state;
+
+    const planLine = [ssmart.action, ssmart.measure ? `for ${ssmart.measure}` : "", ssmart.time ? `at ${ssmart.time}` : ""]
+      .filter(Boolean).join(" ").trim();
+    const reminder = planLine
+      ? `<div class="iaw-scenario-reminder">
+           <span class="iaw-scenario-reminder-label">Normally I will</span>
+           <strong>${escapeHtml(planLine)}</strong>
+         </div>`
+      : `<div class="iaw-scenario-reminder iaw-scenario-reminder--muted">
+           <span class="iaw-scenario-reminder-label">Tip</span>
+           <span>Build your SSMART action first — then your fallbacks will feel grounded.</span>
+         </div>`;
+
+    const cards = (step.scenarios || []).map((s) => {
+      const val = state[s.key] || "";
+      const filled = !!val.trim();
+      return `
+        <div class="iaw-scenario-card ${filled ? "is-filled" : ""}" data-scenario-card="${s.key}">
+          <div class="iaw-scenario-head">
+            <span class="iaw-scenario-icon" aria-hidden="true">${s.icon || "•"}</span>
+            <span class="iaw-scenario-label">${escapeHtml(s.label)}</span>
+          </div>
+          <label class="iaw-scenario-then" for="scenario-${s.key}">…I will</label>
+          <textarea id="scenario-${s.key}"
+                    class="iaw-scenario-input"
+                    data-scenario-key="${s.key}"
+                    rows="2"
+                    placeholder="${escapeHtml(s.placeholder || "")}">${escapeHtml(val)}</textarea>
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <div class="iaw-scenarios" data-step-id="${step.id}">
+        ${reminder}
+        <div class="iaw-scenario-grid">${cards}</div>
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      </div>
+    `;
+  }
+
+  function wireScenarioPlans(root, step) {
+    root.querySelectorAll("[data-scenario-key]").forEach((el) => {
+      el.addEventListener("input", () => {
+        const card = el.closest(".iaw-scenario-card");
+        if (card) card.classList.toggle("is-filled", !!el.value.trim());
+        persistCurrentInputs();
+        updatePath();
+      });
+    });
+  }
+
+  // Missed-day-plan step ---------------------------------------------------
+  function suggestedRestart() {
+    const s = answers["ssmart"] || emptySsmart();
+    const parts = [];
+    if (s.action)  parts.push(s.action);
+    if (s.measure) parts.push(`for ${s.measure}`);
+    if (s.time)    parts.push(`at ${s.time}`);
+    return parts.length ? `Tomorrow I ${parts.join(" ")} as planned.` : "";
+  }
+
+  function renderMissedDayPlan(step) {
+    const state = answers[step.id] || emptyMissedDayPlan();
+    answers[step.id] = state;
+
+    const mantraPicks = (step.mantras || []).map((m) => {
+      const on = state.mantra === m;
+      return `<button type="button"
+                class="iaw-mantra-pick ${on ? "is-on" : ""}"
+                data-mantra-pick
+                aria-pressed="${on ? "true" : "false"}">"${escapeHtml(m)}"</button>`;
+    }).join("");
+
+    const suggestion = suggestedRestart();
+    const restartPlaceholder = suggestion || "e.g. Tomorrow I walk at 7am as planned.";
+
+    return `
+      <div class="iaw-missed" data-step-id="${step.id}">
+        <div class="iaw-missed-section">
+          <h3 class="iaw-missed-section-title">1 · Your self-forgiveness line</h3>
+          <p class="iaw-missed-section-sub">Pick one that lands — or write your own.</p>
+          <div class="iaw-mantra-picks" role="group" aria-label="Self-forgiveness options">${mantraPicks}</div>
+          <textarea class="iaw-missed-input"
+                    data-missed="mantra"
+                    rows="2"
+                    placeholder="Write the exact words you'll say to yourself.">${escapeHtml(state.mantra || "")}</textarea>
+        </div>
+
+        <div class="iaw-missed-section">
+          <h3 class="iaw-missed-section-title">2 · Tomorrow's restart</h3>
+          <p class="iaw-missed-section-sub">Be concrete. No rescheduling, no doubling up. Just tomorrow's plan.</p>
+          ${suggestion ? `<button type="button" class="iaw-missed-suggest" data-missed-suggest>Use my SSMART plan: “${escapeHtml(suggestion)}”</button>` : ""}
+          <textarea class="iaw-missed-input"
+                    data-missed="restart"
+                    rows="2"
+                    placeholder="${escapeHtml(restartPlaceholder)}">${escapeHtml(state.restart || "")}</textarea>
+        </div>
+
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      </div>
+    `;
+  }
+
+  function wireMissedDayPlan(root, step) {
+    const mantraEl  = root.querySelector('[data-missed="mantra"]');
+    const restartEl = root.querySelector('[data-missed="restart"]');
+    const picks     = Array.from(root.querySelectorAll("[data-mantra-pick]"));
+
+    const syncPicks = () => {
+      const v = (mantraEl.value || "").trim().replace(/^["“”]|["“”]$/g, "");
+      picks.forEach((btn) => {
+        const label = btn.textContent.replace(/^["“]|["”]$/g, "").trim();
+        const on = label === v;
+        btn.classList.toggle("is-on", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    };
+    syncPicks();
+
+    picks.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const text = btn.textContent.replace(/^["“]|["”]$/g, "").trim();
+        mantraEl.value = text;
+        persistCurrentInputs();
+        syncPicks();
+        updatePath();
+        mantraEl.focus({ preventScroll: true });
+      });
+    });
+
+    mantraEl.addEventListener("input", () => {
+      persistCurrentInputs();
+      syncPicks();
+      updatePath();
+    });
+
+    restartEl.addEventListener("input", () => {
+      persistCurrentInputs();
+      updatePath();
+    });
+
+    const suggestBtn = root.querySelector("[data-missed-suggest]");
+    if (suggestBtn) {
+      suggestBtn.addEventListener("click", () => {
+        restartEl.value = suggestedRestart();
+        persistCurrentInputs();
+        updatePath();
+        restartEl.focus({ preventScroll: true });
+      });
+    }
+  }
+
   // SSMART builder step ----------------------------------------------------
   function dayFeedback(count) {
     if (count === 0) {
@@ -630,6 +1103,10 @@
     const isProblem     = step.type === "problem-list";
     const isFoundation  = step.type === "identity-foundation";
     const isSsmart      = step.type === "ssmart-builder";
+    const isDistraction = step.type === "distraction-board";
+    const isFriction    = step.type === "friction-reducer";
+    const isScenarios   = step.type === "scenario-plans";
+    const isMissedDay   = step.type === "missed-day-plan";
 
     const timerMarkup = step.timerSeconds ? `
       <div class="iaw-timer" id="timer-wrap-${step.id}">
@@ -668,6 +1145,14 @@
         ${timerMarkup}
         ${renderProblemList(step)}
       `;
+    } else if (isDistraction) {
+      bodyMarkup = renderDistractionBoard(step);
+    } else if (isFriction) {
+      bodyMarkup = renderFrictionReducer(step);
+    } else if (isScenarios) {
+      bodyMarkup = renderScenarioPlans(step);
+    } else if (isMissedDay) {
+      bodyMarkup = renderMissedDayPlan(step);
     } else {
       bodyMarkup = `
         ${timerMarkup}
@@ -731,6 +1216,18 @@
       wireSsmart(root, step);
       const firstInput = root.querySelector('[data-ssmart="action"]');
       if (firstInput) firstInput.focus({ preventScroll: true });
+    } else if (isDistraction) {
+      const root = card.querySelector(".iaw-distraction-board");
+      wireDistractionBoard(root, step);
+    } else if (isFriction) {
+      const root = card.querySelector(".iaw-friction");
+      wireFrictionReducer(root, step);
+    } else if (isScenarios) {
+      const root = card.querySelector(".iaw-scenarios");
+      wireScenarioPlans(root, step);
+    } else if (isMissedDay) {
+      const root = card.querySelector(".iaw-missed");
+      wireMissedDayPlan(root, step);
     } else {
       const input = card.querySelector(".iaw-step-input");
       if (input) {
@@ -808,6 +1305,10 @@
     persistCurrentInputs();
 
     const today = new Date();
+    const structuredTypes = new Set([
+      "problem-list", "ssmart-builder",
+      "distraction-board", "friction-reducer", "scenario-plans", "missed-day-plan",
+    ]);
     const reportData = steps
       .filter((step) => step.type !== "info")
       .map((step, i) => ({
@@ -817,7 +1318,9 @@
         type: step.type,
         entryLabel: entryLabelOf(step),
         fields: getFields(step),
-        value: step.type === "problem-list"
+        tactics: step.tactics || [],
+        scenarios: step.scenarios || [],
+        value: structuredTypes.has(step.type)
           ? answers[step.id]
           : ((answers[step.id] || "").trim() || "(No response entered)"),
       }));
@@ -919,6 +1422,56 @@
         <p><strong>Measure:</strong> ${escapeHtml(s.measure || "—")}</p>
         <p><strong>Time of day:</strong> ${escapeHtml(s.time || "—")}</p>
         <p><strong>Days:</strong> ${escapeHtml(dayStr)}</p>
+      `;
+    }
+    if (item.type === "distraction-board") {
+      const list = Array.isArray(item.value) ? item.value.filter((d) => (d.what || "").trim()) : [];
+      if (!list.length) return `<p>(No distractions listed)</p>`;
+      const tacticLabel = (key) => {
+        const t = (item.tactics || []).find((x) => x.key === key);
+        return t ? t.label : "—";
+      };
+      return list.map((d) => `
+        <div class="report-problem">
+          <p><strong>${escapeHtml(d.what)}</strong> — <em>${escapeHtml(tacticLabel(d.tactic))}</em></p>
+        </div>
+      `).join("");
+    }
+    if (item.type === "friction-reducer") {
+      const state = item.value || {};
+      const active = (item.tactics || []).filter((t) => state[t.key] && state[t.key].on);
+      if (!active.length) return `<p>(No friction-reducing tactics chosen)</p>`;
+      return active.map((t) => {
+        const detail = (state[t.key].detail || "").trim();
+        return `
+          <div class="report-problem">
+            <h5>${escapeHtml(t.title)}</h5>
+            <p>${detail ? escapeHtml(detail) : "<em>(no details added)</em>"}</p>
+          </div>
+        `;
+      }).join("");
+    }
+    if (item.type === "scenario-plans") {
+      const state = item.value || {};
+      const rows = (item.scenarios || [])
+        .map((s) => ({ s, v: (state[s.key] || "").trim() }))
+        .filter(({ v }) => v);
+      if (!rows.length) return `<p>(No fallback plans added)</p>`;
+      return rows.map(({ s, v }) => `
+        <div class="report-problem">
+          <h5>${escapeHtml(s.label)}</h5>
+          <p>${escapeHtml(v)}</p>
+        </div>
+      `).join("");
+    }
+    if (item.type === "missed-day-plan") {
+      const state = item.value || {};
+      const mantra  = (state.mantra  || "").trim();
+      const restart = (state.restart || "").trim();
+      if (!mantra && !restart) return `<p>(No missed-day plan yet)</p>`;
+      return `
+        ${mantra  ? `<p><strong>Self-forgiveness:</strong> "${escapeHtml(mantra)}"</p>` : ""}
+        ${restart ? `<p><strong>Tomorrow's restart:</strong> ${escapeHtml(restart)}</p>` : ""}
       `;
     }
     if (item.type !== "problem-list") {
