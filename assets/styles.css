@@ -842,7 +842,7 @@ footer.page-foot a { color: var(--ink); }
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  padding: 0 0 0 12px;
+  padding: 0 8px 0 12px;
   min-height: 48px;
   user-select: none;
   cursor: default;
@@ -892,6 +892,7 @@ footer.page-foot a { color: var(--ink); }
   grid-auto-columns: 30px;
   gap: 0;
   margin-left: 6px;
+  margin-right: -8px;
   border-left: 1px solid var(--line);
   border-radius: 0 var(--r-sm) var(--r-sm) 0;
   overflow: hidden;
