@@ -871,6 +871,138 @@ footer.page-foot a { color: var(--ink); }
   font-size: 1.05rem;
 }
 
+/* Problem list — one card per problem with four small fields */
+.iaw-problem-list {
+  display: grid;
+  gap: 14px;
+  margin: 4px 0 6px;
+}
+.iaw-problems {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.iaw-problem {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fffaf0;
+  padding: 14px 16px 16px;
+  transition: border-color 180ms var(--ease), box-shadow 180ms var(--ease);
+}
+.iaw-problem:focus-within {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 4px rgba(200, 118, 104, 0.14);
+}
+.iaw-problem-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.iaw-problem-num {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--terra-deep);
+  font-weight: 600;
+}
+.iaw-problem-remove {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
+}
+.iaw-problem-remove:hover {
+  color: var(--terra-deep);
+  border-color: var(--terra);
+  background: #fff;
+}
+.iaw-problem-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+.iaw-problem-field {
+  display: grid;
+  gap: 6px;
+}
+.iaw-problem-field:nth-child(1),
+.iaw-problem-field:nth-child(4) {
+  grid-column: 1 / -1;
+}
+@media (max-width: 640px) {
+  .iaw-problem-grid { grid-template-columns: 1fr; }
+  .iaw-problem-field:nth-child(n) { grid-column: auto; }
+}
+.iaw-problem-field-label {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.iaw-problem-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: #fff;
+  padding: 10px 12px;
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink);
+  resize: vertical;
+  transition: border-color 160ms var(--ease), box-shadow 160ms var(--ease);
+}
+textarea.iaw-problem-input { min-height: 64px; }
+.iaw-problem-input::placeholder {
+  color: #a59f92;
+  font-style: italic;
+  font-family: var(--sans);
+  font-size: 0.94rem;
+}
+.iaw-problem-input:focus {
+  outline: none;
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px rgba(200, 118, 104, 0.18);
+}
+.iaw-problem-add {
+  justify-self: start;
+  appearance: none;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 160ms var(--ease), border-color 160ms var(--ease), background 160ms var(--ease);
+}
+.iaw-problem-add:hover {
+  color: var(--terra-deep);
+  border-color: var(--terra);
+  background: #fff;
+}
+.iaw-problem-optional {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
 /* Info step — animated 4-week chart + copy */
 .iaw-info {
   display: grid;

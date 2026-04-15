@@ -24,9 +24,9 @@
       example: "Example: I forgive myself for the years I spent waiting to feel ready.",
       type: "textarea" },
     { id: "current-problems",  phase: "feel",      title: "Problems caused by your current actions",
-      prompt: "Include how often each problem happens and exactly how each one feels.",
+      prompt: "List any problems your current actions are causing. Add as many as feel true — or skip this step entirely. Each problem has four small prompts to help you think it through.",
       example: "Take your time — five minutes of honesty here is worth an hour of planning later.",
-      type: "textarea", timerSeconds: 300 },
+      type: "problem-list", timerSeconds: 300 },
     { id: "positive-outcomes", phase: "feel",      title: "Positive outcomes if you fix this behaviour",
       prompt: "Include immediate + long-term outcomes and how each one feels.",
       example: "Imagine the first week, the first month, the first year. Let yourself want it.",
@@ -68,7 +68,20 @@
   ];
 
   // State ------------------------------------------------------------------
-  const answers = Object.fromEntries(steps.map((s) => [s.id, ""]));
+  const answers = Object.fromEntries(
+    steps.map((s) => [s.id, s.type === "problem-list" ? [] : ""])
+  );
+
+  // Fields that make up a single entry in a problem-list step.
+  const PROBLEM_FIELDS = [
+    { key: "problem",  label: "Problem",                      placeholder: "What is the problem?",                rows: 2 },
+    { key: "stops",    label: "What it stops you from doing", placeholder: "What does it keep you from?",         rows: 2 },
+    { key: "duration", label: "How long it's been a problem", placeholder: "Weeks, months, years…",               rows: 1 },
+    { key: "feeling",  label: "How it makes you feel",        placeholder: "Name the feelings honestly.",         rows: 2 },
+  ];
+  const emptyProblem = () => PROBLEM_FIELDS.reduce((a, f) => (a[f.key] = "", a), {});
+  const problemIsEmpty = (p) => PROBLEM_FIELDS.every((f) => !(p[f.key] || "").trim());
+  const problemListIsEmpty = (arr) => !Array.isArray(arr) || arr.every(problemIsEmpty);
   const timerState = new Map();
   let currentIndex = 0;
 
@@ -152,7 +165,7 @@
 
     // Dot states
     Array.from(dotsEl.children).forEach((node, i) => {
-      const done = i < currentIndex && (steps[i].type === "info" || answers[steps[i].id].trim() !== "");
+      const done = i < currentIndex && (steps[i].type === "info" || !answerIsEmpty(steps[i]));
       node.classList.toggle("is-done",    done);
       node.classList.toggle("is-touched", i <  currentIndex);
       node.classList.toggle("is-current", i === currentIndex);
@@ -164,13 +177,147 @@
     return p ? `tone-${p.tone}` : "";
   }
 
+  function answerIsEmpty(step) {
+    const v = answers[step.id];
+    if (step.type === "problem-list") return problemListIsEmpty(v);
+    return !String(v || "").trim();
+  }
+
+  // Pull in the user's identity noun so the current-problems step reads as
+  // "…of not being {identity}". Falls back to the neutral title if empty.
+  function resolveStepTitle(step) {
+    if (step.id === "current-problems") {
+      const identity = (answers["identity"] || "").trim();
+      if (identity) return `Problems caused by your current actions of not being ${identity}`;
+    }
+    return step.title;
+  }
+
+  // Pull the latest values out of the DOM for whichever step is on screen,
+  // so we don't lose work on re-render or navigation.
+  function persistCurrentInputs() {
+    const root = stepRoot.querySelector("[data-step-id]");
+    if (!root) return;
+    const stepId = root.dataset.stepId;
+    const step = steps.find((s) => s.id === stepId);
+    if (!step) return;
+    if (step.type === "problem-list") {
+      const items = Array.from(root.querySelectorAll(".iaw-problem"));
+      answers[stepId] = items.map((item) => {
+        const entry = emptyProblem();
+        PROBLEM_FIELDS.forEach((f) => {
+          const el = item.querySelector(`[data-field="${f.key}"]`);
+          if (el) entry[f.key] = el.value;
+        });
+        return entry;
+      });
+    } else {
+      const input = root.classList.contains("iaw-step-input")
+        ? root
+        : root.querySelector(".iaw-step-input");
+      if (input) answers[stepId] = input.value;
+    }
+  }
+
+  function renderProblemItem(entry, index) {
+    const fields = PROBLEM_FIELDS.map((f) => {
+      const id = `problem-${index}-${f.key}`;
+      const value = escapeHtml(entry[f.key] || "");
+      const control = f.rows > 1
+        ? `<textarea id="${id}" class="iaw-problem-input" data-field="${f.key}" rows="${f.rows}" placeholder="${escapeHtml(f.placeholder)}">${value}</textarea>`
+        : `<input id="${id}" class="iaw-problem-input" data-field="${f.key}" type="text" value="${value}" placeholder="${escapeHtml(f.placeholder)}" />`;
+      return `
+        <div class="iaw-problem-field">
+          <label class="iaw-problem-field-label" for="${id}">${escapeHtml(f.label)}</label>
+          ${control}
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <li class="iaw-problem" data-problem-index="${index}">
+        <header class="iaw-problem-head">
+          <span class="iaw-problem-num">Problem ${index + 1}</span>
+          <button type="button" class="iaw-problem-remove" data-action="remove" aria-label="Remove problem ${index + 1}">Remove</button>
+        </header>
+        <div class="iaw-problem-grid">${fields}</div>
+      </li>
+    `;
+  }
+
+  function wireProblemList(listRoot, step) {
+    const tryStartTimer = () => {
+      if (step.timerSeconds && !timerState.has(step.id) && !problemListIsEmpty(answers[step.id])) {
+        startTimer(step.id, step.timerSeconds);
+      }
+    };
+
+    listRoot.addEventListener("input", (e) => {
+      const target = e.target;
+      if (!target.matches(".iaw-problem-input")) return;
+      persistCurrentInputs();
+      tryStartTimer();
+      updatePath();
+    });
+
+    listRoot.addEventListener("click", (e) => {
+      const addBtn = e.target.closest('[data-action="add"]');
+      if (addBtn) {
+        e.preventDefault();
+        persistCurrentInputs();
+        const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
+        list.push(emptyProblem());
+        answers[step.id] = list;
+        rerenderProblemList(listRoot, step, { focusIndex: list.length - 1 });
+        return;
+      }
+      const removeBtn = e.target.closest('[data-action="remove"]');
+      if (removeBtn) {
+        e.preventDefault();
+        persistCurrentInputs();
+        const item = removeBtn.closest(".iaw-problem");
+        const index = Number(item.dataset.problemIndex);
+        const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
+        list.splice(index, 1);
+        if (list.length === 0) list.push(emptyProblem());
+        answers[step.id] = list;
+        rerenderProblemList(listRoot, step, { focusIndex: Math.max(0, index - 1) });
+        updatePath();
+      }
+    });
+  }
+
+  function rerenderProblemList(listRoot, step, { focusIndex } = {}) {
+    const list = answers[step.id];
+    const ol = listRoot.querySelector(".iaw-problems");
+    ol.innerHTML = list.map((entry, i) => renderProblemItem(entry, i)).join("");
+    if (focusIndex != null) {
+      const target = ol.querySelector(`.iaw-problem[data-problem-index="${focusIndex}"] .iaw-problem-input`);
+      if (target) target.focus({ preventScroll: true });
+    }
+  }
+
+  function renderProblemList(step) {
+    const list = Array.isArray(answers[step.id]) ? answers[step.id] : [];
+    if (list.length === 0) list.push(emptyProblem());
+    answers[step.id] = list;
+
+    const items = list.map((entry, i) => renderProblemItem(entry, i)).join("");
+
+    return `
+      <div class="iaw-problem-list" data-step-id="${step.id}">
+        <ol class="iaw-problems">${items}</ol>
+        <button type="button" class="iaw-problem-add" data-action="add">+ Add another problem</button>
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+        <p class="iaw-problem-optional">This step is optional — leave it blank if nothing comes to mind.</p>
+      </div>
+    `;
+  }
+
   // Render a single step ---------------------------------------------------
   function renderStep() {
     // Persist previous answer before re-rendering
-    const existingInput = stepRoot.querySelector(".iaw-step-input");
-    if (existingInput && existingInput.dataset.stepId) {
-      answers[existingInput.dataset.stepId] = existingInput.value;
-    }
+    persistCurrentInputs();
 
     stepRoot.innerHTML = "";
 
@@ -180,26 +327,35 @@
     const card = document.createElement("article");
     card.className = `iaw-step-card ${toneClass(step.phase)}`;
 
-    const isInfo  = step.type === "info";
-    const isShort = step.type === "short";
+    const isInfo    = step.type === "info";
+    const isShort   = step.type === "short";
+    const isProblem = step.type === "problem-list";
 
-    const bodyMarkup = isInfo
-      ? `
+    const timerMarkup = step.timerSeconds ? `
+      <div class="iaw-timer" id="timer-wrap-${step.id}">
+        <span class="iaw-timer-dot" aria-hidden="true"></span>
+        <span class="iaw-timer-label">Suggested time</span>
+        <span class="iaw-timer-value" id="timer-${step.id}">${formatTime(step.timerSeconds)}</span>
+      </div>
+    ` : "";
+
+    let bodyMarkup;
+    if (isInfo) {
+      bodyMarkup = `
         <div class="iaw-info">
           <p class="iaw-info-lead">A visible chart turns intention into <strong>evidence</strong>. Every tick is proof — to you — of your new identity, and a quiet promise kept to your future self.</p>
           ${renderAnimatedGrid()}
           <p class="iaw-info-note">This chart will be included in your report — print it, stick it somewhere hard to ignore, and mark one box each day.</p>
         </div>
-      `
-      : `
-        ${step.timerSeconds ? `
-          <div class="iaw-timer" id="timer-wrap-${step.id}">
-            <span class="iaw-timer-dot" aria-hidden="true"></span>
-            <span class="iaw-timer-label">Suggested time</span>
-            <span class="iaw-timer-value" id="timer-${step.id}">${formatTime(step.timerSeconds)}</span>
-          </div>
-        ` : ""}
-
+      `;
+    } else if (isProblem) {
+      bodyMarkup = `
+        ${timerMarkup}
+        ${renderProblemList(step)}
+      `;
+    } else {
+      bodyMarkup = `
+        ${timerMarkup}
         <label class="iaw-step-label" for="input-${step.id}">Your answer</label>
         ${isShort
           ? `<input id="input-${step.id}"
@@ -214,6 +370,7 @@
                        placeholder="Write here — no pressure to be perfect."></textarea>`}
         <p class="iaw-step-example">${escapeHtml(step.example)}</p>
       `;
+    }
 
     card.innerHTML = `
       <header class="iaw-step-head">
@@ -225,7 +382,7 @@
         <p class="iaw-step-phase">${phase.label}</p>
       </header>
 
-      <h2 class="iaw-step-title">${escapeHtml(step.title)}</h2>
+      <h2 class="iaw-step-title">${escapeHtml(resolveStepTitle(step))}</h2>
       ${step.prompt ? `<p class="iaw-step-prompt">${escapeHtml(step.prompt)}</p>` : ""}
 
       ${bodyMarkup}
@@ -244,18 +401,25 @@
     stepRoot.appendChild(card);
 
     // Restore answer / wire input
-    const input = card.querySelector(".iaw-step-input");
-    if (input) {
-      input.value = answers[step.id] || "";
-      input.focus({ preventScroll: true });
+    if (isProblem) {
+      const listRoot = card.querySelector(".iaw-problem-list");
+      wireProblemList(listRoot, step);
+      const firstInput = listRoot.querySelector(".iaw-problem-input");
+      if (firstInput) firstInput.focus({ preventScroll: true });
+    } else {
+      const input = card.querySelector(".iaw-step-input");
+      if (input) {
+        input.value = answers[step.id] || "";
+        input.focus({ preventScroll: true });
 
-      input.addEventListener("input", () => {
-        answers[step.id] = input.value;
-        if (step.timerSeconds && input.value.trim() && !timerState.has(step.id)) {
-          startTimer(step.id, step.timerSeconds);
-        }
-        updatePath();
-      });
+        input.addEventListener("input", () => {
+          answers[step.id] = input.value;
+          if (step.timerSeconds && input.value.trim() && !timerState.has(step.id)) {
+            startTimer(step.id, step.timerSeconds);
+          }
+          updatePath();
+        });
+      }
     }
 
     // If a timer was already running for this step, resume its display
@@ -294,8 +458,7 @@
 
   function finish() {
     // Persist final answer
-    const inp = stepRoot.querySelector(".iaw-step-input");
-    if (inp) answers[inp.dataset.stepId] = inp.value;
+    persistCurrentInputs();
     reportCard.classList.remove("is-hidden");
     reportCard.scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -317,17 +480,19 @@
   // Report generation ------------------------------------------------------
   buildReportBtn.addEventListener("click", () => {
     // Make sure we have the latest in-flight answer
-    const inp = stepRoot.querySelector(".iaw-step-input");
-    if (inp) answers[inp.dataset.stepId] = inp.value;
+    persistCurrentInputs();
 
     const today = new Date();
     const reportData = steps
       .filter((step) => step.type !== "info")
       .map((step, i) => ({
         number: i + 1,
-        title: step.title,
+        title: resolveStepTitle(step),
         phase: PHASES[step.phase].label,
-        value: (answers[step.id] || "").trim() || "(No response entered)",
+        type: step.type,
+        value: step.type === "problem-list"
+          ? answers[step.id]
+          : ((answers[step.id] || "").trim() || "(No response entered)"),
       }));
 
     const gridDays = createGridDays(today, 28);
@@ -354,7 +519,7 @@
       .map((item) => `
         <div class="preview-block">
           <h4>${item.number}. ${escapeHtml(item.title)}</h4>
-          <p>${escapeHtml(item.value)}</p>
+          ${renderReportValue(item, "preview")}
         </div>`)
       .join("");
     const grid = renderGridTable(gridDays);
@@ -390,6 +555,9 @@
   th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
   th { background: #f0e9dd; }
   .box { font-size: 16px; }
+  .report-problem { margin: 10px 0 14px; padding: 10px 12px; border: 1px solid #ecdfc8; border-radius: 8px; background: #fffaf0; }
+  .report-problem h5 { margin: 0 0 6px; font-family: Georgia, serif; font-size: 1rem; color: #9e5447; }
+  .report-problem p { margin: 4px 0; }
 </style>
 </head>
 <body>
@@ -399,7 +567,7 @@
     <section class="block">
       <div class="phase">${escapeHtml(item.phase)}</div>
       <h2>${item.number}. ${escapeHtml(item.title)}</h2>
-      <p>${escapeHtml(item.value)}</p>
+      ${renderReportValue(item, "download")}
     </section>`).join("")}
   <section class="block">
     <h2>4-week progress grid</h2>
@@ -408,6 +576,28 @@
   </section>
 </body>
 </html>`;
+  }
+
+  function renderReportValue(item, _mode) {
+    if (item.type !== "problem-list") {
+      return `<p>${escapeHtml(item.value)}</p>`;
+    }
+    const list = Array.isArray(item.value) ? item.value.filter((p) => !problemIsEmpty(p)) : [];
+    if (list.length === 0) return `<p>(No problems listed)</p>`;
+    const entries = list.map((p, idx) => {
+      const rows = PROBLEM_FIELDS.map((f) => {
+        const v = (p[f.key] || "").trim();
+        if (!v) return "";
+        return `<p><strong>${escapeHtml(f.label)}:</strong> ${escapeHtml(v)}</p>`;
+      }).join("");
+      return `
+        <div class="report-problem">
+          <h5>Problem ${idx + 1}</h5>
+          ${rows}
+        </div>
+      `;
+    }).join("");
+    return entries;
   }
 
   function createGridDays(startDate, count) {
