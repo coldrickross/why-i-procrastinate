@@ -68,10 +68,11 @@
   const verdictEl = document.getElementById("v2Verdict");
   const chipsForEl = document.getElementById("v2ChipsFor");
   const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
-  const scaleEl = document.querySelector(".v2-scale-big");
 
-  // Timer used to debounce the scale-freeze class when moving between items.
-  let interactTimer = null;
+  // While the mouse is inside either pan's items area, we skip tilting the
+  // scale so +/- buttons stay put under the cursor. The scale catches up
+  // smoothly once the mouse moves away.
+  let interacting = false;
 
   // Seed example items so the page isn't empty on first load.
   actionInput.value = DEFAULT_ACTION;
@@ -96,6 +97,17 @@
 
   actionInput.addEventListener("input", (e) => {
     state.action = e.target.value;
+  });
+
+  // Attach once to the persistent pan containers (the inner rows get rebuilt
+  // on every render, so per-row listeners would break mid-click).
+  [itemsForEl, itemsAgainstEl].forEach((container) => {
+    container.addEventListener("mouseenter", () => { interacting = true; });
+    container.addEventListener("mouseleave", () => {
+      interacting = false;
+      // Catch up to the real state now that the user is done clicking.
+      recomputeTotalsAndTilt();
+    });
   });
 
   addForBtn.addEventListener("click", () => addItem("for"));
@@ -213,17 +225,6 @@
     row.appendChild(minusBtn);
     row.appendChild(removeBtn);
 
-    // Freeze the scale animation while the mouse is over this row so the
-    // buttons don't drift away mid-click. A brief timer prevents a flash
-    // when moving directly from one item to another.
-    row.addEventListener("mouseenter", () => {
-      clearTimeout(interactTimer);
-      scaleEl.classList.add("v2-interacting");
-    });
-    row.addEventListener("mouseleave", () => {
-      interactTimer = setTimeout(() => scaleEl.classList.remove("v2-interacting"), 0);
-    });
-
     // Double-click the label to rename.
     label.addEventListener("dblclick", (e) => {
       e.stopPropagation();
@@ -271,6 +272,12 @@
     const againstTotal = sumWeights(state.against);
     forTotalEl.textContent = forTotal;
     againstTotalEl.textContent = againstTotal;
+    updateVerdict(forTotal, againstTotal);
+
+    // While the mouse is over a pan, leave the beam/pans where they are so
+    // the +/- buttons stay under the cursor for rapid clicks. The mouseleave
+    // handler will call us again to catch up.
+    if (interacting) return;
 
     // Positive rotation = clockwise in SVG → pulls the right (against) side down.
     // Against heavier → against goes down → positive tilt.
@@ -287,8 +294,6 @@
     const right = anchorDisplacement(ARM_X, ANCHOR_OFFSET_Y, theta);
     panLeftEl.style.transform = `translate(${left.dx}px, ${left.dy}px)`;
     panRightEl.style.transform = `translate(${right.dx}px, ${right.dy}px)`;
-
-    updateVerdict(forTotal, againstTotal);
   }
 
   // How far an anchor point at offset (offX, offY) from the pivot moves when
