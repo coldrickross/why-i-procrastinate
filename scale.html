@@ -72,33 +72,38 @@
           </svg>
         </div>
 
-        <aside class="v2-side-panel" aria-label="Action details and outcome">
-          <button class="v2-panel-toggle" id="v2PanelToggle" type="button" aria-expanded="true" aria-controls="v2SideContent">
-            Hide panel
-          </button>
-
-          <div class="v2-side-content" id="v2SideContent">
-            <h1 class="v2-side-title">The <em>Scale</em></h1>
-
-            <section class="v2-action-bar" aria-label="Action being considered">
-              <label class="v2-action-label" for="v2Action">THE ACTION:</label>
-              <input
-                class="v2-action-input"
-                id="v2Action"
-                type="text"
-                placeholder="Insert Action (e.g. Apply for jobs)"
-                autocomplete="off"
-              />
-            </section>
-
-            <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
-
-            <div class="v2-actions">
-              <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
-            </div>
-          </div>
-        </aside>
       </div>
+
+      <button class="v2-sidebar-handle" id="v2SidebarHandle" type="button" aria-expanded="false" aria-controls="v2Sidebar">
+        Open panel
+      </button>
+
+      <aside class="v2-sidebar" id="v2Sidebar" aria-label="Action details and outcome">
+        <button class="v2-sidebar-close" id="v2SidebarClose" type="button" aria-label="Close side panel">
+          ×
+        </button>
+
+        <div class="v2-side-content">
+          <h1 class="v2-side-title">The <em>Scale</em></h1>
+
+          <section class="v2-action-bar" aria-label="Action being considered">
+            <label class="v2-action-label" for="v2Action">THE ACTION:</label>
+            <input
+              class="v2-action-input"
+              id="v2Action"
+              type="text"
+              placeholder="Insert Action (e.g. Apply for jobs)"
+              autocomplete="off"
+            />
+          </section>
+
+          <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
+
+          <div class="v2-actions">
+            <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
+          </div>
+        </div>
+      </aside>
     </section>
 
     <section class="suggested" aria-label="Suggested reasons">

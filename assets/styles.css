@@ -741,11 +741,7 @@ footer.page-foot a { color: var(--ink); }
 }
 
 .v2-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 2.35fr) minmax(220px, 0.85fr);
-  gap: 18px;
-  align-items: start;
-  transition: grid-template-columns 260ms var(--ease), gap 260ms var(--ease);
+  display: block;
 }
 
 .v2-scale-holder {
@@ -753,68 +749,83 @@ footer.page-foot a { color: var(--ink); }
   width: 100%;
 }
 
-.v2-side-panel {
-  position: sticky;
-  top: 20px;
+.v2-sidebar {
+  position: fixed;
+  top: 88px;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 36vw);
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  box-shadow: var(--shadow-sm);
-  padding: 14px;
+  border-left: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  padding: 18px 16px 22px;
+  z-index: 30;
+  transform: translateX(calc(100% - 52px));
+  transition: transform 260ms var(--ease);
 }
 
-.v2-panel-toggle {
+.v2-stage.is-sidebar-open .v2-sidebar {
+  transform: translateX(0);
+}
+
+.v2-sidebar-handle {
+  position: fixed;
+  top: 160px;
+  right: 0;
+  z-index: 40;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 12px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(26, 29, 46, 0.18);
+  border-right: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 180ms var(--ease), color 180ms var(--ease), transform 220ms var(--ease);
+}
+
+.v2-sidebar-handle:hover {
+  background: var(--gold-deep);
+  color: #fff;
+}
+
+.v2-stage.is-sidebar-open .v2-sidebar-handle {
+  transform: translateX(50px) rotate(180deg);
+}
+
+.v2-sidebar-close {
   align-self: flex-end;
-  padding: 6px 12px;
+  width: 34px;
+  height: 34px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: #fff;
   color: var(--ink-soft);
-  font-size: 0.82rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 1.2rem;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
   transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
 }
 
-.v2-panel-toggle:hover {
-  background: var(--ink);
-  color: var(--cream);
-  border-color: var(--ink);
+.v2-sidebar-close:hover {
+  background: var(--terra);
+  color: #fff;
+  border-color: var(--terra);
 }
 
 .v2-side-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.v2-stage.is-panel-collapsed .v2-layout {
-  grid-template-columns: minmax(0, 1fr) 54px;
-  gap: 24px;
-}
-
-.v2-stage.is-panel-collapsed .v2-side-panel {
-  align-self: stretch;
-  position: sticky;
-  top: 20px;
-  padding: 10px 8px;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.v2-stage.is-panel-collapsed .v2-panel-toggle {
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  align-self: center;
-  min-height: 170px;
-  padding: 12px 8px;
-}
-
-.v2-stage.is-panel-collapsed .v2-side-content {
-  display: none;
 }
 
 .v2-side-title {
@@ -1090,33 +1101,24 @@ footer.page-foot a { color: var(--ink); }
     grid-template-columns: 1fr;
   }
 
-  .v2-side-panel {
-    position: static;
+  .v2-sidebar {
+    top: auto;
+    width: min(92vw, 380px);
+    min-width: 0;
   }
 
-  .v2-panel-toggle {
-    align-self: center;
-  }
-
-  .v2-stage.is-panel-collapsed .v2-layout {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .v2-stage.is-panel-collapsed .v2-side-panel {
-    padding: 10px 10px 2px;
-    align-items: stretch;
-  }
-
-  .v2-stage.is-panel-collapsed .v2-panel-toggle {
+  .v2-sidebar-handle {
     writing-mode: horizontal-tb;
     transform: none;
-    min-height: 0;
+    top: auto;
+    bottom: 110px;
+    right: 10px;
     width: fit-content;
+    border-right: 1px solid rgba(26, 29, 46, 0.18);
   }
 
-  .v2-stage.is-panel-collapsed .v2-side-content {
-    display: flex;
+  .v2-stage.is-sidebar-open .v2-sidebar-handle {
+    transform: none;
   }
 
   .v2-side-title {

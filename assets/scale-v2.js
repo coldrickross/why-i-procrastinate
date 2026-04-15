@@ -60,7 +60,8 @@
   const addForBtn = document.getElementById("v2AddFor");
   const addAgainstBtn = document.getElementById("v2AddAgainst");
   const resetBtn = document.getElementById("v2Reset");
-  const panelToggleBtn = document.getElementById("v2PanelToggle");
+  const sidebarHandleBtn = document.getElementById("v2SidebarHandle");
+  const sidebarCloseBtn = document.getElementById("v2SidebarClose");
   const stageEl = document.querySelector(".v2-stage");
   const forTotalEl = document.getElementById("v2ForTotal");
   const againstTotalEl = document.getElementById("v2AgainstTotal");
@@ -75,7 +76,7 @@
   // scale so +/- buttons stay put under the cursor. The scale catches up
   // smoothly once the mouse moves away.
   let interacting = false;
-  let isPanelCollapsed = false;
+  let isSidebarOpen = false;
 
   // Seed example items so the page isn't empty on first load.
   actionInput.value = DEFAULT_ACTION;
@@ -131,15 +132,20 @@
     render();
   });
 
-  panelToggleBtn.addEventListener("click", () => {
-    isPanelCollapsed = !isPanelCollapsed;
-    syncPanelState();
+  sidebarHandleBtn.addEventListener("click", () => {
+    isSidebarOpen = !isSidebarOpen;
+    syncSidebarState();
   });
 
-  function syncPanelState() {
-    stageEl.classList.toggle("is-panel-collapsed", isPanelCollapsed);
-    panelToggleBtn.textContent = isPanelCollapsed ? "Show panel" : "Hide panel";
-    panelToggleBtn.setAttribute("aria-expanded", isPanelCollapsed ? "false" : "true");
+  sidebarCloseBtn.addEventListener("click", () => {
+    isSidebarOpen = false;
+    syncSidebarState();
+  });
+
+  function syncSidebarState() {
+    stageEl.classList.toggle("is-sidebar-open", isSidebarOpen);
+    sidebarHandleBtn.textContent = isSidebarOpen ? "Hide panel" : "Open panel";
+    sidebarHandleBtn.setAttribute("aria-expanded", isSidebarOpen ? "true" : "false");
   }
 
   function addItem(side) {
@@ -357,6 +363,6 @@
   }
 
   sizeActionInput();
-  syncPanelState();
+  syncSidebarState();
   render();
 })();
