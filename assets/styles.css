@@ -856,6 +856,7 @@ footer.page-foot a { color: var(--ink); }
   cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
   line-height: 1.2;
+  overflow: hidden;
   /* Fixed, readable size for every row regardless of weight. */
   font-size: 1.08rem;
 }
@@ -881,7 +882,7 @@ footer.page-foot a { color: var(--ink); }
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
-  text-overflow: ellipsis;
+  max-height: calc(1.15em * 3);
   overflow: hidden;
   align-self: center;
 }
@@ -902,7 +903,7 @@ footer.page-foot a { color: var(--ink); }
 
 .v2-item-controls {
   align-self: stretch;
-  display: grid;
+  display: none;
   grid-auto-flow: column;
   grid-auto-columns: 30px;
   gap: 0;
@@ -912,10 +913,6 @@ footer.page-foot a { color: var(--ink); }
   border-radius: 0 var(--r-sm) var(--r-sm) 0;
   overflow: hidden;
   background: #f9f8f4;
-  visibility: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 140ms var(--ease), visibility 140ms var(--ease);
 }
 
 .v2-item-edit {
@@ -956,9 +953,7 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-remove { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
 .v2-item:hover .v2-item-controls,
 .v2-item:focus-within .v2-item-controls {
-  visibility: visible;
-  opacity: 1;
-  pointer-events: auto;
+  display: grid;
 }
 .v2-item-edit-btn:hover,
 .v2-item-plus:hover { background: var(--teal); color: #fff; }
