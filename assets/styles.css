@@ -842,7 +842,8 @@ footer.page-foot a { color: var(--ink); }
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  padding: 6px 0 6px 12px;
+  padding: 0 0 0 12px;
+  min-height: 48px;
   user-select: none;
   cursor: default;
   transition: transform 140ms var(--ease), box-shadow 160ms var(--ease), border-color 160ms var(--ease);
@@ -886,7 +887,7 @@ footer.page-foot a { color: var(--ink); }
 
 .v2-item-controls {
   align-self: stretch;
-  display: grid;
+  display: none;
   grid-auto-flow: column;
   grid-auto-columns: 30px;
   gap: 0;
@@ -933,6 +934,10 @@ footer.page-foot a { color: var(--ink); }
 .v2-item-plus { background: rgba(91, 138, 138, 0.18); color: var(--teal-deep); }
 .v2-item-minus { background: rgba(212, 165, 116, 0.22); color: #946437; }
 .v2-item-remove { background: rgba(200, 118, 104, 0.18); color: var(--terra-deep); }
+.v2-item:hover .v2-item-controls,
+.v2-item:focus-within .v2-item-controls {
+  display: grid;
+}
 .v2-item-edit-btn:hover,
 .v2-item-plus:hover { background: var(--teal); color: #fff; }
 .v2-item-minus:hover { background: var(--gold-deep); color: #fff; }
