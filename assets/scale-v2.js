@@ -214,7 +214,7 @@
     removeBtn.className = "v2-item-remove";
     removeBtn.setAttribute("aria-label", `Remove "${item.text}"`);
     removeBtn.title = "Remove reason";
-    removeBtn.textContent = "Remove";
+    removeBtn.textContent = "\u00d7"; // ×
 
     const actions = document.createElement("span");
     actions.className = "v2-item-actions";

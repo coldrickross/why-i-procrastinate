@@ -870,7 +870,8 @@ footer.page-foot a { color: var(--ink); }
   font-family: var(--serif);
   font-weight: 500;
   color: var(--ink);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .v2-item-weight {
@@ -930,7 +931,8 @@ footer.page-foot a { color: var(--ink); }
   margin-left: 8px;
   color: var(--terra-deep);
   border: 1px solid rgba(200, 118, 104, 0.25);
-  min-width: 68px;
+  min-width: 34px;
+  font-size: 1rem;
 }
 .v2-item:hover .v2-item-edit-btn,
 .v2-item:hover .v2-item-minus,
@@ -1016,6 +1018,7 @@ footer.page-foot a { color: var(--ink); }
   gap: 10px;
   font-size: 0.9rem;
 }
+.v2-toast[hidden] { display: none !important; }
 .v2-toast-undo {
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.35);
