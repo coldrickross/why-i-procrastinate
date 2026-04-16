@@ -1,7 +1,4 @@
 (function () {
-  const data = window.PROGRESS_DATA;
-  if (!data) return;
-
   // ---------- Helpers (minimal copies of worksheet.js idioms) ---------------
   const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const DAY_SHORT  = ["M", "T", "W", "T", "F", "S", "S"];
@@ -9,6 +6,7 @@
 
   const dayIndexFromDate = (d) => (d.getDay() + 6) % 7;               // Mon=0..Sun=6
   const parseIso = (s) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
+  const toIso    = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   const humanDate = (d) => `${DAY_LABELS[dayIndexFromDate(d)]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
   const escapeHtml = (s) => String(s ?? "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -16,6 +14,48 @@
 
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
   const sameDay = (a, b) => a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+
+  // ---------- Mode selection ------------------------------------------------
+  // Priority:
+  //   1. ?demo=1                      → Alex sample (window.PROGRESS_DATA)
+  //   2. worksheet complete + saved   → the user's personal journey
+  //   3. otherwise                    → locked screen (with a link to the sample)
+  const params = new URLSearchParams(window.location.search);
+  const wantDemo = params.get("demo") === "1";
+  const worksheetState = readJson("wip-worksheet");
+  const completion     = readJson("wip-worksheet-complete");
+  const journeyState   = readJson("wip-journey") || { checkins: {}, reflections: [] };
+
+  function readJson(key) {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; }
+    catch (_) { return null; }
+  }
+  function writeJson(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) { /* ignore */ }
+  }
+
+  const hasPersonal = !!(worksheetState && completion && worksheetState.answers);
+
+  if (!hasPersonal && !wantDemo) {
+    renderLocked();
+    return;
+  }
+
+  // Assemble the data object. In demo mode we use the bundled example;
+  // otherwise we synthesise one from the user's worksheet + journey state.
+  const data = wantDemo && window.PROGRESS_DATA
+    ? window.PROGRESS_DATA
+    : buildPersonalData(worksheetState, completion, journeyState);
+  if (!data) { renderLocked(); return; }
+
+  const isPersonal = !wantDemo && hasPersonal;
+
+  // Today is dynamic for personal journeys so "day N" advances over time.
+  if (isPersonal) {
+    const nowIso = toIso(new Date());
+    data.today = nowIso;
+    if (!data.startDate) data.startDate = completion.startDate || nowIso;
+  }
 
   const startDate = parseIso(data.startDate);
   const today     = parseIso(data.today);
@@ -27,7 +67,8 @@
   const anyScheduled = scheduledByDow.some(Boolean);
 
   // ---------- Checkins → derived per-day grid -------------------------------
-  // status: done | missed | scheduled | rest | future
+  // status: done | missed | scheduled | rest | future | pending
+  const defaultPastStatus = data.defaultPastStatus || "done"; // demo fills past; personal leaves pending
   const cells = [];
   for (let i = 0; i < 28; i += 1) {
     const date = addDays(startDate, i);
@@ -35,7 +76,8 @@
     const isScheduled = anyScheduled ? !!scheduledByDow[dow] : true;
     const isPast = date < today && !sameDay(date, today);
     const isToday = sameDay(date, today);
-    const override = data.checkins && data.checkins[i];
+    // Checkins may be keyed by day-index OR by ISO date string. Try both.
+    const override = data.checkins && (data.checkins[i] || data.checkins[toIso(date)]);
 
     let status;
     let note = "";
@@ -47,7 +89,7 @@
     } else if (isToday) {
       status = "scheduled";
     } else if (isPast) {
-      status = "done"; // default past scheduled day to done
+      status = defaultPastStatus;
     } else {
       status = "future";
     }
@@ -180,13 +222,17 @@
         case "rest":
           srStatus = "rest day";
           break;
+        case "pending":
+          glyph = '<span class="tracker-dot" aria-hidden="true"></span>';
+          srStatus = "pending — tap to mark";
+          break;
         case "future":
         default:
           srStatus = "upcoming";
       }
       const noteHtml = c.note ? `<span class="tracker-note" aria-hidden="true">${escapeHtml(c.note)}</span>` : "";
       return `
-        <div class="${classes.join(" ")}" role="listitem" aria-label="${escapeHtml(dateLabel)} — ${srStatus}${c.note ? ". Note: " + escapeHtml(c.note) : ""}">
+        <div class="${classes.join(" ")}" role="listitem" data-cell-index="${c.i}" aria-label="${escapeHtml(dateLabel)} — ${srStatus}${c.note ? ". Note: " + escapeHtml(c.note) : ""}">
           <span class="tracker-daynum">${c.date.getDate()}</span>
           <span class="tracker-glyph">${glyph}</span>
           ${noteHtml}
@@ -294,6 +340,101 @@
     `;
   }
 
+  // ---------- Personal-journey plumbing -------------------------------------
+  function buildPersonalData(ws, comp, journey) {
+    const a = (ws && ws.answers) || {};
+    const identity = (a.identity || "").trim();
+    const nowIso = toIso(new Date());
+    const startIso = (comp && comp.startDate) || nowIso;
+    const reflections = Array.isArray(journey.reflections) ? journey.reflections : [];
+    const latest = reflections.length ? reflections[reflections.length - 1] : null;
+    return {
+      displayName: "You",
+      avatarInitial: "★",
+      startDate: startIso,
+      today: nowIso,
+      defaultPastStatus: "pending",
+      latestCheckinAgo: latest ? humanDate(parseIso(latest.date)) : "",
+      latestNote: latest ? latest.text : "",
+      answers: {
+        goal: a.goal || "",
+        identity: identity,
+        "identity-foundation": a["identity-foundation"] || "",
+        "positive-outcomes": a["positive-outcomes"] || [],
+        "future-problems":   a["future-problems"]   || [],
+        ssmart: a.ssmart || null,
+        stakes: a.stakes || null,
+        roadblocks: a.roadblocks || null,
+      },
+      checkins: journey.checkins || {},
+      reflections: reflections,
+    };
+  }
+
+  function saveCheckin(isoDate, patch) {
+    const current = readJson("wip-journey") || { checkins: {}, reflections: [] };
+    current.checkins = current.checkins || {};
+    const prev = current.checkins[isoDate] || {};
+    const next = { ...prev, ...patch };
+    // If cleared back to default, drop the entry.
+    if (!next.status && !(next.note && next.note.trim())) {
+      delete current.checkins[isoDate];
+    } else {
+      current.checkins[isoDate] = next;
+    }
+    writeJson("wip-journey", current);
+    data.checkins = current.checkins;
+  }
+
+  function addReflection(text) {
+    const trimmed = (text || "").trim();
+    if (!trimmed) return;
+    const current = readJson("wip-journey") || { checkins: {}, reflections: [] };
+    current.reflections = Array.isArray(current.reflections) ? current.reflections : [];
+    current.reflections.push({
+      id: `r${Date.now()}`,
+      date: toIso(new Date()),
+      text: trimmed,
+    });
+    writeJson("wip-journey", current);
+    data.reflections = current.reflections;
+    const latest = current.reflections[current.reflections.length - 1];
+    data.latestNote = latest.text;
+    data.latestCheckinAgo = humanDate(parseIso(latest.date));
+  }
+
+  function deleteReflection(id) {
+    const current = readJson("wip-journey") || { checkins: {}, reflections: [] };
+    current.reflections = (current.reflections || []).filter((r) => r.id !== id);
+    writeJson("wip-journey", current);
+    data.reflections = current.reflections;
+    const latest = current.reflections.length ? current.reflections[current.reflections.length - 1] : null;
+    data.latestNote = latest ? latest.text : "";
+    data.latestCheckinAgo = latest ? humanDate(parseIso(latest.date)) : "";
+  }
+
+  function renderLocked() {
+    const wrap = document.querySelector("main.prog-wrap");
+    if (!wrap) return;
+    wrap.innerHTML = `
+      <section class="prog-lock" aria-label="Journey locked">
+        <div class="prog-lock-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="11" width="16" height="9" rx="2" />
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+        </div>
+        <p class="prog-eyebrow">Your journey</p>
+        <h1>Finish the worksheet to unlock this tab.</h1>
+        <p class="prog-lock-sub">The Journey tab is where your 4-week progress lives &mdash; your tracker, your reflections, your updates. It opens the moment you complete the Inspire Action worksheet.</p>
+        <div class="prog-lock-actions">
+          <a class="btn" href="worksheet.html">Open the worksheet &rarr;</a>
+          <a class="prog-lock-demo" href="progress.html?demo=1">or view a sample journey</a>
+        </div>
+      </section>
+    `;
+  }
+
   // ---------- Boot ----------------------------------------------------------
   renderHero();
   renderStrip();
@@ -303,4 +444,227 @@
   renderStakes();
   renderFallbacks();
   renderLatest();
+
+  if (isPersonal) {
+    wireTrackerEditing();
+    wireReflectionEditing();
+    addDemoBannerIfNeeded();
+  } else if (wantDemo) {
+    addDemoBannerIfNeeded();
+  }
+
+  function addDemoBannerIfNeeded() {
+    if (!wantDemo) return;
+    const hero = document.getElementById("progHero");
+    if (!hero) return;
+    const banner = document.createElement("p");
+    banner.className = "prog-demo-banner";
+    banner.innerHTML = `You're viewing a sample journey (Alex). <a href="progress.html">Back to your journey &rarr;</a>`;
+    hero.parentNode.insertBefore(banner, hero);
+  }
+
+  // ---------- Tracker editing ----------------------------------------------
+  function wireTrackerEditing() {
+    const root = document.getElementById("progTracker");
+    if (!root) return;
+    root.classList.add("is-editable");
+    root.addEventListener("click", (e) => {
+      const cell = e.target.closest(".tracker-cell");
+      if (!cell) return;
+      const idx = Number(cell.dataset.cellIndex);
+      if (Number.isNaN(idx)) return;
+      openCellEditor(idx, cell);
+    });
+  }
+
+  function openCellEditor(cellIndex, anchorEl) {
+    closeCellEditor();
+    const c = cells[cellIndex];
+    const iso = toIso(c.date);
+    const existing = (data.checkins && (data.checkins[iso] || data.checkins[cellIndex])) || {};
+    const current = existing.status || c.status;
+    const note    = existing.note   || "";
+    const isFuture = c.date > today && !sameDay(c.date, today);
+
+    const popover = document.createElement("div");
+    popover.className = "tracker-editor";
+    popover.setAttribute("role", "dialog");
+    popover.setAttribute("aria-label", `Edit ${humanDate(c.date)}`);
+    popover.innerHTML = `
+      <header class="tracker-editor-head">
+        <strong>${escapeHtml(humanDate(c.date))}</strong>
+        <button type="button" class="tracker-editor-close" aria-label="Close">&times;</button>
+      </header>
+      ${isFuture ? `<p class="tracker-editor-hint">This day hasn't arrived yet. You can still jot a note.</p>` : ""}
+      <div class="tracker-editor-statuses" role="radiogroup" aria-label="Status">
+        ${statusBtn("done",    "Done",    "✓", current)}
+        ${statusBtn("missed",  "Missed",  "✕", current)}
+        ${statusBtn("rest",    "Rest",    "·", current)}
+        ${statusBtn("pending", "Pending", "…", current)}
+      </div>
+      <label class="tracker-editor-note-label" for="tracker-editor-note">Note (optional)</label>
+      <textarea id="tracker-editor-note" class="tracker-editor-note" rows="3" maxlength="240" placeholder="A line about how it went.">${escapeHtml(note)}</textarea>
+      <footer class="tracker-editor-foot">
+        <button type="button" class="tracker-editor-clear">Clear</button>
+        <button type="button" class="tracker-editor-save btn-primary">Save</button>
+      </footer>
+    `;
+    document.body.appendChild(popover);
+    positionPopover(popover, anchorEl);
+
+    const onDocClick = (ev) => {
+      if (popover.contains(ev.target) || anchorEl.contains(ev.target)) return;
+      closeCellEditor();
+    };
+    const onKey = (ev) => { if (ev.key === "Escape") closeCellEditor(); };
+    setTimeout(() => {
+      document.addEventListener("click", onDocClick);
+      document.addEventListener("keydown", onKey);
+    }, 0);
+    popover._cleanup = () => {
+      document.removeEventListener("click", onDocClick);
+      document.removeEventListener("keydown", onKey);
+      popover.remove();
+    };
+
+    popover.querySelector(".tracker-editor-close").addEventListener("click", closeCellEditor);
+
+    let pickedStatus = current;
+    popover.querySelectorAll(".tracker-editor-status").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pickedStatus = btn.dataset.status;
+        popover.querySelectorAll(".tracker-editor-status").forEach((b) =>
+          b.classList.toggle("is-selected", b === btn));
+      });
+    });
+
+    popover.querySelector(".tracker-editor-clear").addEventListener("click", () => {
+      saveCheckin(iso, { status: "", note: "" });
+      closeCellEditor();
+      rebuildCell(cellIndex);
+      renderTracker();
+      wireTrackerEditing();
+      renderStrip();
+    });
+
+    popover.querySelector(".tracker-editor-save").addEventListener("click", () => {
+      const newNote = popover.querySelector(".tracker-editor-note").value.trim();
+      saveCheckin(iso, { status: pickedStatus, note: newNote });
+      closeCellEditor();
+      rebuildCell(cellIndex);
+      renderTracker();
+      wireTrackerEditing();
+      renderStrip();
+    });
+  }
+
+  function rebuildCell(i) {
+    const c = cells[i];
+    if (!c) return;
+    const iso = toIso(c.date);
+    const override = data.checkins && (data.checkins[iso] || data.checkins[i]);
+    const isPast = c.date < today && !sameDay(c.date, today);
+    const isToday = c.isToday;
+    if (override) {
+      c.status = override.status;
+      c.note = override.note || "";
+    } else if (!c.isScheduled) {
+      c.status = "rest"; c.note = "";
+    } else if (isToday) {
+      c.status = "scheduled"; c.note = "";
+    } else if (isPast) {
+      c.status = data.defaultPastStatus || "done"; c.note = "";
+    } else {
+      c.status = "future"; c.note = "";
+    }
+  }
+
+  function statusBtn(key, label, glyph, current) {
+    const sel = current === key ? " is-selected" : "";
+    return `<button type="button" class="tracker-editor-status${sel}" data-status="${key}">
+      <span class="tracker-editor-glyph" aria-hidden="true">${glyph}</span>
+      <span>${label}</span>
+    </button>`;
+  }
+
+  function closeCellEditor() {
+    const existing = document.querySelector(".tracker-editor");
+    if (existing && existing._cleanup) existing._cleanup();
+    else if (existing) existing.remove();
+  }
+
+  function positionPopover(popover, anchor) {
+    const r = anchor.getBoundingClientRect();
+    const pageY = window.scrollY + r.bottom + 8;
+    const pageX = window.scrollX + r.left + (r.width / 2);
+    popover.style.position = "absolute";
+    popover.style.top = `${pageY}px`;
+    popover.style.left = `${pageX}px`;
+    popover.style.transform = "translateX(-50%)";
+    // Flip above if it would go off the bottom of the viewport.
+    requestAnimationFrame(() => {
+      const pr = popover.getBoundingClientRect();
+      if (pr.bottom > window.innerHeight) {
+        popover.style.top = `${window.scrollY + r.top - pr.height - 8}px`;
+      }
+      const margin = 12;
+      if (pr.left < margin) popover.style.left = `${window.scrollX + margin}px`, popover.style.transform = "none";
+      if (pr.right > window.innerWidth - margin) {
+        popover.style.left = `${window.scrollX + window.innerWidth - pr.width - margin}px`;
+        popover.style.transform = "none";
+      }
+    });
+  }
+
+  // ---------- Reflection editing --------------------------------------------
+  function wireReflectionEditing() {
+    const root = document.getElementById("progLatest");
+    if (!root) return;
+    renderReflectionsEditor();
+  }
+
+  function renderReflectionsEditor() {
+    const root = document.getElementById("progLatest");
+    if (!root) return;
+    const refs = Array.isArray(data.reflections) ? data.reflections.slice().reverse() : [];
+    const items = refs.map((r) => `
+      <li class="prog-reflection" data-reflection-id="${escapeHtml(r.id)}">
+        <blockquote>
+          <p>${escapeHtml(r.text)}</p>
+          <footer>${escapeHtml(humanDate(parseIso(r.date)))}</footer>
+        </blockquote>
+        <button type="button" class="prog-reflection-remove" aria-label="Delete reflection">Delete</button>
+      </li>`).join("");
+    root.innerHTML = `
+      <h2 class="prog-section-title">Reflections &amp; updates</h2>
+      <p class="prog-section-sub">How are things going? Drop a note for future-you.</p>
+      <form class="prog-reflection-form" aria-label="Add a reflection">
+        <textarea class="prog-reflection-input" rows="3" maxlength="600" placeholder="What went well? What got in the way? What's next?"></textarea>
+        <div class="prog-reflection-foot">
+          <button type="submit" class="btn-primary">Save reflection</button>
+        </div>
+      </form>
+      ${refs.length
+        ? `<ul class="prog-reflection-list">${items}</ul>`
+        : `<p class="prog-reflection-empty">No reflections yet &mdash; the first one is usually the hardest.</p>`}
+    `;
+
+    const form = root.querySelector(".prog-reflection-form");
+    const input = root.querySelector(".prog-reflection-input");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      addReflection(input.value);
+      renderReflectionsEditor();
+    });
+    root.querySelectorAll(".prog-reflection-remove").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const li = btn.closest(".prog-reflection");
+        const id = li && li.dataset.reflectionId;
+        if (!id) return;
+        if (!window.confirm("Delete this reflection?")) return;
+        deleteReflection(id);
+        renderReflectionsEditor();
+      });
+    });
+  }
 })();
