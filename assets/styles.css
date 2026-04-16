@@ -2109,7 +2109,7 @@ textarea.iaw-problem-input { min-height: 64px; }
 .v2-status-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 12px;
   padding: 8px 0;
   position: relative;
@@ -2361,10 +2361,10 @@ textarea.iaw-problem-input { min-height: 64px; }
 .v2-verdict {
   margin: 0;
   font-family: var(--serif);
-  font-size: 1rem;
+  font-size: 0.88rem;
   color: var(--muted);
-  min-height: 1.4em;
-  flex: 1;
+  min-height: 1.2em;
+  text-align: center;
 }
 
 .v2-reset {
@@ -2399,6 +2399,5 @@ textarea.iaw-problem-input { min-height: 64px; }
   }
   .v2-toolbar-title { text-align: center; }
   .v2-toolbar-sub { max-width: none; text-align: center; margin: 2px auto 0; }
-  .v2-status-bar { flex-wrap: wrap; justify-content: center; text-align: center; }
-  .v2-verdict { text-align: center; flex-basis: 100%; }
+  .v2-status-bar { justify-content: center; }
 }
