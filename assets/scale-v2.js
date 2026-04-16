@@ -74,10 +74,16 @@
   // smoothly once the mouse moves away.
   let interacting = false;
 
-  // Seed example items so the page isn't empty on first load.
-  actionInput.value = DEFAULT_ACTION;
-  SEED_FOR.forEach((s) => state.for.push({ id: newId(), text: s.text, weight: s.weight }));
-  SEED_AGAINST.forEach((s) => state.against.push({ id: newId(), text: s.text, weight: s.weight }));
+  // Seed example items so the page isn't empty on first load,
+  // unless we can restore a previous session from localStorage.
+  const _restored = loadFromLocalStorage();
+  if (_restored) {
+    actionInput.value = state.action;
+  } else {
+    actionInput.value = DEFAULT_ACTION;
+    SEED_FOR.forEach((s) => state.for.push({ id: newId(), text: s.text, weight: s.weight }));
+    SEED_AGAINST.forEach((s) => state.against.push({ id: newId(), text: s.text, weight: s.weight }));
+  }
 
   // Build suggestion chips.
   SUGGESTIONS_FOR.forEach((s) => chipsForEl.appendChild(makeChip(s, "for")));
@@ -98,6 +104,7 @@
   actionInput.addEventListener("input", (e) => {
     state.action = e.target.value;
     sizeActionInput();
+    saveToLocalStorage();
   });
 
   function sizeActionInput() {
@@ -128,6 +135,7 @@
     state.action = "";
     actionInput.value = "";
     sizeActionInput();
+    try { localStorage.removeItem("wip-scale"); } catch (e) {}
     render();
   });
 
@@ -149,6 +157,7 @@
     renderColumn(itemsForEl, state.for, "for");
     renderColumn(itemsAgainstEl, state.against, "against");
     recomputeTotalsAndTilt();
+    saveToLocalStorage();
   }
 
   function renderColumn(container, items, side) {
@@ -343,6 +352,38 @@
 
   function clamp(v, lo, hi) {
     return Math.max(lo, Math.min(hi, v));
+  }
+
+  // ---- localStorage persistence -------------------------------------------
+  function saveToLocalStorage() {
+    try {
+      localStorage.setItem("wip-scale", JSON.stringify({
+        action: state.action,
+        for: state.for,
+        against: state.against,
+      }));
+    } catch (e) { /* quota exceeded or private browsing — silently fail */ }
+  }
+
+  function loadFromLocalStorage() {
+    try {
+      const raw = localStorage.getItem("wip-scale");
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object") return false;
+      if (typeof saved.action !== "string") return false;
+      if (!Array.isArray(saved.for) || !Array.isArray(saved.against)) return false;
+      state.action = saved.action;
+      state.for = saved.for;
+      state.against = saved.against;
+      // Recompute nextId to avoid collisions with restored items.
+      const maxId = Math.max(0, ...state.for.map((x) => x.id || 0), ...state.against.map((x) => x.id || 0));
+      nextId = maxId + 1;
+      return true;
+    } catch (e) {
+      try { localStorage.removeItem("wip-scale"); } catch (_) {}
+      return false;
+    }
   }
 
   sizeActionInput();
