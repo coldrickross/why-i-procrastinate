@@ -318,10 +318,15 @@
   }
 
   function updateVerdict(f, a) {
+    const empty = f === 0 && a === 0;
+    if (empty) {
+      verdictEl.textContent = "";
+      resetBtn.style.display = "none";
+      return;
+    }
+    resetBtn.style.display = "";
     let line;
-    if (f === 0 && a === 0) {
-      line = "Nothing on the scale yet. Start adding reasons.";
-    } else if (f === a) {
+    if (f === a) {
       line = "Perfectly balanced. A nudge either way will tip it.";
     } else if (f > a) {
       const d = f - a;

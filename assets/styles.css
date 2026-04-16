@@ -2061,11 +2061,11 @@ textarea.iaw-problem-input { min-height: 64px; }
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-sm);
-  padding: 10px 16px;
+  padding: 18px 24px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   max-width: 100%;
   text-align: center;
 }
@@ -2089,6 +2089,7 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-weight: 500;
   color: var(--ink);
   padding: 4px 0;
+  margin-bottom: 6px;
   border-bottom: 1px dashed var(--line);
   text-align: center;
 }
@@ -2353,8 +2354,10 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-family: var(--serif);
   font-size: 0.88rem;
   color: var(--muted);
-  min-height: 1.2em;
   text-align: center;
+}
+.v2-verdict:empty {
+  display: none;
 }
 
 .v2-reset {
