@@ -398,18 +398,20 @@
 
   function renderProblemItem(step, entry, index) {
     const label = entryLabelOf(step);
-    const fields = getFields(step).map((f) => {
+    const fields = getFields(step).map((f, fi) => {
       const id = `${step.id}-${index}-${f.key}`;
       const value = escapeHtml(entry[f.key] || "");
       const control = f.rows > 1
         ? `<textarea id="${id}" class="iaw-problem-input" data-field="${f.key}" rows="${f.rows}" placeholder="${escapeHtml(f.placeholder)}">${value}</textarea>`
         : `<input id="${id}" class="iaw-problem-input" data-field="${f.key}" type="text" value="${value}" placeholder="${escapeHtml(f.placeholder)}" />`;
-      return `
+      const fieldHtml = `
         <div class="iaw-problem-field">
           <label class="iaw-problem-field-label" for="${id}">${escapeHtml(f.label)}</label>
           ${control}
         </div>
       `;
+      if (fi === 0) return fieldHtml;
+      return `<div class="iaw-problem-field-wrap" data-reveal-index="${fi}">${fieldHtml}</div>`;
     }).join("");
 
     return `
@@ -421,6 +423,26 @@
         <div class="iaw-problem-grid">${fields}</div>
       </li>
     `;
+  }
+
+  function applyFieldDisclosure(problemEl, step) {
+    const fields = getFields(step);
+    const wraps = problemEl.querySelectorAll('.iaw-problem-field-wrap');
+    wraps.forEach((wrap) => {
+      const ri = Number(wrap.dataset.revealIndex);
+      const prevInput = problemEl.querySelector(`[data-field="${fields[ri - 1].key}"]`);
+      const curInput = problemEl.querySelector(`[data-field="${fields[ri].key}"]`);
+      const show = (prevInput && prevInput.value.length > 0) || (curInput && curInput.value.length > 0);
+      wrap.classList.toggle('is-revealed', show);
+      if (curInput) {
+        if (show) curInput.removeAttribute('tabindex');
+        else curInput.setAttribute('tabindex', '-1');
+      }
+    });
+  }
+
+  function applyAllFieldDisclosure(listRoot, step) {
+    listRoot.querySelectorAll('.iaw-problem').forEach((el) => applyFieldDisclosure(el, step));
   }
 
   function wireProblemList(listRoot, step) {
@@ -436,6 +458,8 @@
       persistCurrentInputs();
       tryStartTimer();
       updatePath();
+      const problemEl = target.closest('.iaw-problem');
+      if (problemEl) applyFieldDisclosure(problemEl, step);
     });
 
     listRoot.addEventListener("click", (e) => {
@@ -469,6 +493,7 @@
     const list = answers[step.id];
     const ol = listRoot.querySelector(".iaw-problems");
     ol.innerHTML = list.map((entry, i) => renderProblemItem(step, entry, i)).join("");
+    applyAllFieldDisclosure(listRoot, step);
     if (focusIndex != null) {
       const target = ol.querySelector(`.iaw-problem[data-problem-index="${focusIndex}"] .iaw-problem-input`);
       if (target) target.focus({ preventScroll: true });
@@ -1204,6 +1229,7 @@
     if (isProblem) {
       const listRoot = card.querySelector(".iaw-problem-list");
       wireProblemList(listRoot, step);
+      applyAllFieldDisclosure(listRoot, step);
       const firstInput = listRoot.querySelector(".iaw-problem-input");
       if (firstInput) firstInput.focus({ preventScroll: true });
     } else if (isFoundation) {
