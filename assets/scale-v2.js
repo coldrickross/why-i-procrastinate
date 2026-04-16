@@ -125,6 +125,9 @@
   resetBtn.addEventListener("click", () => {
     state.for = [];
     state.against = [];
+    state.action = "";
+    actionInput.value = "";
+    sizeActionInput();
     render();
   });
 
@@ -322,16 +325,16 @@
       line = "Perfectly balanced. A nudge either way will tip it.";
     } else if (f > a) {
       const d = f - a;
-      if (d >= 8) line = "Tilted hard toward action — you'll do it.";
-      else if (d >= 3) line = "Tilted toward action — you're likely to do it.";
-      else line = "Leaning toward action.";
+      if (d >= 8) line = "Strongly tilted toward action.";
+      else if (d >= 3) line = "Tilted toward action.";
+      else line = "Slightly tilted toward action.";
     } else {
       const d = a - f;
-      if (d >= 8) line = "Tilted hard away from action — you won't.";
-      else if (d >= 3) line = "Tilted away from action — you probably won't.";
-      else line = "Leaning away from action.";
+      if (d >= 8) line = "Strongly tilted away from action.";
+      else if (d >= 3) line = "Tilted away from action.";
+      else line = "Slightly tilted away from action.";
     }
-    verdictEl.textContent = `${line}  (${f} for, ${a} against)`;
+    verdictEl.textContent = line;
   }
 
   function sumWeights(arr) {

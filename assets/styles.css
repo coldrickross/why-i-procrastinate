@@ -2055,6 +2055,8 @@ textarea.iaw-problem-input { min-height: 64px; }
 }
 
 .v2-action-bar {
+  position: relative;
+  z-index: 2;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
@@ -2104,7 +2106,19 @@ textarea.iaw-problem-input { min-height: 64px; }
 }
 .v2-legend b { color: var(--ink); font-weight: 600; }
 
+.v2-status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  position: relative;
+  z-index: 2;
+}
+
 .v2-stage {
+  position: relative;
+  z-index: 1;
   margin: 0;
 }
 .v2-stage .suggested {
@@ -2114,7 +2128,7 @@ textarea.iaw-problem-input { min-height: 64px; }
 .v2-scale-holder {
   position: relative;
   max-width: 1000px;
-  margin: 0 auto;
+  margin: -20px auto 0;
 }
 
 /* The whole scale — beam, pillar, base, AND the pans — live inside one SVG
@@ -2345,21 +2359,16 @@ textarea.iaw-problem-input { min-height: 64px; }
 .v2-add-against:hover { background: rgba(200, 118, 104, 0.08); color: var(--terra-deep); border-color: var(--terra); }
 
 .v2-verdict {
-  margin: 12px auto 0;
-  max-width: 640px;
-  text-align: center;
+  margin: 0;
   font-family: var(--serif);
-  font-size: 1.1rem;
-  color: var(--ink);
+  font-size: 1rem;
+  color: var(--muted);
   min-height: 1.4em;
+  flex: 1;
 }
 
-.v2-actions {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-}
 .v2-reset {
+  flex-shrink: 0;
   padding: 8px 18px;
   border-radius: 999px;
   background: transparent;
@@ -2390,4 +2399,6 @@ textarea.iaw-problem-input { min-height: 64px; }
   }
   .v2-toolbar-title { text-align: center; }
   .v2-toolbar-sub { max-width: none; text-align: center; margin: 2px auto 0; }
+  .v2-status-bar { flex-wrap: wrap; justify-content: center; text-align: center; }
+  .v2-verdict { text-align: center; flex-basis: 100%; }
 }
