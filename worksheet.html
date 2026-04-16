@@ -28,7 +28,7 @@
 
   <main class="wrap iaw-wrap">
 
-    <!-- Intro: three predictable reasons -->
+    <!-- Intro: four predictable reasons -->
     <section class="iaw-intro" aria-label="Why people stall">
       <h2 class="iaw-intro-title">The most predictable reasons people haven't made meaningful change</h2>
       <ol class="iaw-reasons">
@@ -43,7 +43,7 @@
           <span class="iaw-reason-num">2</span>
           <div>
             <h3>They haven't explored the emotional depth of the problems and outcomes</h3>
-            <p>So we sit with it — honestly — until the feelings become fuel.</p>
+            <p>So we sit with it &mdash; honestly &mdash; until the feelings become fuel.</p>
           </div>
         </li>
         <li>
@@ -53,48 +53,28 @@
             <p>So we engineer the path so doing the right thing is the default.</p>
           </div>
         </li>
+        <li>
+          <span class="iaw-reason-num">4</span>
+          <div>
+            <h3>They haven't planned for when life gets in the way</h3>
+            <p>So we build fallback plans before you need them &mdash; in calm mind, not crisis mode.</p>
+          </div>
+        </li>
       </ol>
     </section>
 
-    <!-- Progress zig-zag -->
+    <!-- Phase progress bar -->
     <section class="iaw-progress" aria-label="Progress">
-      <div class="iaw-progress-inner">
-        <svg id="iawPath" class="iaw-path" viewBox="0 0 900 120" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <ol id="iawDots" class="iaw-dots"></ol>
-      </div>
-      <p class="iaw-progress-meta"><span id="iawStepNow">1</span> <span class="iaw-progress-dim">/ <span id="iawStepTotal">15</span> · <span id="iawPhaseName">Establish what you want</span></span></p>
+      <div class="iaw-phases-bar" id="iawPhasesBar"></div>
+      <div class="iaw-step-dots" id="iawStepDots"></div>
+      <p class="iaw-progress-meta" id="iawProgressMeta"></p>
     </section>
 
     <!-- Single-step view -->
     <section id="iawStep" class="iaw-step" aria-live="polite"></section>
 
-    <!-- Why this matters -->
-    <section class="iaw-why">
-      <h2>Why this matters</h2>
-      <ul class="iaw-why-list">
-        <li>
-          <span class="iaw-why-dash" aria-hidden="true"></span>
-          <div>
-            <strong>Extrinsic motivation is fleeting.</strong>
-            <span>Rewards and punishments fade. Identity endures — so we build on it.</span>
-          </div>
-        </li>
-        <li>
-          <span class="iaw-why-dash" aria-hidden="true"></span>
-          <div>
-            <strong>Identity makes the future easy.</strong>
-            <span>When the behaviour is who you are, tomorrow takes care of itself.</span>
-          </div>
-        </li>
-        <li>
-          <span class="iaw-why-dash" aria-hidden="true"></span>
-          <div>
-            <strong>Without a clear aim, action is hard.</strong>
-            <span>Clarity is the cheapest fuel there is. Name the thing, then move.</span>
-          </div>
-        </li>
-      </ul>
-    </section>
+    <!-- Why this matters (dynamic, updated per phase by JS) -->
+    <section class="iaw-why" id="iawWhy" aria-label="Why this matters"></section>
 
     <!-- Report (revealed at final step) -->
     <section id="iawReportCard" class="iaw-report-card is-hidden" aria-label="Generate report">
