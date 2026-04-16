@@ -20,21 +20,23 @@
     </div>
   </nav>
 
-  <header class="hero v2-hero">
-    <h1>The <em>Scale</em></h1>
-  </header>
-
-  <main class="wrap v2-wrap">
-    <section class="v2-action-bar" aria-label="Action being considered">
-      <label class="v2-action-label" for="v2Action">THE ACTION:</label>
-      <input
-        class="v2-action-input"
-        id="v2Action"
-        type="text"
-        placeholder="Insert Action (e.g. Apply for jobs)"
-        autocomplete="off"
-      />
-    </section>
+  <main class="wrap v2-wrap v2-app">
+    <header class="v2-toolbar-header">
+      <div class="v2-toolbar-title">
+        <h1>The <em>Scale</em></h1>
+        <p class="v2-toolbar-sub">See what pulls you toward action and what holds you back.</p>
+      </div>
+      <section class="v2-action-bar" aria-label="Action being considered">
+        <label class="v2-action-label" for="v2Action">THE ACTION:</label>
+        <input
+          class="v2-action-input"
+          id="v2Action"
+          type="text"
+          placeholder="Insert Action (e.g. Apply for jobs)"
+          autocomplete="off"
+        />
+      </section>
+    </header>
 
     <section class="v2-stage" aria-label="Interactive scale">
       <div class="v2-scale-holder">
@@ -91,16 +93,18 @@
       <div class="v2-actions">
         <button class="v2-reset" id="v2Reset" type="button" aria-label="Clear every reason from both sides">Clear reasons</button>
       </div>
+
+      <section class="suggested" aria-label="Suggested reasons">
+        <h4>Need ideas? Tap to drop a common weight onto the scale.</h4>
+        <p class="hint">Click a chip to add it to that side. You can edit, resize, or remove it afterwards.</p>
+        <span class="chip-label">Toward action</span>
+        <div class="chip-row" id="v2ChipsFor"></div>
+        <span class="chip-label">Away from action</span>
+        <div class="chip-row" id="v2ChipsAgainst"></div>
+      </section>
     </section>
 
-    <section class="suggested" aria-label="Suggested reasons">
-      <h4>Need ideas? Tap to drop a common weight onto the scale.</h4>
-      <p class="hint">Click a chip to add it to that side. You can edit, resize, or remove it afterwards.</p>
-      <span class="chip-label">Toward action</span>
-      <div class="chip-row" id="v2ChipsFor"></div>
-      <span class="chip-label">Away from action</span>
-      <div class="chip-row" id="v2ChipsAgainst"></div>
-    </section>
+    <hr class="v2-app-divider">
 
     <section class="explain">
       <h2>How the scale works</h2>
