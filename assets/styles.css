@@ -581,6 +581,7 @@ footer.page-foot a { color: var(--ink); }
 .iaw-reasons li:nth-child(1) { box-shadow: inset 3px 0 0 var(--gold-deep); }
 .iaw-reasons li:nth-child(2) { box-shadow: inset 3px 0 0 var(--terra); }
 .iaw-reasons li:nth-child(3) { box-shadow: inset 3px 0 0 var(--teal); }
+.iaw-reasons li:nth-child(4) { box-shadow: inset 3px 0 0 var(--sage); }
 
 .iaw-reason-num {
   font-family: var(--serif);
@@ -596,6 +597,7 @@ footer.page-foot a { color: var(--ink); }
 .iaw-reasons li:nth-child(1) .iaw-reason-num { color: var(--gold-deep); background: rgba(212, 165, 116, 0.18); }
 .iaw-reasons li:nth-child(2) .iaw-reason-num { color: var(--terra-deep); background: rgba(200, 118, 104, 0.16); }
 .iaw-reasons li:nth-child(3) .iaw-reason-num { color: var(--teal-deep); background: rgba(91, 138, 138, 0.16); }
+.iaw-reasons li:nth-child(4) .iaw-reason-num { color: var(--sage-deep); background: rgba(125, 160, 125, 0.18); }
 
 .iaw-reasons h3 {
   margin: 2px 0 3px;
