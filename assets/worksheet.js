@@ -141,8 +141,6 @@
         { key: "travel",    label: "When I'm travelling",      icon: "✈️", placeholder: "e.g. 10-min hotel walk or bodyweight squats." },
         { key: "tired",     label: "When I'm exhausted",       icon: "😴", placeholder: "e.g. Put the shoes on, walk to the corner, come home." },
         { key: "busy",      label: "When the day gets hijacked", icon: "⏰", placeholder: "e.g. 2-minute version counts. Anything > 0." },
-        { key: "weather",   label: "When the weather blocks me", icon: "🌧️", placeholder: "e.g. Indoor stair loops for 10 minutes." },
-        { key: "low-mood",  label: "When I feel low",          icon: "🌧", placeholder: "e.g. Walk to the door. That's the whole win today." },
       ] },
     { id: "missed-day",        phase: "protect", title: "If you miss a day",
       prompt: "Missing once is noise. Missing twice is a pattern. Write the script now so you know exactly what to say — and do — on day one after a slip.",
