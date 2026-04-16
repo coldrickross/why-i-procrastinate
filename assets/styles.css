@@ -14,6 +14,8 @@
   --teal-deep: #3f6969;
   --terra: #c87668;
   --terra-deep: #9e5447;
+  --sage: #7da07d;
+  --sage-deep: #5b805b;
   --muted: #6b6a73;
   --line: rgba(26, 29, 46, 0.12);
 
@@ -609,89 +611,165 @@ footer.page-foot a { color: var(--ink); }
   font-size: 0.95rem;
 }
 
-/* ---------- Zig-zag progress ---------- */
+/* ---------- Phase progress bar ---------- */
 .iaw-progress {
   margin: 0 0 22px;
-  padding: 18px 18px 10px;
+  padding: 22px 18px 14px;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   box-shadow: var(--shadow-sm);
 }
-.iaw-progress-inner {
-  position: relative;
-  width: 100%;
-  height: 120px;
+
+/* Phase bar — horizontal row of nodes + connecting lines */
+.iaw-phases-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto 14px;
+  max-width: 520px;
 }
-.iaw-path {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.iaw-path-bg {
-  fill: none;
-  stroke: rgba(26, 29, 46, 0.12);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 4 6;
-}
-.iaw-path-fg {
-  fill: none;
-  stroke: var(--gold-deep);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transition: stroke-dasharray 400ms var(--ease);
-}
-.iaw-dots {
-  position: absolute;
-  inset: 0;
-  list-style: none;
-  margin: 0;
+
+.iaw-phase-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
   padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
 }
-.iaw-dot {
-  position: absolute;
-  width: 28px; height: 28px;
+.iaw-phase-node:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.iaw-phase-pip {
+  width: 40px; height: 40px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2.5px solid var(--line);
+  display: grid;
+  place-items: center;
+  transition: background 250ms var(--ease), border-color 250ms var(--ease), box-shadow 250ms var(--ease), transform 250ms var(--ease);
+}
+.iaw-phase-num {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color 250ms var(--ease);
+}
+.iaw-phase-check {
+  display: none;
+  font-size: 1.1rem;
+  color: #fff;
+  line-height: 1;
+}
+
+.iaw-phase-short {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 250ms var(--ease);
+}
+
+/* Phase node states */
+.iaw-phase-node.is-current .iaw-phase-pip {
+  border-color: var(--ink);
+  background: var(--ink);
+  box-shadow: 0 0 0 5px rgba(26, 29, 46, 0.12);
+  transform: scale(1.08);
+}
+.iaw-phase-node.is-current .iaw-phase-num { color: var(--cream); }
+.iaw-phase-node.is-current .iaw-phase-short { color: var(--ink); font-weight: 600; }
+
+/* Done states — per-tone colors */
+.iaw-phase-node.is-done .iaw-phase-pip {
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.06);
+  transform: scale(1);
+}
+.iaw-phase-node.is-done .iaw-phase-num { display: none; }
+.iaw-phase-node.is-done .iaw-phase-check { display: block; }
+
+.iaw-phase-node.is-done.tone-gold .iaw-phase-pip    { background: var(--gold-deep); border-color: var(--gold-deep); }
+.iaw-phase-node.is-done.tone-gold .iaw-phase-short   { color: var(--gold-deep); }
+.iaw-phase-node.is-done.tone-terra .iaw-phase-pip   { background: var(--terra-deep); border-color: var(--terra-deep); }
+.iaw-phase-node.is-done.tone-terra .iaw-phase-short  { color: var(--terra-deep); }
+.iaw-phase-node.is-done.tone-teal .iaw-phase-pip    { background: var(--teal-deep); border-color: var(--teal-deep); }
+.iaw-phase-node.is-done.tone-teal .iaw-phase-short   { color: var(--teal-deep); }
+.iaw-phase-node.is-done.tone-sage .iaw-phase-pip    { background: var(--sage-deep); border-color: var(--sage-deep); }
+.iaw-phase-node.is-done.tone-sage .iaw-phase-short   { color: var(--sage-deep); }
+
+.iaw-phase-node.is-upcoming .iaw-phase-pip { opacity: 0.5; }
+.iaw-phase-node.is-upcoming .iaw-phase-short { opacity: 0.5; }
+
+.iaw-phase-node:hover .iaw-phase-pip {
+  transform: scale(1.06);
+}
+.iaw-phase-node.is-current:hover .iaw-phase-pip {
+  transform: scale(1.1);
+}
+
+/* Connecting lines */
+.iaw-phase-line {
+  flex: 1;
+  height: 2.5px;
+  background: var(--line);
+  margin: 0 6px;
+  margin-bottom: 22px; /* offset for label below nodes */
+  border-radius: 2px;
+  transition: background 300ms var(--ease);
+}
+.iaw-phase-line.is-filled {
+  background: var(--ink);
+}
+
+/* Step dots — small dots for current phase */
+.iaw-step-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 10px;
+  min-height: 18px;
+}
+.iaw-step-dot {
+  width: 14px; height: 14px;
   border-radius: 999px;
   background: #fff;
   border: 2px solid var(--line);
-  transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
   cursor: pointer;
-  transition: transform 180ms var(--ease), background 180ms var(--ease), border-color 180ms var(--ease), box-shadow 180ms var(--ease);
+  padding: 0;
+  transition: background 200ms var(--ease), border-color 200ms var(--ease), transform 200ms var(--ease), box-shadow 200ms var(--ease);
 }
-.iaw-dot:hover { transform: translate(-50%, -50%) scale(1.08); }
-.iaw-dot:focus-visible {
+.iaw-step-dot:hover { transform: scale(1.15); }
+.iaw-step-dot:focus-visible {
   outline: 2px solid var(--gold-deep);
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
-.iaw-dot-num {
-  font-family: var(--sans);
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-.iaw-dot.is-touched { background: var(--cream-deep); border-color: rgba(184, 134, 79, 0.4); }
-.iaw-dot.is-touched .iaw-dot-num { color: var(--ink); }
-.iaw-dot.is-done {
+.iaw-step-dot.is-done {
   background: var(--gold-deep);
   border-color: var(--gold-deep);
-  box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.2);
 }
-.iaw-dot.is-done .iaw-dot-num { color: #fff; }
-.iaw-dot.is-current {
+.iaw-step-dot.is-current {
   background: var(--ink);
   border-color: var(--ink);
-  box-shadow: 0 0 0 5px rgba(26, 29, 46, 0.12);
-  transform: translate(-50%, -50%) scale(1.12);
+  box-shadow: 0 0 0 3px rgba(26, 29, 46, 0.12);
+  transform: scale(1.15);
 }
-.iaw-dot.is-current .iaw-dot-num { color: var(--cream); }
+.iaw-step-dot.is-upcoming {
+  opacity: 0.45;
+}
 
+/* Progress meta text */
 .iaw-progress-meta {
   margin: 4px 0 0;
   text-align: center;
@@ -730,6 +808,7 @@ footer.page-foot a { color: var(--ink); }
 .iaw-step-card.tone-gold::before  { background: var(--gold-deep); }
 .iaw-step-card.tone-terra::before { background: var(--terra); }
 .iaw-step-card.tone-teal::before  { background: var(--teal); }
+.iaw-step-card.tone-sage::before  { background: var(--sage); }
 
 .iaw-step-head {
   display: flex;
@@ -772,6 +851,7 @@ footer.page-foot a { color: var(--ink); }
 }
 .tone-terra .iaw-step-phase { color: var(--terra-deep); }
 .tone-teal  .iaw-step-phase { color: var(--teal-deep); }
+.tone-sage  .iaw-step-phase { color: var(--sage-deep); }
 
 .iaw-step-title {
   margin: 0 0 6px;
@@ -861,6 +941,7 @@ footer.page-foot a { color: var(--ink); }
 }
 .tone-terra .iaw-step-input:focus { border-color: var(--terra); box-shadow: 0 0 0 4px rgba(200, 118, 104, 0.18); }
 .tone-teal  .iaw-step-input:focus { border-color: var(--teal);  box-shadow: 0 0 0 4px rgba(91, 138, 138, 0.18); }
+.tone-sage  .iaw-step-input:focus { border-color: var(--sage);  box-shadow: 0 0 0 4px rgba(125, 160, 125, 0.18); }
 
 /* Short single-line variant for brief answers */
 .iaw-step-input--short {
@@ -1434,64 +1515,7 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-weight: 700;
 }
 
-/* ---------- Why this matters ---------- */
-.iaw-why {
-  margin: 40px 0 8px;
-  padding: 28px 28px 22px;
-  background: linear-gradient(135deg, var(--ink) 0%, var(--ink-soft) 100%);
-  color: var(--cream);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-md);
-}
-.iaw-why h2 {
-  margin: 0 0 18px;
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: clamp(1.4rem, 3vw, 1.8rem);
-  color: #fff;
-  letter-spacing: -0.005em;
-  position: relative;
-  padding-bottom: 10px;
-}
-.iaw-why h2::after {
-  content: "";
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 44px; height: 2px;
-  background: var(--gold);
-}
-.iaw-why-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 14px;
-}
-.iaw-why-list li {
-  display: grid;
-  grid-template-columns: 28px 1fr;
-  gap: 12px;
-  align-items: start;
-}
-.iaw-why-dash {
-  display: inline-block;
-  width: 18px;
-  height: 2px;
-  background: var(--gold);
-  margin-top: 14px;
-}
-.iaw-why-list strong {
-  display: block;
-  font-family: var(--serif);
-  font-weight: 500;
-  font-size: 1.1rem;
-  color: #fff;
-  margin-bottom: 2px;
-}
-.iaw-why-list span {
-  color: rgba(246, 241, 231, 0.78);
-  font-size: 0.98rem;
-}
+/* (Old "Why this matters" static section removed — now dynamic, styled below in Stakes section) */
 
 /* ---------- Distraction board (step 10) ---------- */
 .iaw-distraction-board { display: grid; gap: 14px; }
@@ -1908,6 +1932,126 @@ textarea.iaw-problem-input { min-height: 64px; }
   background: rgba(212,165,116,0.08);
 }
 
+/* ---------- Stakes builder ---------- */
+.iaw-stakes { display: grid; gap: 16px; }
+.iaw-stake-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.iaw-stake-card {
+  appearance: none;
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  transition: border-color 180ms var(--ease), background 180ms var(--ease), transform 140ms var(--ease), box-shadow 180ms var(--ease);
+}
+.iaw-stake-card:hover {
+  border-color: var(--teal);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.iaw-stake-card.is-selected {
+  border-color: var(--teal-deep);
+  background: rgba(91, 138, 138, 0.08);
+  box-shadow: 0 0 0 3px rgba(91, 138, 138, 0.15);
+}
+.iaw-stake-icon { font-size: 1.5rem; line-height: 1; }
+.iaw-stake-label {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.3;
+}
+.iaw-stake-detail {
+  display: grid;
+  gap: 8px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 300ms var(--ease), opacity 250ms var(--ease), margin 250ms var(--ease);
+}
+.iaw-stake-detail.is-visible {
+  max-height: 300px;
+  opacity: 1;
+  margin-top: 4px;
+}
+.iaw-stake-detail-label {
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.iaw-stake-optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+.iaw-stake-textarea {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 70px;
+}
+.iaw-stake-textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(91, 138, 138, 0.18);
+}
+.iaw-stake-amount-input {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  color: var(--ink);
+  max-width: 260px;
+}
+.iaw-stake-amount-input:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(91, 138, 138, 0.18);
+}
+
+/* ---------- Dynamic why section ---------- */
+.iaw-why {
+  margin: 24px 0;
+  padding: 20px 22px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+.iaw-why h2 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin: 0 0 6px;
+}
+.iaw-why-body {
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin: 0;
+  line-height: 1.55;
+}
+
 /* ---------- Report card ---------- */
 .iaw-report-card {
   margin-top: 28px;
@@ -2008,13 +2152,17 @@ textarea.iaw-problem-input { min-height: 64px; }
   .iaw-reasons li { padding: 12px; grid-template-columns: 36px 1fr; gap: 12px; }
   .iaw-reason-num { width: 32px; height: 32px; font-size: 1.25rem; }
   .iaw-progress-inner { height: 90px; }
-  .iaw-dot { width: 22px; height: 22px; }
-  .iaw-dot-num { font-size: 0.62rem; }
+  .iaw-phase-pip { width: 34px; height: 34px; }
+  .iaw-phase-num { font-size: 0.75rem; }
+  .iaw-phase-short { font-size: 0.68rem; }
+  .iaw-phase-line { margin-bottom: 18px; }
+  .iaw-step-dot { width: 12px; height: 12px; }
+  .iaw-stake-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
   .iaw-step-card { padding: 22px 20px 18px; }
   .iaw-step-nav { grid-template-columns: 1fr 1fr; }
   .iaw-step-save { grid-column: 1 / -1; order: 2; }
   .iaw-btn { padding: 10px 14px; }
-  .iaw-why { padding: 22px 20px 18px; }
+  .iaw-why { padding: 16px 18px; }
   .iaw-report-card { padding: 22px 18px; }
 }
 

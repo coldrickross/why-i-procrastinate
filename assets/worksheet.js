@@ -1,10 +1,16 @@
 (function () {
-  // Phases mirror the three reasons from the intro. Each step belongs to one.
+  // Phases mirror the reasons from the intro. Each step belongs to one.
   const PHASES = {
-    want:     { key: "want",     label: "Establish what you want",           tone: "gold"  },
-    feel:     { key: "feel",     label: "Explore the emotional depth",       tone: "terra" },
-    structure:{ key: "structure",label: "Structure your life for action",    tone: "teal"  },
+    want:    { key: "want",    label: "Establish what you want",     short: "Clarity", tone: "gold",
+      why: { title: "Why clarity matters", body: "Identity is the most powerful motivator there is. When the behaviour is who you are, tomorrow takes care of itself. But first you need to name it." }},
+    feel:    { key: "feel",    label: "Explore the emotional depth", short: "Depth",   tone: "terra",
+      why: { title: "Why emotional depth matters", body: "Knowing what to do was never the problem. Feeling it deeply enough to act \u2014 that\u2019s the unlock. These steps turn abstract goals into visceral motivation." }},
+    build:   { key: "build",   label: "Build the habit",            short: "Build",   tone: "teal",
+      why: { title: "Why structure matters", body: "Willpower is a terrible strategy. Instead, we engineer your environment and commitments so doing the right thing is the path of least resistance." }},
+    protect: { key: "protect", label: "Protect the habit",          short: "Protect", tone: "sage",
+      why: { title: "Why protection matters", body: "Life will interrupt. The difference between people who stick with it and people who don\u2019t isn\u2019t perfection \u2014 it\u2019s having a plan for when things go wrong." }},
   };
+  const PHASE_ORDER = ["want", "feel", "build", "protect"];
 
   const steps = [
     { id: "goal",              phase: "want",      title: "Decide a long-term goal",
@@ -54,7 +60,7 @@
         { key: "impact",  label: "Impact / what it stops you from doing",   placeholder: "What does it cost you?",   rows: 2 },
         { key: "feeling", label: "How you'll feel",                         placeholder: "Name the feelings honestly.", rows: 2 },
       ] },
-    { id: "identity-foundation", phase: "structure", title: "Find the smaller identity beneath it",
+    { id: "identity-foundation", phase: "build", title: "Find the smaller identity beneath it",
       prompt: "Before you can become someone strong and athletic, you first have to become someone who SHOWS UP. Before you can be a great writer, you have to be someone who opens the document. Pick the smaller, truer identity that gets you through the door — everything else grows from it.",
       example: "Pick one that fits — or write your own.",
       type: "identity-foundation",
@@ -65,11 +71,11 @@
         "Someone who starts, even badly",
         "Someone who doesn't wait to feel ready",
       ] },
-    { id: "ssmart",            phase: "structure", title: "Build your SSMART task",
+    { id: "ssmart",            phase: "build", title: "Build your SSMART task",
       prompt: "Small, Specific, Measurable, Attainable, Relevant, Time-bound. Build it piece by piece — then pick the days you'll actually do it.",
       example: "Example: Walk · 20 minutes · 7am · Mon & Wed.",
       type: "ssmart-builder" },
-    { id: "distractions",      phase: "structure", title: "Remove distractions",
+    { id: "distractions",      phase: "build", title: "Remove distractions",
       prompt: "Every distraction has a tactic. Tap a common one below or add your own, then pick how you'll handle it.",
       example: "The best tactic is often the laziest one — move the thing, don't rely on willpower.",
       type: "distraction-board",
@@ -85,7 +91,7 @@
         { key: "hide",     label: "Hide",     hint: "Off the home screen, in a drawer." },
         { key: "relocate", label: "Relocate", hint: "Charge it in another room." },
       ] },
-    { id: "resistance",        phase: "structure", title: "Engineer out environmental resistance",
+    { id: "resistance",        phase: "build", title: "Engineer out environmental resistance",
       prompt: "Friction is the silent killer of habits. Pick the tactics you'll use, then describe what it looks like in your life.",
       example: "You don't need all of them. One or two, used seriously, is plenty.",
       type: "friction-reducer",
@@ -109,13 +115,24 @@
           blurb: "Lock it in before resistance shows up.",
           placeholder: "e.g. Alarm set. Walking buddy texted the night before." },
       ] },
-    { id: "accountability",    phase: "structure", title: "Add accountability — gently",
+    { id: "accountability",    phase: "build", title: "Add accountability — gently",
       prompt: "Who sees your effort? How often? Keep self-worth separate from their reaction.",
       example: "Example: Send a thumbs-up in the group chat each morning I walk.",
       type: "textarea" },
-    { id: "tracking",          phase: "structure", title: "Your 4-week progress chart",
+    { id: "stakes",            phase: "build", title: "Raise the stakes",
+      prompt: "Accountability works better when something real is on the line. Choose a consequence you\u2019d genuinely dislike \u2014 something that makes skipping feel more costly than showing up.",
+      example: "The best stake is one that makes you wince slightly. That\u2019s the point.",
+      type: "stakes-builder",
+      suggestions: [
+        { key: "donate",   label: "Donate to a cause I disagree with", icon: "\ud83d\udcb8", placeholder: "e.g. $20 to [party/org] every week I miss my target." },
+        { key: "give-up",  label: "Give up something I enjoy",         icon: "\ud83d\udeab", placeholder: "e.g. No takeaway coffee for the week if I skip." },
+        { key: "uncomfy",  label: "Do something uncomfortable",        icon: "\ud83d\ude2c", placeholder: "e.g. Cold shower every morning of the week after a miss." },
+        { key: "public",   label: "Public confession",                 icon: "\ud83d\udce2", placeholder: "e.g. Post on my story that I didn\u2019t follow through." },
+        { key: "friend",   label: "Financial penalty to a friend",     icon: "\ud83e\udd1d", placeholder: "e.g. Send \u00a310 to my friend \u2014 they keep it if I miss." },
+      ] },
+    { id: "tracking",          phase: "protect", title: "Your 4-week progress chart",
       type: "info" },
-    { id: "roadblocks",        phase: "structure", title: "Plan exceptions and roadblocks",
+    { id: "roadblocks",        phase: "protect", title: "Plan exceptions and roadblocks",
       prompt: "Life will get in the way. Decide now — in calm mind — what the tiny fallback looks like so future-you doesn't have to improvise.",
       example: "The fallback should be small enough that you can't talk yourself out of it.",
       type: "scenario-plans",
@@ -127,7 +144,7 @@
         { key: "weather",   label: "When the weather blocks me", icon: "🌧️", placeholder: "e.g. Indoor stair loops for 10 minutes." },
         { key: "low-mood",  label: "When I feel low",          icon: "🌧", placeholder: "e.g. Walk to the door. That's the whole win today." },
       ] },
-    { id: "missed-day",        phase: "structure", title: "If you miss a day",
+    { id: "missed-day",        phase: "protect", title: "If you miss a day",
       prompt: "Missing once is noise. Missing twice is a pattern. Write the script now so you know exactly what to say — and do — on day one after a slip.",
       example: "Speak to yourself the way you'd speak to a friend you love.",
       type: "missed-day-plan",
@@ -158,6 +175,7 @@
     (step.scenarios || []).forEach((s) => { out[s.key] = ""; });
     return out;
   };
+  const emptyStakes = () => ({ chosen: "", detail: "", amount: "" });
   const emptyMissedDayPlan = () => ({ mantra: "", restart: "" });
 
   const answers = Object.fromEntries(
@@ -166,6 +184,7 @@
       if (s.type === "ssmart-builder") return [s.id, emptySsmart()];
       if (s.type === "distraction-board") return [s.id, emptyDistractionBoard()];
       if (s.type === "friction-reducer") return [s.id, emptyFrictionReducer(s)];
+      if (s.type === "stakes-builder") return [s.id, emptyStakes()];
       if (s.type === "scenario-plans") return [s.id, emptyScenarioPlans(s)];
       if (s.type === "missed-day-plan") return [s.id, emptyMissedDayPlan()];
       return [s.id, ""];
@@ -194,90 +213,127 @@
   let currentIndex = 0;
 
   // Elements ---------------------------------------------------------------
-  const stepRoot     = document.getElementById("iawStep");
-  const reportCard   = document.getElementById("iawReportCard");
-  const reportOutput = document.getElementById("reportOutput");
-  const buildReportBtn = document.getElementById("buildReportBtn");
-  const stepNowEl    = document.getElementById("iawStepNow");
-  const stepTotalEl  = document.getElementById("iawStepTotal");
-  const phaseNameEl  = document.getElementById("iawPhaseName");
-  const dotsEl       = document.getElementById("iawDots");
-  const pathEl       = document.getElementById("iawPath");
+  const stepRoot      = document.getElementById("iawStep");
+  const reportCard    = document.getElementById("iawReportCard");
+  const reportOutput  = document.getElementById("reportOutput");
+  const buildReportBtn= document.getElementById("buildReportBtn");
+  const phasesBarEl   = document.getElementById("iawPhasesBar");
+  const stepDotsEl    = document.getElementById("iawStepDots");
+  const progressMeta  = document.getElementById("iawProgressMeta");
+  const whyEl         = document.getElementById("iawWhy");
 
-  stepTotalEl.textContent = steps.length;
-
-  // Build the zig-zag path + dots -----------------------------------------
-  function layoutPath() {
-    const n = steps.length;
-    const vbW = 900;
-    const vbH = 120;
-    const padX = 36;
-    const usableW = vbW - padX * 2;
-    const topY = 28;
-    const botY = vbH - 28;
-
-    const points = steps.map((_, i) => {
-      const x = padX + (usableW * i) / (n - 1);
-      const y = i % 2 === 0 ? topY : botY;
-      return { x, y };
-    });
-
-    // Clear
-    pathEl.innerHTML = "";
-    dotsEl.innerHTML = "";
-
-    // Background polyline
-    const ptsStr = points.map((p) => `${p.x},${p.y}`).join(" ");
-    const bg = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    bg.setAttribute("points", ptsStr);
-    bg.setAttribute("class", "iaw-path-bg");
-    pathEl.appendChild(bg);
-
-    // Progress polyline — updated when current step changes
-    const fg = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-    fg.setAttribute("class", "iaw-path-fg");
-    fg.id = "iawPathFg";
-    pathEl.appendChild(fg);
-
-    // Dots are positioned as percentages so they sit on top of the SVG.
-    points.forEach((p, i) => {
-      const li = document.createElement("li");
-      li.className = "iaw-dot " + toneClass(steps[i].phase);
-      li.style.left = `${(p.x / vbW) * 100}%`;
-      li.style.top  = `${(p.y / vbH) * 100}%`;
-      li.dataset.index = String(i);
-      li.title = `Step ${i + 1}: ${steps[i].title}`;
-      li.setAttribute("role", "button");
-      li.setAttribute("tabindex", "0");
-      li.setAttribute("aria-label", `Go to step ${i + 1}: ${steps[i].title}`);
-      li.innerHTML = `<span class="iaw-dot-num">${i + 1}</span>`;
-      li.addEventListener("click", () => goTo(i));
-      li.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goTo(i); }
-      });
-      dotsEl.appendChild(li);
-    });
-
-    // Store points for progress updates
-    pathEl.dataset.points = JSON.stringify(points);
+  // Phase helpers -----------------------------------------------------------
+  function getPhaseSteps(phaseKey) {
+    return steps
+      .map((s, i) => ({ step: s, globalIndex: i }))
+      .filter(({ step }) => step.phase === phaseKey);
   }
 
-  function updatePath() {
-    const points = JSON.parse(pathEl.dataset.points || "[]");
-    if (!points.length) return;
+  function getStepPhaseInfo(globalIndex) {
+    const step = steps[globalIndex];
+    const phaseKey = step.phase;
+    const phaseIdx = PHASE_ORDER.indexOf(phaseKey);
+    const phaseSteps = getPhaseSteps(phaseKey);
+    const stepInPhase = phaseSteps.findIndex((ps) => ps.globalIndex === globalIndex);
+    return {
+      phaseKey,
+      phaseIndex: phaseIdx + 1,
+      stepInPhase: stepInPhase + 1,
+      totalInPhase: phaseSteps.length,
+    };
+  }
 
-    // Progress polyline — from start to current index
-    const fg = document.getElementById("iawPathFg");
-    const slice = points.slice(0, currentIndex + 1);
-    fg.setAttribute("points", slice.map((p) => `${p.x},${p.y}`).join(" "));
+  function isPhaseComplete(phaseKey) {
+    return getPhaseSteps(phaseKey).every(({ step }) =>
+      step.type === "info" || !answerIsEmpty(step)
+    );
+  }
 
-    // Dot states
-    Array.from(dotsEl.children).forEach((node, i) => {
-      const done = i < currentIndex && (steps[i].type === "info" || !answerIsEmpty(steps[i]));
-      node.classList.toggle("is-done",    done);
-      node.classList.toggle("is-touched", i <  currentIndex);
-      node.classList.toggle("is-current", i === currentIndex);
+  // Build the phase progress bar ------------------------------------------
+  function layoutPhases() {
+    phasesBarEl.innerHTML = "";
+
+    PHASE_ORDER.forEach((key, i) => {
+      const phase = PHASES[key];
+
+      // Node
+      const node = document.createElement("button");
+      node.className = `iaw-phase-node tone-${phase.tone}`;
+      node.dataset.phase = key;
+      node.setAttribute("role", "button");
+      node.setAttribute("tabindex", "0");
+      node.setAttribute("aria-label", `Go to ${phase.label}`);
+      node.innerHTML = `
+        <span class="iaw-phase-pip"><span class="iaw-phase-num">${i + 1}</span><span class="iaw-phase-check" aria-hidden="true">&#10003;</span></span>
+        <span class="iaw-phase-short">${escapeHtml(phase.short)}</span>
+      `;
+      node.addEventListener("click", () => {
+        const first = getPhaseSteps(key)[0];
+        if (first) goTo(first.globalIndex);
+      });
+      phasesBarEl.appendChild(node);
+
+      // Connecting line (except after last)
+      if (i < PHASE_ORDER.length - 1) {
+        const line = document.createElement("div");
+        line.className = "iaw-phase-line";
+        line.dataset.after = key;
+        phasesBarEl.appendChild(line);
+      }
     });
+  }
+
+  function updateProgress() {
+    const info = getStepPhaseInfo(currentIndex);
+    const currentPhaseKey = info.phaseKey;
+    const currentPhaseIdx = PHASE_ORDER.indexOf(currentPhaseKey);
+
+    // Phase nodes
+    PHASE_ORDER.forEach((key, i) => {
+      const node = phasesBarEl.querySelector(`[data-phase="${key}"]`);
+      if (!node) return;
+      const done = i < currentPhaseIdx || (i === currentPhaseIdx && isPhaseComplete(key));
+      node.classList.toggle("is-done", done && i < currentPhaseIdx);
+      node.classList.toggle("is-current", i === currentPhaseIdx);
+      node.classList.toggle("is-upcoming", i > currentPhaseIdx);
+    });
+
+    // Connecting lines
+    phasesBarEl.querySelectorAll(".iaw-phase-line").forEach((line) => {
+      const afterPhase = line.dataset.after;
+      const afterIdx = PHASE_ORDER.indexOf(afterPhase);
+      line.classList.toggle("is-filled", afterIdx < currentPhaseIdx);
+    });
+
+    // Step dots for current phase only
+    const phaseSteps = getPhaseSteps(currentPhaseKey);
+    stepDotsEl.innerHTML = "";
+    phaseSteps.forEach(({ step, globalIndex }) => {
+      const dot = document.createElement("button");
+      dot.className = "iaw-step-dot";
+      dot.setAttribute("role", "button");
+      dot.setAttribute("tabindex", "0");
+      dot.title = step.title;
+      dot.setAttribute("aria-label", `Go to: ${step.title}`);
+      const done = globalIndex < currentIndex && (step.type === "info" || !answerIsEmpty(step));
+      dot.classList.toggle("is-done", done);
+      dot.classList.toggle("is-current", globalIndex === currentIndex);
+      dot.classList.toggle("is-upcoming", globalIndex > currentIndex);
+      dot.addEventListener("click", () => goTo(globalIndex));
+      stepDotsEl.appendChild(dot);
+    });
+
+    // Meta text: "Phase X of 4 · Step Y of Z"
+    const phase = PHASES[currentPhaseKey];
+    progressMeta.innerHTML = `<strong>Phase ${info.phaseIndex} of ${PHASE_ORDER.length}</strong> <span class="iaw-progress-dim">\u00b7 Step ${info.stepInPhase} of ${info.totalInPhase} \u00b7 ${escapeHtml(phase.label)}</span>`;
+
+    // Dynamic why section
+    if (whyEl && phase.why) {
+      whyEl.innerHTML = `
+        <h2>${escapeHtml(phase.why.title)}</h2>
+        <p class="iaw-why-body">${escapeHtml(phase.why.body)}</p>
+      `;
+    }
   }
 
   function toneClass(phaseKey) {
@@ -299,6 +355,10 @@
     if (step.type === "friction-reducer") {
       if (!v) return true;
       return !(step.tactics || []).some((t) => v[t.key] && v[t.key].on);
+    }
+    if (step.type === "stakes-builder") {
+      if (!v) return true;
+      return !String(v.chosen || "").trim() && !String(v.detail || "").trim();
     }
     if (step.type === "scenario-plans") {
       if (!v) return true;
@@ -373,6 +433,15 @@
           detail: detailEl ? detailEl.value : (current[t.key] && current[t.key].detail) || "",
         };
       });
+      answers[stepId] = current;
+    } else if (step.type === "stakes-builder") {
+      const current = answers[stepId] || emptyStakes();
+      const detail  = root.querySelector('[data-stakes="detail"]');
+      const amount  = root.querySelector('[data-stakes="amount"]');
+      const chosen  = root.querySelector('.iaw-stake-card.is-selected');
+      if (chosen)  current.chosen = chosen.dataset.stakeKey || "";
+      if (detail)  current.detail = detail.value;
+      if (amount)  current.amount = amount.value;
       answers[stepId] = current;
     } else if (step.type === "scenario-plans") {
       const current = answers[stepId] || emptyScenarioPlans(step);
@@ -457,7 +526,7 @@
       if (!target.matches(".iaw-problem-input")) return;
       persistCurrentInputs();
       tryStartTimer();
-      updatePath();
+      updateProgress();
       const problemEl = target.closest('.iaw-problem');
       if (problemEl) applyFieldDisclosure(problemEl, step);
     });
@@ -484,7 +553,7 @@
         if (list.length === 0) list.push(emptyEntry(step));
         answers[step.id] = list;
         rerenderProblemList(listRoot, step, { focusIndex: Math.max(0, index - 1) });
-        updatePath();
+        updateProgress();
       }
     });
   }
@@ -576,7 +645,7 @@
     input.addEventListener("input", () => {
       answers[step.id] = input.value;
       syncPicks();
-      updatePath();
+      updateProgress();
     });
 
     picks.forEach((btn) => {
@@ -585,7 +654,7 @@
         input.value = v;
         answers[step.id] = v;
         syncPicks();
-        updatePath();
+        updateProgress();
         input.focus({ preventScroll: true });
       });
     });
@@ -667,7 +736,7 @@
         const target = listEl.querySelector(`.iaw-distraction[data-distraction-index="${focusIndex}"] [data-distraction="what"]`);
         if (target) target.focus({ preventScroll: true });
       }
-      updatePath();
+      updateProgress();
     };
 
     // Suggestion chips — add a row with that distraction pre-filled
@@ -693,7 +762,7 @@
     listEl.addEventListener("input", (e) => {
       if (!e.target.matches('[data-distraction="what"]')) return;
       persistCurrentInputs();
-      updatePath();
+      updateProgress();
     });
 
     listEl.addEventListener("click", (e) => {
@@ -715,7 +784,7 @@
           btn.classList.toggle("is-on", on);
           btn.setAttribute("aria-pressed", on ? "true" : "false");
         });
-        updatePath();
+        updateProgress();
         return;
       }
       const removeBtn = e.target.closest('[data-action="remove"]');
@@ -781,14 +850,14 @@
         toggle.setAttribute("aria-pressed", on ? "true" : "false");
         if (wrap) wrap.hidden = !on;
         persistCurrentInputs();
-        updatePath();
+        updateProgress();
         if (on && textarea) textarea.focus({ preventScroll: true });
       });
 
       if (textarea) {
         textarea.addEventListener("input", () => {
           persistCurrentInputs();
-          updatePath();
+          updateProgress();
         });
       }
     });
@@ -846,7 +915,7 @@
         const card = el.closest(".iaw-scenario-card");
         if (card) card.classList.toggle("is-filled", !!el.value.trim());
         persistCurrentInputs();
-        updatePath();
+        updateProgress();
       });
     });
   }
@@ -925,7 +994,7 @@
         mantraEl.value = text;
         persistCurrentInputs();
         syncPicks();
-        updatePath();
+        updateProgress();
         mantraEl.focus({ preventScroll: true });
       });
     });
@@ -933,12 +1002,12 @@
     mantraEl.addEventListener("input", () => {
       persistCurrentInputs();
       syncPicks();
-      updatePath();
+      updateProgress();
     });
 
     restartEl.addEventListener("input", () => {
       persistCurrentInputs();
-      updatePath();
+      updateProgress();
     });
 
     const suggestBtn = root.querySelector("[data-missed-suggest]");
@@ -946,8 +1015,94 @@
       suggestBtn.addEventListener("click", () => {
         restartEl.value = suggestedRestart();
         persistCurrentInputs();
-        updatePath();
+        updateProgress();
         restartEl.focus({ preventScroll: true });
+      });
+    }
+  }
+
+  // Stakes builder step -----------------------------------------------------
+  function renderStakes(step) {
+    const state = answers[step.id] || emptyStakes();
+    answers[step.id] = state;
+
+    const cards = (step.suggestions || []).map((s) => {
+      const on = state.chosen === s.key;
+      return `<button type="button"
+                class="iaw-stake-card ${on ? "is-selected" : ""}"
+                data-stake-key="${s.key}"
+                aria-pressed="${on ? "true" : "false"}">
+                <span class="iaw-stake-icon" aria-hidden="true">${s.icon}</span>
+                <span class="iaw-stake-label">${escapeHtml(s.label)}</span>
+              </button>`;
+    }).join("");
+
+    const chosen = (step.suggestions || []).find((s) => s.key === state.chosen);
+    const placeholder = chosen ? chosen.placeholder : "Describe your consequence in specific terms.";
+
+    return `
+      <div class="iaw-stakes" data-step-id="${step.id}">
+        <div class="iaw-stake-grid" role="group" aria-label="Consequence suggestions">${cards}</div>
+        <div class="iaw-stake-detail ${state.chosen || state.detail ? "is-visible" : ""}">
+          <label class="iaw-stake-detail-label" for="stakes-detail">Your specific commitment</label>
+          <textarea id="stakes-detail"
+                    class="iaw-stake-textarea"
+                    data-stakes="detail"
+                    rows="3"
+                    placeholder="${escapeHtml(placeholder)}">${escapeHtml(state.detail || "")}</textarea>
+          <label class="iaw-stake-detail-label" for="stakes-amount">Amount or measure <span class="iaw-stake-optional">(optional)</span></label>
+          <input id="stakes-amount"
+                 class="iaw-stake-amount-input"
+                 data-stakes="amount"
+                 type="text"
+                 placeholder="e.g. $20, one week, 3 days"
+                 value="${escapeHtml(state.amount || "")}" />
+        </div>
+        <p class="iaw-step-example">${escapeHtml(step.example)}</p>
+      </div>
+    `;
+  }
+
+  function wireStakes(root, step) {
+    const cards = Array.from(root.querySelectorAll(".iaw-stake-card"));
+    const detailWrap = root.querySelector(".iaw-stake-detail");
+    const detailEl = root.querySelector('[data-stakes="detail"]');
+    const amountEl = root.querySelector('[data-stakes="amount"]');
+    const state = answers[step.id] || emptyStakes();
+
+    cards.forEach((card) => {
+      card.addEventListener("click", () => {
+        const key = card.dataset.stakeKey;
+        const wasSelected = state.chosen === key;
+        state.chosen = wasSelected ? "" : key;
+        cards.forEach((c) => {
+          const on = c.dataset.stakeKey === state.chosen;
+          c.classList.toggle("is-selected", on);
+          c.setAttribute("aria-pressed", on ? "true" : "false");
+        });
+        // Update placeholder to match selected suggestion
+        const sug = (step.suggestions || []).find((s) => s.key === state.chosen);
+        if (detailEl && sug) detailEl.placeholder = sug.placeholder;
+        if (detailWrap) detailWrap.classList.add("is-visible");
+        persistCurrentInputs();
+        updateProgress();
+        if (detailEl) detailEl.focus({ preventScroll: true });
+      });
+    });
+
+    if (detailEl) {
+      detailEl.addEventListener("input", () => {
+        if (detailWrap && !detailWrap.classList.contains("is-visible")) {
+          detailWrap.classList.add("is-visible");
+        }
+        persistCurrentInputs();
+        updateProgress();
+      });
+    }
+    if (amountEl) {
+      amountEl.addEventListener("input", () => {
+        persistCurrentInputs();
+        updateProgress();
       });
     }
   }
@@ -1092,7 +1247,7 @@
       el.addEventListener("input", () => {
         persistCurrentInputs();
         refreshDerived();
-        updatePath();
+        updateProgress();
       });
     });
 
@@ -1105,7 +1260,7 @@
         btn.setAttribute("aria-pressed", s.days[i] ? "true" : "false");
         btn.classList.toggle("is-on", s.days[i]);
         refreshDerived();
-        updatePath();
+        updateProgress();
       });
     });
   }
@@ -1130,6 +1285,7 @@
     const isSsmart      = step.type === "ssmart-builder";
     const isDistraction = step.type === "distraction-board";
     const isFriction    = step.type === "friction-reducer";
+    const isStakes      = step.type === "stakes-builder";
     const isScenarios   = step.type === "scenario-plans";
     const isMissedDay   = step.type === "missed-day-plan";
 
@@ -1174,6 +1330,8 @@
       bodyMarkup = renderDistractionBoard(step);
     } else if (isFriction) {
       bodyMarkup = renderFrictionReducer(step);
+    } else if (isStakes) {
+      bodyMarkup = renderStakes(step);
     } else if (isScenarios) {
       bodyMarkup = renderScenarioPlans(step);
     } else if (isMissedDay) {
@@ -1197,12 +1355,13 @@
       `;
     }
 
+    const phaseInfo = getStepPhaseInfo(currentIndex);
     card.innerHTML = `
       <header class="iaw-step-head">
         <div class="iaw-step-badge">
           <span class="iaw-step-badge-label">Step</span>
-          <span class="iaw-step-badge-num">${currentIndex + 1}</span>
-          <span class="iaw-step-badge-of">of ${steps.length}</span>
+          <span class="iaw-step-badge-num">${phaseInfo.stepInPhase}</span>
+          <span class="iaw-step-badge-of">of ${phaseInfo.totalInPhase}</span>
         </div>
         <p class="iaw-step-phase">${phase.label}</p>
       </header>
@@ -1248,6 +1407,9 @@
     } else if (isFriction) {
       const root = card.querySelector(".iaw-friction");
       wireFrictionReducer(root, step);
+    } else if (isStakes) {
+      const root = card.querySelector(".iaw-stakes");
+      wireStakes(root, step);
     } else if (isScenarios) {
       const root = card.querySelector(".iaw-scenarios");
       wireScenarioPlans(root, step);
@@ -1265,7 +1427,7 @@
           if (step.timerSeconds && input.value.trim() && !timerState.has(step.id)) {
             startTimer(step.id, step.timerSeconds);
           }
-          updatePath();
+          updateProgress();
         });
       }
     }
@@ -1286,14 +1448,10 @@
       }
     });
 
-    // Meta
-    stepNowEl.textContent = String(currentIndex + 1);
-    phaseNameEl.textContent = phase.label;
-
     // Animate in
     requestAnimationFrame(() => card.classList.add("is-in"));
 
-    updatePath();
+    updateProgress();
   }
 
   function goTo(idx) {
@@ -1332,7 +1490,7 @@
 
     const today = new Date();
     const structuredTypes = new Set([
-      "problem-list", "ssmart-builder",
+      "problem-list", "ssmart-builder", "stakes-builder",
       "distraction-board", "friction-reducer", "scenario-plans", "missed-day-plan",
     ]);
     const reportData = steps
@@ -1346,6 +1504,7 @@
         fields: getFields(step),
         tactics: step.tactics || [],
         scenarios: step.scenarios || [],
+        suggestions: step.suggestions || [],
         value: structuredTypes.has(step.type)
           ? answers[step.id]
           : ((answers[step.id] || "").trim() || "(No response entered)"),
@@ -1437,6 +1596,19 @@
   }
 
   function renderReportValue(item, _mode) {
+    if (item.type === "stakes-builder") {
+      const s = item.value || emptyStakes();
+      const hasAny = String(s.chosen || "").trim() || String(s.detail || "").trim();
+      if (!hasAny) return `<p>(No stakes set)</p>`;
+      const sug = (item.suggestions || []).find((x) => x.key === s.chosen);
+      return `
+        <div class="report-problem">
+          ${sug ? `<h5>${escapeHtml(sug.icon + " " + sug.label)}</h5>` : ""}
+          ${s.detail ? `<p>${escapeHtml(s.detail)}</p>` : ""}
+          ${s.amount ? `<p><strong>Amount / measure:</strong> ${escapeHtml(s.amount)}</p>` : ""}
+        </div>
+      `;
+    }
     if (item.type === "ssmart-builder") {
       const s = item.value || emptySsmart();
       const hasAny = [s.action, s.measure, s.time].some((v) => String(v || "").trim())
@@ -1631,6 +1803,6 @@
   });
 
   // Boot -------------------------------------------------------------------
-  layoutPath();
+  layoutPhases();
   renderStep();
 })();
