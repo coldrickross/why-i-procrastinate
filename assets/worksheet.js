@@ -461,6 +461,40 @@
         : root.querySelector(".iaw-step-input");
       if (input) answers[stepId] = input.value;
     }
+    saveToLocalStorage();
+  }
+
+  // ---- localStorage persistence -------------------------------------------
+  function saveToLocalStorage() {
+    try {
+      localStorage.setItem("wip-worksheet", JSON.stringify({
+        answers: answers,
+        currentIndex: currentIndex,
+      }));
+    } catch (e) { /* quota exceeded or private browsing — silently fail */ }
+  }
+
+  function loadFromLocalStorage() {
+    try {
+      const raw = localStorage.getItem("wip-worksheet");
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+      if (!saved || typeof saved !== "object") return false;
+      if (typeof saved.currentIndex === "number" &&
+          saved.currentIndex >= 0 &&
+          saved.currentIndex < steps.length) {
+        currentIndex = saved.currentIndex;
+      }
+      if (saved.answers && typeof saved.answers === "object") {
+        for (const key of Object.keys(answers)) {
+          if (key in saved.answers) answers[key] = saved.answers[key];
+        }
+      }
+      return true;
+    } catch (e) {
+      try { localStorage.removeItem("wip-worksheet"); } catch (_) {}
+      return false;
+    }
   }
 
   function renderProblemItem(step, entry, index) {
@@ -1373,7 +1407,7 @@
         <button class="iaw-btn iaw-btn-ghost" id="iawPrev" type="button" ${currentIndex === 0 ? "disabled" : ""}>
           ← Previous
         </button>
-        <div class="iaw-step-save" id="iawSaveHint" aria-live="polite">${isInfo ? "Included in your report" : "Draft kept in this tab"}</div>
+        <div class="iaw-step-save" id="iawSaveHint" aria-live="polite">${isInfo ? "Included in your report" : "Draft saved automatically"}</div>
         <button class="iaw-btn iaw-btn-primary" id="iawNext" type="button">
           ${currentIndex === steps.length - 1 ? "Finish" : "Next"} →
         </button>
@@ -1801,6 +1835,7 @@
   });
 
   // Boot -------------------------------------------------------------------
+  loadFromLocalStorage();
   layoutPhases();
   renderStep();
 })();
