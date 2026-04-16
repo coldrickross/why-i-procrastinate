@@ -1479,6 +1479,421 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-size: 0.98rem;
 }
 
+/* ---------- Distraction board (step 10) ---------- */
+.iaw-distraction-board { display: grid; gap: 14px; }
+.iaw-distraction-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.iaw-distraction-chip {
+  appearance: none;
+  border: 1px dashed var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease), transform 120ms var(--ease);
+}
+.iaw-distraction-chip:hover {
+  border-color: var(--terra);
+  border-style: solid;
+  color: var(--terra-deep);
+  transform: translateY(-1px);
+}
+.iaw-distraction-divider {
+  height: 1px;
+  background: var(--line);
+  margin: 6px 0 2px;
+}
+.iaw-distraction-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.iaw-distraction {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fffaf0;
+  display: grid;
+  gap: 10px;
+}
+.iaw-distraction-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.iaw-distraction-input {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  color: var(--ink);
+}
+.iaw-distraction-input:focus {
+  outline: none;
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px rgba(200,118,104,0.15);
+}
+.iaw-distraction-remove {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background 120ms var(--ease), color 120ms var(--ease), border-color 120ms var(--ease);
+}
+.iaw-distraction-remove:hover {
+  background: rgba(200,118,104,0.1);
+  color: var(--terra-deep);
+  border-color: var(--terra);
+}
+.iaw-distraction-tactics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.iaw-distraction-tactic {
+  appearance: none;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink-soft);
+  padding: 6px 11px;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease), transform 120ms var(--ease);
+}
+.iaw-distraction-tactic:hover {
+  border-color: var(--terra);
+  color: var(--terra-deep);
+}
+.iaw-distraction-tactic.is-on {
+  background: var(--terra);
+  border-color: var(--terra-deep);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px -6px rgba(158,84,71,0.5);
+}
+.iaw-distraction-empty {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.92rem;
+}
+.iaw-distraction-add {
+  justify-self: start;
+  appearance: none;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 9px 14px;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease);
+}
+.iaw-distraction-add:hover {
+  border-style: solid;
+  border-color: var(--terra);
+  color: var(--terra-deep);
+}
+
+/* ---------- Friction reducer (step 11) ---------- */
+.iaw-friction { display: grid; gap: 14px; }
+.iaw-friction-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 640px) {
+  .iaw-friction-grid { grid-template-columns: 1fr; }
+}
+.iaw-friction-card {
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  padding: 12px 14px;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease), box-shadow 160ms var(--ease);
+  display: grid;
+  gap: 10px;
+}
+.iaw-friction-card.is-on {
+  border-color: var(--teal);
+  background: rgba(91,138,138,0.06);
+  box-shadow: 0 4px 14px -10px rgba(63,105,105,0.4);
+}
+.iaw-friction-toggle {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  align-items: start;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+}
+.iaw-friction-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 2px solid var(--line);
+  margin-top: 3px;
+  background: #fff;
+  position: relative;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease);
+}
+.iaw-friction-card.is-on .iaw-friction-check {
+  background: var(--teal);
+  border-color: var(--teal-deep);
+}
+.iaw-friction-card.is-on .iaw-friction-check::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.iaw-friction-head { display: grid; gap: 2px; }
+.iaw-friction-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.iaw-friction-blurb {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+.iaw-friction-detail-wrap { display: grid; }
+.iaw-friction-detail {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 56px;
+}
+.iaw-friction-detail:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(91,138,138,0.15);
+}
+
+/* ---------- Scenario plans (step 14) ---------- */
+.iaw-scenarios { display: grid; gap: 14px; }
+.iaw-scenario-reminder {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, rgba(91,138,138,0.12), rgba(91,138,138,0.02));
+  border: 1px solid rgba(91,138,138,0.3);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 1rem;
+}
+.iaw-scenario-reminder strong { font-weight: 500; color: var(--teal-deep); }
+.iaw-scenario-reminder--muted {
+  background: #fff;
+  border-style: dashed;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.93rem;
+}
+.iaw-scenario-reminder-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.iaw-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (max-width: 640px) {
+  .iaw-scenario-grid { grid-template-columns: 1fr; }
+}
+.iaw-scenario-card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  padding: 12px 14px;
+  display: grid;
+  gap: 6px;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease), box-shadow 160ms var(--ease);
+}
+.iaw-scenario-card.is-filled {
+  border-color: var(--gold);
+  background: rgba(212,165,116,0.08);
+  box-shadow: 0 4px 14px -10px rgba(184,134,79,0.35);
+}
+.iaw-scenario-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.iaw-scenario-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.iaw-scenario-label {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+.iaw-scenario-then {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.iaw-scenario-input {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 9px 11px;
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 48px;
+}
+.iaw-scenario-input:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(212,165,116,0.2);
+}
+
+/* ---------- Missed-day plan (step 15) ---------- */
+.iaw-missed { display: grid; gap: 18px; }
+.iaw-missed-section {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fffaf0;
+  display: grid;
+  gap: 10px;
+}
+.iaw-missed-section-title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 1.08rem;
+  color: var(--ink);
+}
+.iaw-missed-section-sub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+.iaw-mantra-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.iaw-mantra-pick {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-family: var(--serif);
+  font-size: 0.96rem;
+  font-style: italic;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+  transition: background 160ms var(--ease), border-color 160ms var(--ease), color 160ms var(--ease), transform 120ms var(--ease);
+}
+.iaw-mantra-pick:hover {
+  border-color: var(--gold-deep);
+  color: var(--gold-deep);
+  transform: translateY(-1px);
+}
+.iaw-mantra-pick.is-on {
+  background: var(--gold);
+  border-color: var(--gold-deep);
+  color: #fff;
+}
+.iaw-missed-input {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-family: var(--sans);
+  font-size: 0.98rem;
+  color: var(--ink);
+  resize: vertical;
+  min-height: 56px;
+}
+.iaw-missed-input:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(212,165,116,0.2);
+}
+.iaw-missed-suggest {
+  justify-self: start;
+  appearance: none;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease);
+  text-align: left;
+}
+.iaw-missed-suggest:hover {
+  border-style: solid;
+  border-color: var(--gold-deep);
+  color: var(--gold-deep);
+  background: rgba(212,165,116,0.08);
+}
+
 /* ---------- Report card ---------- */
 .iaw-report-card {
   margin-top: 28px;
