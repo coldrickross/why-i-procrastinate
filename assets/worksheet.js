@@ -30,7 +30,7 @@
       example: "Example: I forgive myself for the years I spent waiting to feel ready.",
       type: "textarea" },
     { id: "current-problems",  phase: "feel",      title: "Problems caused by your current actions",
-      prompt: "List any problems your current actions are causing. Add as many as feel true — or skip this step entirely. Each problem has four small prompts to help you think it through.",
+      prompt: "List any problems your current actions are causing. Each problem has four small prompts to help you think it through.",
       example: "Take your time — five minutes of honesty here is worth an hour of planning later.",
       type: "problem-list", timerSeconds: 300,
       entryLabel: "Problem",
@@ -41,7 +41,7 @@
         { key: "feeling",  label: "How it makes you feel",        placeholder: "Name the feelings honestly.",  rows: 2 },
       ] },
     { id: "positive-outcomes", phase: "feel",      title: "Positive outcomes if you fix this behaviour",
-      prompt: "List the good things you'd gain. Add as many as feel true — or skip this step entirely.",
+      prompt: "List the good things you'd gain. Add as many as feel true.",
       example: "Imagine the first week, the first month, the first year. Let yourself want it.",
       type: "problem-list", timerSeconds: 300,
       entryLabel: "Outcome",
@@ -51,7 +51,7 @@
         { key: "feeling", label: "How you'd feel about it",       placeholder: "Name the feelings honestly.",   rows: 2 },
       ] },
     { id: "future-problems",   phase: "feel",      title: "If nothing changes — 6 months, 1 year, 2 years",
-      prompt: "Write down the consequences if nothing changes. Add as many as feel true — or skip this step entirely.",
+      prompt: "Write down the consequences if nothing changes. Add as many as feel true.",
       example: "Don't soften it. Future-you deserves an honest warning.",
       type: "problem-list", timerSeconds: 120,
       entryLabel: "Problem",
@@ -141,8 +141,6 @@
         { key: "travel",    label: "When I'm travelling",      icon: "✈️", placeholder: "e.g. 10-min hotel walk or bodyweight squats." },
         { key: "tired",     label: "When I'm exhausted",       icon: "😴", placeholder: "e.g. Put the shoes on, walk to the corner, come home." },
         { key: "busy",      label: "When the day gets hijacked", icon: "⏰", placeholder: "e.g. 2-minute version counts. Anything > 0." },
-        { key: "weather",   label: "When the weather blocks me", icon: "🌧️", placeholder: "e.g. Indoor stair loops for 10 minutes." },
-        { key: "low-mood",  label: "When I feel low",          icon: "🌧", placeholder: "e.g. Walk to the door. That's the whole win today." },
       ] },
     { id: "missed-day",        phase: "protect", title: "If you miss a day",
       prompt: "Missing once is noise. Missing twice is a pattern. Write the script now so you know exactly what to say — and do — on day one after a slip.",
@@ -264,7 +262,7 @@
       node.setAttribute("tabindex", "0");
       node.setAttribute("aria-label", `Go to ${phase.label}`);
       node.innerHTML = `
-        <span class="iaw-phase-pip"><span class="iaw-phase-num">${i + 1}</span><span class="iaw-phase-check" aria-hidden="true">&#10003;</span></span>
+        <span class="iaw-phase-pip"><span class="iaw-phase-cross" aria-hidden="true">&#10005;</span><span class="iaw-phase-check" aria-hidden="true">&#10003;</span></span>
         <span class="iaw-phase-short">${escapeHtml(phase.short)}</span>
       `;
       node.addEventListener("click", () => {
@@ -293,8 +291,8 @@
       const node = phasesBarEl.querySelector(`[data-phase="${key}"]`);
       if (!node) return;
       const done = i < currentPhaseIdx || (i === currentPhaseIdx && isPhaseComplete(key));
-      node.classList.toggle("is-done", done && i < currentPhaseIdx);
-      node.classList.toggle("is-current", i === currentPhaseIdx);
+      node.classList.toggle("is-done", done);
+      node.classList.toggle("is-current", i === currentPhaseIdx && !done);
       node.classList.toggle("is-upcoming", i > currentPhaseIdx);
     });
 
@@ -581,7 +579,6 @@
         <ol class="iaw-problems">${items}</ol>
         <button type="button" class="iaw-problem-add" data-action="add">+ Add another ${escapeHtml(entryLabelOf(step).toLowerCase())}</button>
         <p class="iaw-step-example">${escapeHtml(step.example)}</p>
-        <p class="iaw-problem-optional">This step is optional — leave it blank if nothing comes to mind.</p>
       </div>
     `;
   }
@@ -1454,8 +1451,37 @@
     updateProgress();
   }
 
+  function showValidationNudge() {
+    const card = stepRoot.querySelector(".iaw-step-card");
+    if (!card) return;
+    card.classList.remove("iaw-shake");
+    void card.offsetWidth; // force reflow to restart animation
+    card.classList.add("iaw-shake");
+
+    // Show or refresh the nudge message
+    let msg = card.querySelector(".iaw-validation-msg");
+    if (!msg) {
+      msg = document.createElement("p");
+      msg.className = "iaw-validation-msg";
+      msg.textContent = "Complete this step before continuing.";
+      const nav = card.querySelector(".iaw-step-nav");
+      if (nav) nav.before(msg);
+    }
+    msg.classList.add("is-visible");
+  }
+
   function goTo(idx) {
     if (idx < 0 || idx >= steps.length) return;
+    // Persist current inputs so validation sees the latest values
+    persistCurrentInputs();
+    // Prevent forward navigation if current step is incomplete
+    if (idx > currentIndex) {
+      const step = steps[currentIndex];
+      if (step.type !== "info" && answerIsEmpty(step)) {
+        showValidationNudge();
+        return;
+      }
+    }
     currentIndex = idx;
     renderStep();
     // Keep the step roughly in view
