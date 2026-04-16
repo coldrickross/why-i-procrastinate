@@ -196,9 +196,11 @@
 
   function renderTracker() {
     const root = document.getElementById("progTracker");
-    const headerCells = DAY_LABELS.map((l, i) =>
-      `<div class="tracker-dow" aria-hidden="true"><span class="tracker-dow-long">${l}</span><span class="tracker-dow-short">${DAY_SHORT[i]}</span></div>`
-    ).join("");
+    const startDow = dayIndexFromDate(startDate);
+    const headerCells = Array.from({ length: 7 }, (_, i) => {
+      const idx = (startDow + i) % 7;
+      return `<div class="tracker-dow" aria-hidden="true"><span class="tracker-dow-long">${DAY_LABELS[idx]}</span><span class="tracker-dow-short">${DAY_SHORT[idx]}</span></div>`;
+    }).join("");
 
     const cellHtml = cells.map((c) => {
       const classes = ["tracker-cell", `tracker-cell--${c.status}`];
@@ -242,7 +244,6 @@
 
     root.innerHTML = `
       <h2 class="prog-section-title">4-week tracker</h2>
-      <p class="prog-section-sub">Mon &rarr; Sun. Gold = done, dim = rest, outline = still to come.</p>
       <div class="tracker-grid" role="list" aria-label="4-week progress tracker">
         <div class="tracker-dow-row" aria-hidden="true">${headerCells}</div>
         ${cellHtml}

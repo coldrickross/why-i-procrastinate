@@ -1461,6 +1461,15 @@
           }
           updateProgress();
         });
+
+        input.addEventListener("keydown", (e) => {
+          if (e.key !== "Enter") return;
+          const isTextarea = input.tagName === "TEXTAREA";
+          if (isTextarea && !(e.metaKey || e.ctrlKey)) return;
+          e.preventDefault();
+          const nextBtn = document.getElementById("iawNext");
+          if (nextBtn) nextBtn.click();
+        });
       }
     }
 
