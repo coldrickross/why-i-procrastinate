@@ -1497,8 +1497,28 @@
   function finish() {
     // Persist final answer
     persistCurrentInputs();
+    markWorksheetComplete();
     reportCard.classList.remove("is-hidden");
     reportCard.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function markWorksheetComplete() {
+    try {
+      const existingRaw = localStorage.getItem("wip-worksheet-complete");
+      const existing = existingRaw ? JSON.parse(existingRaw) : null;
+      const startDate = (existing && existing.startDate) || toIsoDate(new Date());
+      localStorage.setItem("wip-worksheet-complete", JSON.stringify({
+        completedAt: new Date().toISOString(),
+        startDate: startDate,
+      }));
+    } catch (_) { /* ignore quota / private mode */ }
+    // Remove the lock indicator from the in-page nav link without a reload.
+    document.querySelectorAll('.nav .links a.is-locked').forEach((a) => {
+      a.classList.remove("is-locked");
+      a.removeAttribute("title");
+      const icon = a.querySelector(".nav-lock-icon");
+      if (icon) icon.remove();
+    });
   }
 
   // Timers -----------------------------------------------------------------
