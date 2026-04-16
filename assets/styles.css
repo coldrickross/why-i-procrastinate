@@ -2147,6 +2147,91 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-size: 0.9rem;
 }
 
+/* ----- Tracker section (extras around the 4-week grid) ----- */
+.tracker-block { background: #fffaf0; }
+.tracker-header {
+  margin: 6px 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+}
+.tracker-pledge {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.tracker-pledge-lead {
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-right: 6px;
+}
+.tracker-pledge-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.tracker-asides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+.tracker-aside {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: #fff;
+  padding: 12px 14px;
+}
+.tracker-aside h5 {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #9e5447;
+}
+.tracker-aside p {
+  margin: 4px 0;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  color: var(--ink-soft);
+}
+.tracker-aside--stakes { background: #fdf2e6; border-color: #f1d6b2; }
+.tracker-fallback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.tracker-fallback {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbf7ef;
+  padding: 8px 10px;
+}
+.tracker-fallback-head {
+  font-weight: 600;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+.tracker-fallback-icon { margin-right: 6px; }
+.tracker-fallback-body {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  white-space: pre-wrap;
+}
+.tracker-quote { font-style: italic; color: var(--ink-soft); }
+.tracker-restart { margin-top: 6px; }
+.tracker-stake-label { font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+@media (max-width: 640px) {
+  .tracker-asides, .tracker-fallback-grid { grid-template-columns: 1fr; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 720px) {
   .iaw-hero { padding-top: 44px; }

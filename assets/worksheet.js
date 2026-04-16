@@ -1591,6 +1591,98 @@
     reportOutput.appendChild(link);
   });
 
+  // Pull the at-a-glance info out of the worksheet answers and shape it into
+  // the bits that sit around the 4-week tracker — the commitment pledge, the
+  // if-then fallbacks, the missed-day recovery line, the stake, and the
+  // accountability partner. This turns the tracker from a bare grid into a
+  // self-contained page you can print and stick on the fridge.
+  function renderTrackerExtras(allAnswers) {
+    const s           = allAnswers.ssmart || emptySsmart();
+    const foundation  = (allAnswers["identity-foundation"] || "").trim();
+    const identity    = (allAnswers.identity || "").trim();
+    const goal        = (allAnswers.goal || "").trim();
+
+    const bits = [];
+    if (s.action)  bits.push(escapeHtml(s.action));
+    if (s.measure) bits.push(`for ${escapeHtml(s.measure)}`);
+    if (s.time)    bits.push(`at ${escapeHtml(s.time)}`);
+    const dayStr = selectedDayLabels(s).join(", ");
+    if (dayStr)    bits.push(`on ${escapeHtml(dayStr)}`);
+
+    const pledgeLead = foundation
+      ? `As <strong>${escapeHtml(foundation)}</strong>, I will`
+      : "I will";
+    const pledgeLine = bits.length
+      ? `<p class="tracker-pledge"><span class="tracker-pledge-lead">${pledgeLead}</span> ${bits.join(" ")}.</p>`
+      : "";
+
+    const identityLine = identity
+      ? `<p class="tracker-pledge-sub">Long-term identity: <strong>${escapeHtml(identity)}</strong>${goal ? ` — ${escapeHtml(goal)}` : ""}</p>`
+      : (goal ? `<p class="tracker-pledge-sub">${escapeHtml(goal)}</p>` : "");
+
+    const header = (pledgeLine || identityLine)
+      ? `<div class="tracker-header">${pledgeLine}${identityLine}</div>`
+      : "";
+
+    // Fallback plans (sick / travel / tired / busy)
+    const roadblocksStep = steps.find((st) => st.id === "roadblocks");
+    const roadState = allAnswers.roadblocks || {};
+    const scenarios = (roadblocksStep && roadblocksStep.scenarios) || [];
+    const filledScenarios = scenarios.filter((sc) => (roadState[sc.key] || "").trim());
+    const fallbackBlock = filledScenarios.length
+      ? `<div class="tracker-aside">
+           <h5>When life gets in the way</h5>
+           <div class="tracker-fallback-grid">
+             ${filledScenarios.map((sc) => `
+               <div class="tracker-fallback">
+                 <div class="tracker-fallback-head"><span class="tracker-fallback-icon" aria-hidden="true">${sc.icon || "•"}</span>${escapeHtml(sc.label)}</div>
+                 <div class="tracker-fallback-body">${escapeHtml(roadState[sc.key])}</div>
+               </div>`).join("")}
+           </div>
+         </div>`
+      : "";
+
+    // Missed-day recovery
+    const miss    = allAnswers["missed-day"] || {};
+    const mantra  = (miss.mantra  || "").trim();
+    const restart = (miss.restart || "").trim();
+    const missedBlock = (mantra || restart)
+      ? `<div class="tracker-aside">
+           <h5>If I miss a day</h5>
+           ${mantra  ? `<p class="tracker-quote">&ldquo;${escapeHtml(mantra)}&rdquo;</p>` : ""}
+           ${restart ? `<p class="tracker-restart"><strong>Tomorrow:</strong> ${escapeHtml(restart)}</p>` : ""}
+         </div>`
+      : "";
+
+    // Stakes
+    const stakesStep = steps.find((st) => st.id === "stakes");
+    const stakes = allAnswers.stakes || {};
+    const stakeSug = stakesStep && (stakesStep.suggestions || []).find((x) => x.key === stakes.chosen);
+    const hasStakes = (stakes.detail || "").trim() || (stakes.amount || "").trim() || stakeSug;
+    const stakesBlock = hasStakes
+      ? `<div class="tracker-aside tracker-aside--stakes">
+           <h5>On the line</h5>
+           ${stakeSug ? `<p class="tracker-stake-label">${escapeHtml((stakeSug.icon || "") + " " + stakeSug.label)}</p>` : ""}
+           ${stakes.detail ? `<p>${escapeHtml(stakes.detail)}</p>` : ""}
+           ${stakes.amount ? `<p class="tracker-stake-amount"><strong>Amount / measure:</strong> ${escapeHtml(stakes.amount)}</p>` : ""}
+         </div>`
+      : "";
+
+    // Accountability partner
+    const accountability = (allAnswers.accountability || "").trim();
+    const accountBlock = accountability
+      ? `<div class="tracker-aside">
+           <h5>Accountability</h5>
+           <p>${escapeHtml(accountability)}</p>
+         </div>`
+      : "";
+
+    const asides = [fallbackBlock, missedBlock, stakesBlock, accountBlock].filter(Boolean).join("");
+    const asideWrap = asides ? `<div class="tracker-asides">${asides}</div>` : "";
+
+    return { header, asideWrap };
+  }
+
   function renderReportPreview(data, gridDays, startDate, ssmart) {
     const rows = data
       .map((item) => `
@@ -1601,20 +1693,24 @@
       .join("");
     const grid = renderGridTable(gridDays, ssmart);
     const dayStr = selectedDayLabels(ssmart).join(", ") || "(no days chosen yet)";
+    const { header, asideWrap } = renderTrackerExtras(answers);
     return `
       <div class="preview-head">
         <h3>Your custom report</h3>
         <p>Start date: ${humanDate(startDate)} · Scheduled: ${escapeHtml(dayStr)} · 4-week tracker included.</p>
       </div>
       ${rows}
-      <div class="preview-block">
-        <h4>4-week progress grid</h4>
+      <div class="preview-block tracker-block">
+        <h4>4-week progress tracker</h4>
+        ${header}
         ${grid}
+        ${asideWrap}
       </div>
     `;
   }
 
   function buildDownloadHtml(data, gridDays, startDate, ssmart) {
+    const { header, asideWrap } = renderTrackerExtras(answers);
     return `<!doctype html>
 <html lang="en">
 <head>
@@ -1636,6 +1732,26 @@
   .report-problem { margin: 10px 0 14px; padding: 10px 12px; border: 1px solid #ecdfc8; border-radius: 8px; background: #fffaf0; }
   .report-problem h5 { margin: 0 0 6px; font-family: Georgia, serif; font-size: 1rem; color: #9e5447; }
   .report-problem p { margin: 4px 0; }
+  .tracker-header { margin: 6px 0 14px; padding: 12px 14px; border: 1px solid #e4dcca; border-radius: 10px; background: #fffaf0; }
+  .tracker-pledge { margin: 0; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.5; color: #1a1d2e; }
+  .tracker-pledge-lead { color: #6b6a73; font-family: Inter, Arial, sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-right: 6px; }
+  .tracker-pledge-sub { margin: 6px 0 0; color: #6b6a73; font-size: 0.9rem; }
+  .tracker-asides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 16px; page-break-inside: avoid; }
+  .tracker-aside { border: 1px solid #e4dcca; border-radius: 10px; background: #fffaf0; padding: 12px 14px; }
+  .tracker-aside h5 { margin: 0 0 8px; font-family: Georgia, serif; font-size: 0.98rem; color: #9e5447; font-weight: 500; }
+  .tracker-aside p { margin: 4px 0; font-size: 0.92rem; }
+  .tracker-aside--stakes { background: #fdf2e6; border-color: #f1d6b2; }
+  .tracker-fallback-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .tracker-fallback { border: 1px solid #ecdfc8; border-radius: 8px; background: #fff; padding: 8px 10px; }
+  .tracker-fallback-head { font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; }
+  .tracker-fallback-icon { margin-right: 6px; }
+  .tracker-fallback-body { font-size: 0.88rem; color: #3a3a44; }
+  .tracker-quote { font-style: italic; color: #4a4a55; }
+  .tracker-restart { margin-top: 6px; }
+  .tracker-stake-label { font-weight: 600; margin-bottom: 4px; }
+  @media (max-width: 640px) {
+    .tracker-asides, .tracker-fallback-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -1648,9 +1764,11 @@
       ${renderReportValue(item, "download")}
     </section>`).join("")}
   <section class="block">
-    <h2>4-week progress grid</h2>
+    <h2>4-week progress tracker</h2>
+    ${header}
     <p>Mark one box on every <strong>scheduled</strong> day when you complete your SSMART action. Rest days are on purpose — don't feel you need to fill them in.</p>
     ${renderGridTable(gridDays, ssmart)}
+    ${asideWrap}
   </section>
 </body>
 </html>`;
