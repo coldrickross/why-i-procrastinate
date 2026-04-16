@@ -931,6 +931,20 @@ footer.page-foot a { color: var(--ink); }
   gap: 12px;
   grid-template-columns: 1fr;
 }
+.iaw-problem-field-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  overflow: hidden;
+  transition: grid-template-rows 280ms var(--ease), opacity 280ms var(--ease);
+}
+.iaw-problem-field-wrap.is-revealed {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.iaw-problem-field-wrap > .iaw-problem-field {
+  min-height: 0;
+}
 .iaw-problem-field {
   display: grid;
   gap: 6px;
