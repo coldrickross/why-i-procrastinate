@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Why am I not taking action? — Why I Procrastinate</title>
-<meta name="description" content="A simple field guide to the feelings that keep you stuck — and what to do about each one." />
+<meta name="description" content="A simple guide to feelings that block action, plus clear reasons and easy next steps." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,28 +16,30 @@
     <div class="links">
       <a href="index.html" class="active">Feelings</a>
       <a href="scale.html">The Scale</a>
+      <a href="worksheet.html">Worksheet</a>
     </div>
   </nav>
 
   <header class="hero">
-    <h1>Why am I <em>not</em> taking action?</h1>
-    <p class="sub">Pick the feeling that fits. Each one is a clue about what's really on your scale — and what to do about it.</p>
+    <h1 id="feelings-prompt">Why Am I Not Taking Action?</h1>
+    <p class="sub" id="feelings-helper">Pick one feeling. Then pick a reason. You will get a clear explanation and a simple next step.</p>
   </header>
 
   <main class="wrap">
-    <section class="emotions-grid" id="emotions" aria-label="Reasons we avoid action"></section>
+    <section id="feelings-flow" class="feelings-flow" aria-label="Feeling and reason flow"></section>
 
     <aside class="cta-bar">
       <div>
-        <h3>See the bigger picture.</h3>
-        <p>Every feeling here is a weight on a scale. Visualise yours.</p>
+        <h3>Use the action scale too.</h3>
+        <p>See what pulls you forward and what holds you back.</p>
       </div>
       <a class="btn" href="scale.html">Open the scale →</a>
     </aside>
   </main>
 
   <footer class="page-foot">
-    <p>Made to get you unstuck. <a href="scale.html">Visit the scale</a>.</p>
+    <p class="db-summary db-summary--footer" id="db-summary-footer"></p>
+    <p>Built to help you start. <a href="scale.html">Visit the scale</a>.</p>
   </footer>
 
   <script src="assets/data.js"></script>

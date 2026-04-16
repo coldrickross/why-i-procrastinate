@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inspire Action Worksheet — Why I Procrastinate</title>
+<meta name="description" content="A beautiful 20-minute worksheet to build structure and clarity for meaningful change." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
+    <div class="links">
+      <a href="index.html">Feelings</a>
+      <a href="scale.html">The Scale</a>
+      <a href="worksheet.html" class="active">Worksheet</a>
+    </div>
+  </nav>
+
+  <header class="hero iaw-hero">
+    <p class="iaw-eyebrow">Inspire Action</p>
+    <h1>The <em>Inspire Action</em> Worksheet</h1>
+    <p class="sub">Approx. 20 minutes. By the end you'll have the structure and clarity to maximise the chances you make meaningful change.</p>
+  </header>
+
+  <main class="wrap iaw-wrap">
+
+    <!-- Intro: three predictable reasons -->
+    <section class="iaw-intro" aria-label="Why people stall">
+      <h2 class="iaw-intro-title">The most predictable reasons people haven't made meaningful change</h2>
+      <ol class="iaw-reasons">
+        <li>
+          <span class="iaw-reason-num">1</span>
+          <div>
+            <h3>They've overcomplicated the steps required</h3>
+            <p>So we keep it small. One task. One page. One minute of motion.</p>
+          </div>
+        </li>
+        <li>
+          <span class="iaw-reason-num">2</span>
+          <div>
+            <h3>They haven't explored the emotional depth of the problems and outcomes</h3>
+            <p>So we sit with it — honestly — until the feelings become fuel.</p>
+          </div>
+        </li>
+        <li>
+          <span class="iaw-reason-num">3</span>
+          <div>
+            <h3>They haven't structured their life to make the actions easy</h3>
+            <p>So we engineer the path so doing the right thing is the default.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Progress zig-zag -->
+    <section class="iaw-progress" aria-label="Progress">
+      <div class="iaw-progress-inner">
+        <svg id="iawPath" class="iaw-path" viewBox="0 0 900 120" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <ol id="iawDots" class="iaw-dots"></ol>
+      </div>
+      <p class="iaw-progress-meta"><span id="iawStepNow">1</span> <span class="iaw-progress-dim">/ <span id="iawStepTotal">15</span> · <span id="iawPhaseName">Establish what you want</span></span></p>
+    </section>
+
+    <!-- Single-step view -->
+    <section id="iawStep" class="iaw-step" aria-live="polite"></section>
+
+    <!-- Why this matters -->
+    <section class="iaw-why">
+      <h2>Why this matters</h2>
+      <ul class="iaw-why-list">
+        <li>
+          <span class="iaw-why-dash" aria-hidden="true"></span>
+          <div>
+            <strong>Extrinsic motivation is fleeting.</strong>
+            <span>Rewards and punishments fade. Identity endures — so we build on it.</span>
+          </div>
+        </li>
+        <li>
+          <span class="iaw-why-dash" aria-hidden="true"></span>
+          <div>
+            <strong>Identity makes the future easy.</strong>
+            <span>When the behaviour is who you are, tomorrow takes care of itself.</span>
+          </div>
+        </li>
+        <li>
+          <span class="iaw-why-dash" aria-hidden="true"></span>
+          <div>
+            <strong>Without a clear aim, action is hard.</strong>
+            <span>Clarity is the cheapest fuel there is. Name the thing, then move.</span>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Report (revealed at final step) -->
+    <section id="iawReportCard" class="iaw-report-card is-hidden" aria-label="Generate report">
+      <h2>Create your custom report</h2>
+      <p>We'll turn your answers into a printable report with a 4-week daily tracker starting today.</p>
+      <button id="buildReportBtn" class="btn-primary" type="button">Generate my report</button>
+      <div id="reportOutput" class="report-output" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="page-foot">
+    <p>Small steps count. <a href="scale.html">Use the action scale</a> too.</p>
+  </footer>
+
+  <script src="assets/worksheet.js"></script>
+</body>
+</html>
