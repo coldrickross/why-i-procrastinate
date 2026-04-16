@@ -125,6 +125,9 @@
   resetBtn.addEventListener("click", () => {
     state.for = [];
     state.against = [];
+    state.action = "";
+    actionInput.value = "";
+    sizeActionInput();
     render();
   });
 

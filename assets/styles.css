@@ -2066,6 +2066,8 @@ textarea.iaw-problem-input { min-height: 64px; }
   gap: 4px;
   max-width: 100%;
   text-align: center;
+  position: relative;
+  z-index: 2;
 }
 
 .v2-action-label {
