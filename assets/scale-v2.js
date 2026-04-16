@@ -7,10 +7,8 @@
   const TILT_K = 1.6;    // degrees per unit of weight difference
   const MAX_WEIGHT = 10; // cap so the UI doesn't explode
 
-  // Geometry constants matching the SVG. Pivot is at (500, 60). Each rope is
-  // anchored at the bottom of the beam (y=66), 300 user-units from the pivot.
-  const ARM_X = 300;          // horizontal distance from pivot to rope anchor
-  const ANCHOR_OFFSET_Y = 6;  // anchor is on the bottom edge of the beam
+  // How far each pan card translates in CSS pixels at max tilt.
+  const PAN_DISPLACEMENT_PX = 18;
 
   // Preset example scenario on first load: deciding whether to apply for jobs.
   // Balanced weights so the scale starts near-level, inviting exploration.
@@ -63,8 +61,8 @@
   const forTotalEl = document.getElementById("v2ForTotal");
   const againstTotalEl = document.getElementById("v2AgainstTotal");
   const beamEl = document.getElementById("v2Beam");
-  const panLeftEl = document.getElementById("v2PanLeft");
-  const panRightEl = document.getElementById("v2PanRight");
+  const panForEl = document.getElementById("v2PanFor");
+  const panAgainstEl = document.getElementById("v2PanAgainst");
   const verdictEl = document.getElementById("v2Verdict");
   const chipsForEl = document.getElementById("v2ChipsFor");
   const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
@@ -291,27 +289,15 @@
     // Against heavier → against goes down → positive tilt.
     const diff = againstTotal - forTotal;
     const tiltDeg = clamp(diff * TILT_K, -MAX_TILT, MAX_TILT);
-    const theta = (tiltDeg * Math.PI) / 180;
 
     beamEl.style.transform = `rotate(${tiltDeg}deg)`;
 
-    // Move each pan to wherever its rope-anchor on the beam ends up after the
-    // rotation, but DON'T rotate the pan itself — it stays perpendicular to
-    // the floor, like a real hanging pan held by ropes.
-    const left = anchorDisplacement(-ARM_X, ANCHOR_OFFSET_Y, theta);
-    const right = anchorDisplacement(ARM_X, ANCHOR_OFFSET_Y, theta);
-    panLeftEl.style.transform = `translate(${left.dx}px, ${left.dy}px)`;
-    panRightEl.style.transform = `translate(${right.dx}px, ${right.dy}px)`;
-  }
-
-  // How far an anchor point at offset (offX, offY) from the pivot moves when
-  // the beam rotates by theta radians (SVG convention: y-down, positive = CW).
-  function anchorDisplacement(offX, offY, theta) {
-    const c = Math.cos(theta);
-    const s = Math.sin(theta);
-    const newX = offX * c - offY * s;
-    const newY = offX * s + offY * c;
-    return { dx: newX - offX, dy: newY - offY };
+    // Translate the pan cards up/down in CSS pixel space. Linear mapping from
+    // tilt angle to displacement keeps the motion smooth and proportional.
+    const normalizedTilt = tiltDeg / MAX_TILT; // -1 to +1
+    const dy = normalizedTilt * PAN_DISPLACEMENT_PX;
+    panForEl.style.transform = `translateY(${-dy}px)`;
+    panAgainstEl.style.transform = `translateY(${dy}px)`;
   }
 
   function updateVerdict(f, a) {

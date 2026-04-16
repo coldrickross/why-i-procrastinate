@@ -2111,43 +2111,54 @@ textarea.iaw-problem-input { min-height: 64px; }
   margin: 18px 0 0;
 }
 
-.v2-scale-holder {
+.v2-scale-visual {
   position: relative;
   max-width: 1000px;
   margin: 0 auto;
 }
 
-/* The whole scale — beam, pillar, base, AND the pans — live inside one SVG
-   so the pans can be children of the beam group and tilt with it. */
-.v2-scale-big {
+/* Compact SVG — just the beam, rivet, and short rope stubs. */
+.v2-beam-svg {
   width: 100%;
-  aspect-ratio: 1000 / 680;
+  aspect-ratio: 1000 / 100;
   display: block;
   overflow: visible;
 }
-.v2-scale-big .beam {
+.v2-beam-svg .beam {
   transform-box: view-box;
-  transform-origin: 500px 60px;
+  transform-origin: 500px 40px;
   transition: transform 700ms var(--ease);
 }
-/* Pan groups translate up/down with the beam end, but never rotate, so each
-   pan stays perpendicular to the floor like a real hanging scale pan. */
-.v2-scale-big .pan-group {
-  transform-box: view-box;
-  transform-origin: 0 0;
-  transition: transform 700ms var(--ease);
-}
-.v2-scale-big .base { fill: var(--ink); }
-.v2-scale-big .pillar { fill: var(--ink); }
-.v2-scale-big .beam-shape { fill: var(--ink); }
-.v2-scale-big .rivet { fill: var(--gold); }
-.v2-scale-big .rope { stroke: var(--ink); stroke-width: 3; fill: none; stroke-linecap: round; }
+.v2-beam-svg .beam-shape { fill: var(--ink); }
+.v2-beam-svg .rivet { fill: var(--gold); }
+.v2-beam-svg .rope { stroke: var(--ink); stroke-width: 3; fill: none; stroke-linecap: round; }
 
-/* The pan bodies are HTML inside <foreignObject>. Because foreignObject is a
-   child of <g class="beam">, they inherit the beam's rotation. */
+/* Thin pillar running from beam down through the card area. */
+.v2-pillar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  background: var(--ink);
+  border-radius: 3px;
+  z-index: 0;
+}
+
+/* Two-column grid for the pan cards. */
+.v2-pans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 20px;
+}
+
+/* Pan cards — now regular HTML divs instead of foreignObject. */
 .v2-pan {
   box-sizing: border-box;
-  height: 100%;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-md);
@@ -2156,9 +2167,10 @@ textarea.iaw-problem-input { min-height: 64px; }
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 340px;
   overflow: hidden;
-  /* Bump base size so text stays legible when the SVG scales down. */
-  font-size: 19px;
+  font-size: 1rem;
+  transition: transform 700ms var(--ease);
 }
 .v2-pan-for { border-top: 5px solid var(--teal); }
 .v2-pan-against { border-top: 5px solid var(--terra); }
@@ -2375,12 +2387,12 @@ textarea.iaw-problem-input { min-height: 64px; }
   border-color: var(--muted);
 }
 
-/* On narrow screens the SVG would shrink too far and the pan text would be
-   barely readable. Bump the pan font and soften the tilt there. */
 @media (max-width: 720px) {
-  .v2-pan { font-size: 22px; padding: 12px; }
-  .v2-pan-title { font-size: 1.1rem; }
-  .v2-pan-total { font-size: 0.9rem; }
+  .v2-pan { padding: 10px; font-size: 0.92rem; max-height: 300px; }
+
+  .v2-pans { gap: 20px; }
+
+  .v2-pillar { width: 6px; }
 
   .v2-toolbar-header {
     flex-direction: column;

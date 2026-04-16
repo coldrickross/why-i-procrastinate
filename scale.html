@@ -39,53 +39,42 @@
     </header>
 
     <section class="v2-stage" aria-label="Interactive scale">
-      <div class="v2-scale-holder">
-        <svg class="v2-scale-big" viewBox="0 0 1000 680" role="img" aria-label="A balance scale that literally holds your reasons. The beam tilts while the pans move up and down, staying perpendicular to the floor like real hanging pans.">
-          <!-- Static stand -->
-          <path class="base" d="M370 676 L630 676 L608 652 L392 652 Z" />
-          <rect class="pillar" x="492" y="60" width="16" height="592" rx="4" />
-
-          <!-- Rewards side (left): translates up/down with the beam end, but stays upright -->
-          <g class="pan-group pan-group-left" id="v2PanLeft">
-            <line class="rope" x1="200" y1="66" x2="40" y2="178" />
-            <line class="rope" x1="200" y1="66" x2="360" y2="178" />
-            <foreignObject x="40" y="170" width="320" height="360">
-              <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-for">
-                <div class="v2-pan-heading">
-                  <span class="v2-pan-title">Rewards</span>
-                  <span class="v2-pan-total" id="v2ForTotal">0</span>
-                </div>
-                <div class="v2-items" id="v2ItemsFor"></div>
-                <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Add reason</button>
-              </div>
-            </foreignObject>
-          </g>
-
-          <!-- Costs side (right): translates up/down with the beam end, but stays upright -->
-          <g class="pan-group pan-group-right" id="v2PanRight">
-            <line class="rope" x1="800" y1="66" x2="640" y2="178" />
-            <line class="rope" x1="800" y1="66" x2="960" y2="178" />
-            <foreignObject x="640" y="170" width="320" height="360">
-              <div xmlns="http://www.w3.org/1999/xhtml" class="v2-pan v2-pan-against">
-                <div class="v2-pan-heading">
-                  <span class="v2-pan-title">Costs</span>
-                  <span class="v2-pan-total" id="v2AgainstTotal">0</span>
-                </div>
-                <div class="v2-items" id="v2ItemsAgainst"></div>
-                <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Add reason</button>
-              </div>
-            </foreignObject>
-          </g>
-
+      <div class="v2-scale-visual">
+        <svg class="v2-beam-svg" viewBox="0 0 1000 100" role="img" aria-label="A balance beam that tilts based on the weight of your reasons.">
           <!-- Tilting beam — rotates around the pivot -->
           <g class="beam" id="v2Beam">
-            <rect class="beam-shape" x="100" y="53" width="800" height="14" rx="7" />
-            <circle class="rivet" cx="500" cy="60" r="5" />
+            <rect class="beam-shape" x="150" y="33" width="700" height="14" rx="7" />
+            <circle class="rivet" cx="500" cy="40" r="5" />
+            <!-- Short rope stubs hanging from beam ends — rotate with the beam -->
+            <line class="rope" x1="250" y1="47" x2="250" y2="95" />
+            <line class="rope" x1="750" y1="47" x2="750" y2="95" />
           </g>
 
           <!-- Pivot rivet sits on top of the beam, stays fixed -->
-          <circle class="rivet" cx="500" cy="60" r="8" />
+          <circle class="rivet" cx="500" cy="40" r="8" />
         </svg>
+
+        <div class="v2-pillar"></div>
+
+        <div class="v2-pans">
+          <div class="v2-pan v2-pan-for" id="v2PanFor">
+            <div class="v2-pan-heading">
+              <span class="v2-pan-title">Rewards</span>
+              <span class="v2-pan-total" id="v2ForTotal">0</span>
+            </div>
+            <div class="v2-items" id="v2ItemsFor"></div>
+            <button class="v2-add v2-add-for" id="v2AddFor" type="button">+ Add reason</button>
+          </div>
+
+          <div class="v2-pan v2-pan-against" id="v2PanAgainst">
+            <div class="v2-pan-heading">
+              <span class="v2-pan-title">Costs</span>
+              <span class="v2-pan-total" id="v2AgainstTotal">0</span>
+            </div>
+            <div class="v2-items" id="v2ItemsAgainst"></div>
+            <button class="v2-add v2-add-against" id="v2AddAgainst" type="button">+ Add reason</button>
+          </div>
+        </div>
       </div>
 
       <p class="v2-verdict" id="v2Verdict">Name an action, then start adding reasons on each side.</p>
