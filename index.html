@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Why I Procrastinate — Tools to help you start</title>
-<meta name="description" content="Three free tools to understand why you procrastinate and start taking action." />
+<title>Why am I not taking action? — Why I Procrastinate</title>
+<meta name="description" content="A simple guide to feelings that block action, plus clear reasons and easy next steps." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -14,42 +14,35 @@
   <nav class="nav" aria-label="Primary">
     <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
     <div class="links">
-      <a href="index.html" class="active">Home</a>
-      <a href="feelings.html">Feelings</a>
+      <a href="index.html" class="active">Feelings</a>
       <a href="scale.html">The Scale</a>
       <a href="worksheet.html">Worksheet</a>
     </div>
   </nav>
 
   <header class="hero">
-    <h1>Stop Wondering <em>Why</em>.<br>Start Taking Action.</h1>
-    <p class="sub">Three free tools to understand what holds you back and build the momentum to move forward.</p>
+    <h1 id="feelings-prompt">Why Am I Not Taking Action?</h1>
+    <p class="sub" id="feelings-helper">Pick one feeling. Then pick a reason. You will get a clear explanation and a simple next step.</p>
   </header>
 
   <main class="wrap">
-    <section class="landing-tools" aria-label="Tools">
-      <a class="landing-card" href="feelings.html">
-        <h3>Feelings Guide</h3>
-        <p>Pick what you're feeling. Get a clear explanation of why you're stuck and a simple next step to take right now.</p>
-        <span class="btn-secondary">Explore feelings &rarr;</span>
-      </a>
+    <section id="feelings-flow" class="feelings-flow" aria-label="Feeling and reason flow"></section>
 
-      <a class="landing-card" href="scale.html">
-        <h3>The Action Scale</h3>
-        <p>Weigh what pulls you toward action against what holds you back. Watch the balance tip as you think it through.</p>
-        <span class="btn-secondary">Open the scale &rarr;</span>
-      </a>
-
-      <a class="landing-card" href="worksheet.html">
-        <h3>Inspire Action Worksheet</h3>
-        <p>A guided 20-minute worksheet to build clarity, structure, and real momentum for meaningful change.</p>
-        <span class="btn-primary">Start the worksheet &rarr;</span>
-      </a>
-    </section>
+    <aside class="cta-bar">
+      <div>
+        <h3>Use the action scale too.</h3>
+        <p>See what pulls you forward and what holds you back.</p>
+      </div>
+      <a class="btn" href="scale.html">Open the scale &rarr;</a>
+    </aside>
   </main>
 
   <footer class="page-foot">
-    <p>Built to help you start.</p>
+    <p class="db-summary db-summary--footer" id="db-summary-footer"></p>
+    <p>Built to help you start. <a href="scale.html">Visit the scale</a>.</p>
   </footer>
+
+  <script src="assets/data.js"></script>
+  <script src="assets/emotions.js"></script>
 </body>
 </html>
