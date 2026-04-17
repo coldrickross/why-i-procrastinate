@@ -263,14 +263,12 @@
         <p class="prog-why-kicker">${i === 0 ? "The pull" : "And also"}</p>
         <blockquote>${escapeHtml(o.outcome || "")}</blockquote>
         ${o.allows  ? `<figcaption>${escapeHtml(o.allows)}</figcaption>` : ""}
-        ${o.feeling ? `<p class="prog-why-feel">${escapeHtml(o.feeling)}</p>` : ""}
       </figure>`).join("");
     const futureCards = futures.map((f, i) => `
       <figure class="prog-why-card prog-why-card--push">
         <p class="prog-why-kicker">${i === 0 ? "The cost of staying the same" : "And also"}</p>
         <blockquote>${escapeHtml(f.problem || "")}</blockquote>
         ${f.impact  ? `<figcaption>${escapeHtml(f.impact)}</figcaption>` : ""}
-        ${f.feeling ? `<p class="prog-why-feel">${escapeHtml(f.feeling)}</p>` : ""}
       </figure>`).join("");
     root.innerHTML = `
       <h2 class="prog-section-title">Why this matters</h2>
@@ -356,14 +354,13 @@
   function renderCurrent() {
     const root = document.getElementById("progCurrent");
     const list = (Array.isArray(answers["current-problems"]) ? answers["current-problems"] : [])
-      .filter((p) => p && (p.problem || p.stops || p.duration || p.feeling));
+      .filter((p) => p && (p.problem || p.stops || p.duration));
     if (!list.length) { root.innerHTML = ""; return; }
     const items = list.map((p) => `
       <li class="prog-current-item">
         ${p.problem ? `<p class="prog-current-problem">${escapeHtml(p.problem)}</p>` : ""}
-        ${p.stops   ? `<p class="prog-current-row"><span class="prog-current-label">What it stops</span><span>${escapeHtml(p.stops)}</span></p>` : ""}
-        ${p.duration? `<p class="prog-current-row"><span class="prog-current-label">How long</span><span>${escapeHtml(p.duration)}</span></p>` : ""}
-        ${p.feeling ? `<p class="prog-current-feel">${escapeHtml(p.feeling)}</p>` : ""}
+        ${p.stops   ? `<p class="prog-current-row"><span class="prog-current-label">Stops</span><span>${escapeHtml(p.stops)}</span></p>` : ""}
+        ${p.duration? `<p class="prog-current-row"><span class="prog-current-label">Duration</span><span>${escapeHtml(p.duration)}</span></p>` : ""}
       </li>`).join("");
     root.innerHTML = `
       <h2 class="prog-section-title">The cost of now</h2>
@@ -446,7 +443,6 @@
         ${mantra ? `
           <blockquote class="prog-missed-mantra">
             <p>&ldquo;${escapeHtml(mantra)}&rdquo;</p>
-            <footer>Your self-forgiveness line</footer>
           </blockquote>` : ""}
         ${restart ? `
           <div class="prog-missed-restart">
@@ -586,6 +582,7 @@
   renderFallbacks();
   renderMissedDay();
   renderLatest();
+  wireViewSwitcher();
 
   if (isPersonal) {
     wireTrackerEditing();
@@ -593,6 +590,50 @@
     addDemoBannerIfNeeded();
   } else if (wantDemo) {
     addDemoBannerIfNeeded();
+  }
+
+  function wireViewSwitcher() {
+    const switcher = document.querySelector(".prog-view-switch");
+    const todayView = document.querySelector(".prog-today-view");
+    const planView  = document.querySelector(".prog-plan-view");
+    if (!switcher || !todayView || !planView) return;
+
+    const hashView = (window.location.hash || "").replace(/^#/, "");
+    const stored   = (function () { try { return localStorage.getItem("wip-journey-view"); } catch (_) { return null; } })();
+    const initial  = (hashView === "plan" || hashView === "today") ? hashView
+                   : (stored === "plan" ? "plan" : "today");
+    applyView(initial, /*persist=*/false);
+
+    switcher.addEventListener("click", (e) => {
+      const btn = e.target.closest(".prog-view-btn");
+      if (!btn) return;
+      const view = btn.dataset.view === "plan" ? "plan" : "today";
+      applyView(view, /*persist=*/true);
+    });
+
+    window.addEventListener("hashchange", () => {
+      const h = (window.location.hash || "").replace(/^#/, "");
+      if (h === "today" || h === "plan") applyView(h, /*persist=*/true);
+    });
+
+    function applyView(view, persist) {
+      const isPlan = view === "plan";
+      todayView.classList.toggle("is-active", !isPlan);
+      planView.classList.toggle("is-active", isPlan);
+      todayView.hidden = isPlan;
+      planView.hidden  = !isPlan;
+      switcher.querySelectorAll(".prog-view-btn").forEach((b) => {
+        const on = b.dataset.view === view;
+        b.classList.toggle("is-selected", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      if (persist) {
+        try { localStorage.setItem("wip-journey-view", view); } catch (_) { /* ignore */ }
+        if (window.location.hash.replace(/^#/, "") !== view) {
+          history.replaceState(null, "", `#${view}`);
+        }
+      }
+    }
   }
 
   function addDemoBannerIfNeeded() {
