@@ -3303,6 +3303,75 @@ textarea.iaw-problem-input { min-height: 64px; }
 }
 .tracker-editor-clear:hover { color: var(--terra-deep); text-decoration: underline; }
 
+/* ---------- Relapse detail panel (shown when Slipped is selected) ---------- */
+.tracker-editor { width: min(360px, calc(100vw - 24px)); }
+.tracker-relapse {
+  margin: 0 0 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(200, 118, 104, 0.06);
+}
+.tracker-relapse[hidden] { display: none; }
+.tracker-relapse-lead {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+}
+.tracker-platform-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.tracker-platform-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 120ms var(--ease), border-color 120ms var(--ease), transform 120ms var(--ease), color 120ms var(--ease);
+}
+.tracker-platform-btn:hover { transform: translateY(-1px); color: var(--ink); }
+.tracker-platform-btn.is-selected {
+  background: var(--gold);
+  border-color: var(--gold-deep);
+  color: var(--ink);
+}
+.tracker-platform-logo {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+}
+.tracker-platform-logo svg { width: 100%; height: 100%; }
+.tracker-platform-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+.tracker-relapse-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.tracker-relapse-field { display: flex; flex-direction: column; }
+.tracker-relapse-time,
+.tracker-relapse-trigger {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--ink);
+  background: var(--cream);
+}
+.tracker-relapse-time:focus,
+.tracker-relapse-trigger:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+  background: #fff;
+}
+
 /* ---------- Reflections editor ---------- */
 .prog-reflection-form {
   margin: 8px 0 20px;

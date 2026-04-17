@@ -667,6 +667,7 @@
     const existing = (data.checkins && (data.checkins[iso] || data.checkins[cellIndex])) || {};
     const current = existing.status || c.status;
     const note    = existing.note   || "";
+    const relapse = existing.relapse || {};
     const isFuture = c.date > today && !sameDay(c.date, today);
 
     const popover = document.createElement("div");
@@ -680,11 +681,30 @@
       </header>
       ${isFuture ? `<p class="tracker-editor-hint">This day hasn't arrived yet. You can still jot a note.</p>` : ""}
       <div class="tracker-editor-statuses" role="radiogroup" aria-label="Status">
-        ${statusBtn("done",    "Done",    "✓", current)}
-        ${statusBtn("missed",  "Missed",  "✕", current)}
+        ${statusBtn("done",    "Clean",   "✓", current)}
+        ${statusBtn("missed",  "Slipped", "✕", current)}
         ${statusBtn("rest",    "Rest",    "·", current)}
         ${statusBtn("pending", "Pending", "…", current)}
       </div>
+      <section class="tracker-relapse" hidden aria-label="Relapse details">
+        <p class="tracker-relapse-lead">What pulled you in?</p>
+        <label class="tracker-editor-note-label">Platform</label>
+        <div class="tracker-platform-grid" role="radiogroup" aria-label="Platform">
+          ${PLATFORMS.map((p) => platformBtn(p, relapse.platform)).join("")}
+        </div>
+        <div class="tracker-relapse-row">
+          <div class="tracker-relapse-field">
+            <label class="tracker-editor-note-label" for="tracker-relapse-time">Time</label>
+            <input type="time" id="tracker-relapse-time" class="tracker-relapse-time" value="${escapeHtml(relapse.time || defaultRelapseTime(c.date))}">
+          </div>
+          <div class="tracker-relapse-field">
+            <label class="tracker-editor-note-label" for="tracker-relapse-trigger">Trigger</label>
+            <select id="tracker-relapse-trigger" class="tracker-relapse-trigger">
+              ${TRIGGERS.map((t) => `<option value="${escapeHtml(t)}"${t === (relapse.trigger || "") ? " selected" : ""}>${t || "Pick one…"}</option>`).join("")}
+            </select>
+          </div>
+        </div>
+      </section>
       <label class="tracker-editor-note-label" for="tracker-editor-note">Note (optional)</label>
       <textarea id="tracker-editor-note" class="tracker-editor-note" rows="3" maxlength="240" placeholder="A line about how it went.">${escapeHtml(note)}</textarea>
       <footer class="tracker-editor-foot">
@@ -712,17 +732,34 @@
 
     popover.querySelector(".tracker-editor-close").addEventListener("click", closeCellEditor);
 
+    const relapseSection = popover.querySelector(".tracker-relapse");
     let pickedStatus = current;
+    let pickedPlatform = relapse.platform || "";
+    const toggleRelapse = () => {
+      relapseSection.hidden = pickedStatus !== "missed";
+      requestAnimationFrame(() => positionPopover(popover, anchorEl));
+    };
+    toggleRelapse();
+
     popover.querySelectorAll(".tracker-editor-status").forEach((btn) => {
       btn.addEventListener("click", () => {
         pickedStatus = btn.dataset.status;
         popover.querySelectorAll(".tracker-editor-status").forEach((b) =>
           b.classList.toggle("is-selected", b === btn));
+        toggleRelapse();
+      });
+    });
+
+    popover.querySelectorAll(".tracker-platform-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        pickedPlatform = btn.dataset.platform === pickedPlatform ? "" : btn.dataset.platform;
+        popover.querySelectorAll(".tracker-platform-btn").forEach((b) =>
+          b.classList.toggle("is-selected", b.dataset.platform === pickedPlatform));
       });
     });
 
     popover.querySelector(".tracker-editor-clear").addEventListener("click", () => {
-      saveCheckin(iso, { status: "", note: "" });
+      saveCheckin(iso, { status: "", note: "", relapse: null });
       closeCellEditor();
       rebuildCell(cellIndex);
       renderTracker();
@@ -732,7 +769,16 @@
 
     popover.querySelector(".tracker-editor-save").addEventListener("click", () => {
       const newNote = popover.querySelector(".tracker-editor-note").value.trim();
-      saveCheckin(iso, { status: pickedStatus, note: newNote });
+      const patch = { status: pickedStatus, note: newNote };
+      if (pickedStatus === "missed") {
+        const time = popover.querySelector(".tracker-relapse-time").value || "";
+        const trigger = popover.querySelector(".tracker-relapse-trigger").value || "";
+        const nextRelapse = { platform: pickedPlatform, time, trigger };
+        patch.relapse = (pickedPlatform || time || trigger) ? nextRelapse : null;
+      } else {
+        patch.relapse = null;
+      }
+      saveCheckin(iso, patch);
       closeCellEditor();
       rebuildCell(cellIndex);
       renderTracker();
@@ -768,6 +814,68 @@
       <span class="tracker-editor-glyph" aria-hidden="true">${glyph}</span>
       <span>${label}</span>
     </button>`;
+  }
+
+  // Platform logos as inline SVG so they render without any external assets.
+  // Shapes stay minimal (brand recognisable silhouettes in a single colour).
+  const PLATFORM_ICONS = {
+    chrome:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<path d="M12 2v8M20.7 7 13.5 11M3.3 17 10.5 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    instagram:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="4.6" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<circle cx="17" cy="7" r="1.1" fill="currentColor"/></svg>',
+    tiktok:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v10.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M14 3c.4 2.5 2 4.4 4.5 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>',
+    youtube:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<path d="M10.5 9.2v5.6L15.4 12z" fill="currentColor"/></svg>',
+    x:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l7.2 9.2L4.4 20h2.2l5.5-5.9L16.6 20H20l-7.6-9.7L19.4 4h-2.2l-5 5.4L8 4z" fill="currentColor"/></svg>',
+    reddit:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<circle cx="19" cy="6" r="1.4" fill="currentColor"/>' +
+      '<path d="M12 6l1.4-3.2 3.2.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+      '<circle cx="9.3" cy="13.4" r="0.9" fill="currentColor"/><circle cx="14.7" cy="13.4" r="0.9" fill="currentColor"/>' +
+      '<path d="M9 16.6c1 .9 2 1.2 3 1.2s2-.3 3-1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+    phone:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<line x1="10.5" y1="18.5" x2="13.5" y2="18.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
+    other:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/>' +
+      '<circle cx="8" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="16" cy="12" r="1" fill="currentColor"/></svg>',
+  };
+
+  const PLATFORMS = [
+    { key: "phone",     label: "Phone" },
+    { key: "chrome",    label: "Chrome" },
+    { key: "instagram", label: "Instagram" },
+    { key: "tiktok",    label: "TikTok" },
+    { key: "youtube",   label: "YouTube" },
+    { key: "x",         label: "X" },
+    { key: "reddit",    label: "Reddit" },
+    { key: "other",     label: "Other" },
+  ];
+
+  const TRIGGERS = ["", "Boredom", "Stress", "Loneliness", "FOMO", "Notification", "Habit loop", "Avoidance", "Tired", "Other"];
+
+  function platformBtn(p, current) {
+    const sel = current === p.key ? " is-selected" : "";
+    return `<button type="button" class="tracker-platform-btn${sel}" data-platform="${p.key}" aria-label="${p.label}" title="${p.label}">
+      <span class="tracker-platform-logo" aria-hidden="true">${PLATFORM_ICONS[p.key] || ""}</span>
+      <span class="tracker-platform-label">${p.label}</span>
+    </button>`;
+  }
+
+  function defaultRelapseTime(date) {
+    // For today, seed with the current time. For past days, leave empty so
+    // the user picks an accurate time rather than silently recording "now".
+    if (!sameDay(date, today)) return "";
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
   }
 
   function closeCellEditor() {
