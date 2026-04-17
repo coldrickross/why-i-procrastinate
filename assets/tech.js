@@ -43,6 +43,57 @@
   if (!Array.isArray(state.outcomes))     state.outcomes = [];
   writeState(state);
 
+  // ---------- Relapse vocab ------------------------------------------------
+  // Simplified, monochrome SVG glyphs (currentColor) — not the official brand
+  // marks, so they read as the platform without the trademark issues of the
+  // real logos. Inline so we ship no binary assets.
+  const PLATFORM_ICONS = {
+    instagram: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>',
+    tiktok:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4v10.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 4c.2 2.4 2.1 4.3 4.5 4.5"/></svg>',
+    youtube:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="3"/><path d="M10.5 9.3v5.4l4.5-2.7z" fill="currentColor" stroke="none"/></svg>',
+    x:         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/></svg>',
+    facebook:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M14.5 8.5h-1.2c-.7 0-1.3.6-1.3 1.3V12m-2 0h6m-3 0v8"/></svg>',
+    reddit:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="14" r="7"/><circle cx="12" cy="5.5" r="1.2" fill="currentColor" stroke="none"/><path d="M12 6.7v3.3"/><circle cx="9.3" cy="13.5" r=".9" fill="currentColor" stroke="none"/><circle cx="14.7" cy="13.5" r=".9" fill="currentColor" stroke="none"/><path d="M9.5 16.8c1.2.8 3.8.8 5 0"/></svg>',
+    snapchat:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a5 5 0 0 0-5 5v6c-1 1-2 1.5-3 1.6.9 1.4 2.4 1.9 3.9 2.3.1.9.6 1.4 1.5 1.4.9 0 1.6-.5 2.6-.5s1.7.5 2.6.5c.9 0 1.4-.5 1.5-1.4 1.5-.4 3-.9 3.9-2.3-1 -.1-2-.6-3-1.6V8a5 5 0 0 0-5-5z"/></svg>',
+    chrome:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v8.5M20.4 7.5l-8.4 4M3.6 7.5l8.4 4"/></svg>',
+    phone:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10 5.5h4"/><circle cx="12" cy="18.5" r=".9" fill="currentColor" stroke="none"/></svg>',
+    other:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="12" r=".95" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".95" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r=".95" fill="currentColor" stroke="none"/></svg>',
+  };
+  const PLATFORMS = [
+    { key: "instagram", label: "Instagram" },
+    { key: "tiktok",    label: "TikTok"    },
+    { key: "youtube",   label: "YouTube"   },
+    { key: "x",         label: "X"         },
+    { key: "facebook",  label: "Facebook"  },
+    { key: "reddit",    label: "Reddit"    },
+    { key: "snapchat",  label: "Snapchat"  },
+    { key: "chrome",    label: "Chrome"    },
+    { key: "phone",     label: "Phone"     },
+    { key: "other",     label: "Other"     },
+  ];
+  const TRIGGERS = [
+    { key: "stress",       label: "Stress"          },
+    { key: "boredom",      label: "Boredom"         },
+    { key: "loneliness",   label: "Loneliness"      },
+    { key: "avoidance",    label: "Avoidance"       },
+    { key: "social",       label: "Social pressure" },
+    { key: "notification", label: "Notification"    },
+    { key: "habit",        label: "Autopilot"       },
+    { key: "other",        label: "Other"           },
+  ];
+  const TIME_BUCKETS = [
+    { key: "morning",   label: "Morning" },
+    { key: "afternoon", label: "Afternoon" },
+    { key: "evening",   label: "Evening" },
+    { key: "late",      label: "Late night" },
+  ];
+  const DURATIONS = [
+    { key: "lt15",   label: "<15m"   },
+    { key: "15to60", label: "15–60m" },
+    { key: "1to3h",  label: "1–3h"   },
+    { key: "gt3h",   label: "3h+"    },
+  ];
+
   const startDate = parseIso(state.startDate);
   const today     = parseIso(todayIso);
 
@@ -152,6 +203,16 @@
     const note    = existing.note   || "";
     const isFuture = c.date > today && !sameDay(c.date, today);
 
+    // Working copy of relapse details so users can edit before saving.
+    const relapseDraft = {
+      platforms:    Array.isArray(existing.relapse?.platforms) ? [...existing.relapse.platforms] : [],
+      timeBucket:   existing.relapse?.timeBucket || "",
+      timeExact:    existing.relapse?.timeExact  || "",
+      trigger:      existing.relapse?.trigger    || "",
+      triggerNote:  existing.relapse?.triggerNote || "",
+      duration:     existing.relapse?.duration   || "",
+    };
+
     const popover = document.createElement("div");
     popover.className = "tracker-editor";
     popover.setAttribute("role", "dialog");
@@ -167,6 +228,9 @@
         ${statusBtn("missed",  "Slipped", "✕", current)}
         ${statusBtn("rest",    "Rest",    "·", current)}
         ${statusBtn("pending", "Pending", "…", current)}
+      </div>
+      <div class="relapse-panel" data-relapse-panel hidden>
+        ${renderRelapsePanel(relapseDraft)}
       </div>
       <label class="tracker-editor-note-label" for="tech-editor-note">Note (optional)</label>
       <textarea id="tech-editor-note" class="tracker-editor-note" rows="3" maxlength="240" placeholder="A line about how it went.">${escapeHtml(note)}</textarea>
@@ -195,14 +259,25 @@
 
     popover.querySelector(".tracker-editor-close").addEventListener("click", closeCellEditor);
 
+    const relapsePanel = popover.querySelector("[data-relapse-panel]");
+    const setRelapseVisible = (show) => {
+      relapsePanel.hidden = !show;
+      if (show) requestAnimationFrame(() => positionPopover(popover, anchorEl));
+    };
+
     let pickedStatus = current;
+    setRelapseVisible(pickedStatus === "missed");
+
     popover.querySelectorAll(".tracker-editor-status").forEach((btn) => {
       btn.addEventListener("click", () => {
         pickedStatus = btn.dataset.status;
         popover.querySelectorAll(".tracker-editor-status").forEach((b) =>
           b.classList.toggle("is-selected", b === btn));
+        setRelapseVisible(pickedStatus === "missed");
       });
     });
+
+    wireRelapsePanel(relapsePanel, relapseDraft);
 
     popover.querySelector(".tracker-editor-clear").addEventListener("click", () => {
       delete state.checkins[c.iso];
@@ -214,15 +289,127 @@
 
     popover.querySelector(".tracker-editor-save").addEventListener("click", () => {
       const newNote = popover.querySelector(".tracker-editor-note").value.trim();
-      if (!pickedStatus && !newNote) {
+      const hasRelapseData =
+        relapseDraft.platforms.length > 0 ||
+        relapseDraft.timeBucket || relapseDraft.timeExact ||
+        relapseDraft.trigger || relapseDraft.triggerNote ||
+        relapseDraft.duration;
+
+      if (!pickedStatus && !newNote && !hasRelapseData) {
         delete state.checkins[c.iso];
       } else {
-        state.checkins[c.iso] = { status: pickedStatus, note: newNote };
+        const entry = { status: pickedStatus, note: newNote };
+        if (pickedStatus === "missed" && hasRelapseData) {
+          entry.relapse = {
+            platforms:   [...relapseDraft.platforms],
+            timeBucket:  relapseDraft.timeBucket,
+            timeExact:   relapseDraft.timeExact,
+            trigger:     relapseDraft.trigger,
+            triggerNote: relapseDraft.triggerNote.trim(),
+            duration:    relapseDraft.duration,
+          };
+        }
+        state.checkins[c.iso] = entry;
       }
       writeState(state);
       closeCellEditor();
       rebuildCells();
       renderTracker();
+    });
+  }
+
+  // ---------- Relapse panel (renders inside the cell editor) --------------
+  function renderRelapsePanel(draft) {
+    const platformBtns = PLATFORMS.map((p) => {
+      const on = draft.platforms.includes(p.key);
+      return `<button type="button"
+                class="relapse-platform${on ? " is-selected" : ""}"
+                data-platform="${p.key}"
+                aria-pressed="${on ? "true" : "false"}"
+                title="${escapeHtml(p.label)}">
+        <span class="relapse-platform-icon">${PLATFORM_ICONS[p.key] || ""}</span>
+        <span class="relapse-platform-label">${escapeHtml(p.label)}</span>
+      </button>`;
+    }).join("");
+
+    const chipRow = (items, group, current) => items.map((it) => {
+      const on = current === it.key;
+      return `<button type="button"
+                class="relapse-chip${on ? " is-selected" : ""}"
+                data-group="${group}" data-value="${it.key}"
+                aria-pressed="${on ? "true" : "false"}">${escapeHtml(it.label)}</button>`;
+    }).join("");
+
+    return `
+      <div class="relapse-block">
+        <div class="relapse-label">Which app or site?</div>
+        <div class="relapse-platforms" role="group" aria-label="Platforms used">${platformBtns}</div>
+      </div>
+      <div class="relapse-block">
+        <div class="relapse-label">When did it happen?</div>
+        <div class="relapse-chips" role="radiogroup" aria-label="Time of day">
+          ${chipRow(TIME_BUCKETS, "timeBucket", draft.timeBucket)}
+        </div>
+        <label class="relapse-time-row">
+          <span>Exact time</span>
+          <input type="time" class="relapse-time" data-field="timeExact" value="${escapeHtml(draft.timeExact)}" />
+        </label>
+      </div>
+      <div class="relapse-block">
+        <div class="relapse-label">What set it off?</div>
+        <div class="relapse-chips" role="radiogroup" aria-label="Trigger">
+          ${chipRow(TRIGGERS, "trigger", draft.trigger)}
+        </div>
+        <input type="text" class="relapse-trigger-note"
+               data-field="triggerNote"
+               maxlength="120"
+               placeholder="Optional: in your own words…"
+               value="${escapeHtml(draft.triggerNote)}" />
+      </div>
+      <div class="relapse-block">
+        <div class="relapse-label">How long?</div>
+        <div class="relapse-chips" role="radiogroup" aria-label="Duration">
+          ${chipRow(DURATIONS, "duration", draft.duration)}
+        </div>
+      </div>
+    `;
+  }
+
+  function wireRelapsePanel(panel, draft) {
+    // Multi-select platforms.
+    panel.querySelectorAll(".relapse-platform").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const key = btn.dataset.platform;
+        const idx = draft.platforms.indexOf(key);
+        if (idx === -1) draft.platforms.push(key);
+        else draft.platforms.splice(idx, 1);
+        const on = draft.platforms.includes(key);
+        btn.classList.toggle("is-selected", on);
+        btn.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    });
+
+    // Single-select chip groups.
+    panel.querySelectorAll(".relapse-chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const group = btn.dataset.group;
+        const value = btn.dataset.value;
+        // Toggle off if re-tapping the active chip.
+        const next = draft[group] === value ? "" : value;
+        draft[group] = next;
+        panel.querySelectorAll(`.relapse-chip[data-group="${group}"]`).forEach((b) => {
+          const sel = b.dataset.value === next;
+          b.classList.toggle("is-selected", sel);
+          b.setAttribute("aria-pressed", sel ? "true" : "false");
+        });
+      });
+    });
+
+    // Free-text fields.
+    panel.querySelectorAll("[data-field]").forEach((el) => {
+      el.addEventListener("input", () => {
+        draft[el.dataset.field] = el.value;
+      });
     });
   }
 
