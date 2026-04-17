@@ -2563,7 +2563,36 @@ textarea.iaw-problem-input { min-height: 64px; }
    ========================================================================== */
 .prog-wrap { padding-top: 18px; padding-bottom: 64px; }
 
-.prog-panel { margin: 28px 0; }
+.prog-panel { margin: 22px 0; }
+
+/* ---------- View switcher ---------- */
+.prog-view-switch {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  width: max-content;
+}
+.prog-view-switch .prog-view-btn {
+  padding: 8px 18px;
+  font-size: 0.92rem;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-soft);
+}
+.prog-view-switch .prog-view-btn:hover { transform: none; border-color: transparent; }
+.prog-view-switch .prog-view-btn.is-selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--cream);
+}
+.prog-today-view,
+.prog-plan-view { display: block; }
+.prog-today-view[hidden],
+.prog-plan-view[hidden] { display: none; }
 .prog-section-title {
   font-family: var(--serif);
   font-weight: 500;
@@ -2837,12 +2866,6 @@ textarea.iaw-problem-input { min-height: 64px; }
   font-size: 0.95rem;
   color: var(--ink-soft);
 }
-.prog-why-feel {
-  margin: 8px 0 0;
-  font-style: italic;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
 .prog-why-kicker {
   margin: 0 0 10px;
   text-transform: uppercase;
@@ -2894,6 +2917,186 @@ textarea.iaw-problem-input { min-height: 64px; }
 .prog-fallback-plan { color: var(--ink); font-size: 0.98rem; }
 .prog-fallback.is-empty .prog-fallback-plan { color: var(--muted); font-style: italic; }
 
+/* ---------- Where you started (facts + forgive) ---------- */
+.prog-start-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.prog-start-block {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-start-block p { margin: 0 0 8px; color: var(--ink); line-height: 1.45; font-size: 0.95rem; }
+.prog-start-block p:last-child { margin-bottom: 0; }
+.prog-start-kicker {
+  margin: 0 0 8px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gold-deep);
+}
+.prog-start-block--forgive .prog-start-kicker { color: var(--terra-deep); }
+
+/* ---------- Current problems ---------- */
+.prog-current-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.prog-current-item {
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-current-problem {
+  margin: 0 0 10px;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.prog-current-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 10px;
+  margin: 6px 0;
+  align-items: baseline;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+.prog-current-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+/* ---------- Distractions ---------- */
+.prog-distractions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.prog-distraction {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-distraction-what { font-weight: 500; color: var(--ink); }
+.prog-distraction-tactic {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--teal-deep);
+}
+
+/* ---------- Resistance (friction reducers) ---------- */
+.prog-resistance-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.prog-resistance {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--sage-deep);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-resistance-title {
+  margin: 0 0 4px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+.prog-resistance-detail {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+/* ---------- Accountability ---------- */
+.prog-accountability {
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-accountability p {
+  margin: 0 0 10px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.prog-accountability p:last-child { margin-bottom: 0; }
+
+/* ---------- Missed-day plan ---------- */
+.prog-missed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.prog-missed-mantra {
+  margin: 0;
+  padding: 18px 22px;
+  border-left: 4px solid var(--terra);
+  background: var(--paper);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.prog-missed-mantra p {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.prog-missed-mantra footer {
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--terra-deep);
+  font-style: normal;
+}
+.prog-missed-restart {
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper);
+}
+.prog-missed-label {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gold-deep);
+}
+.prog-missed-restart p:last-child { margin: 0; color: var(--ink); line-height: 1.5; }
+
 /* ---------- Latest reflection ---------- */
 .prog-latest {
   margin: 0;
@@ -2926,6 +3129,12 @@ textarea.iaw-problem-input { min-height: 64px; }
 
   .prog-why-grid { grid-template-columns: 1fr; }
   .prog-fallbacks { grid-template-columns: 1fr; }
+  .prog-start-grid { grid-template-columns: 1fr; }
+  .prog-current-list { grid-template-columns: 1fr; }
+  .prog-resistance-list { grid-template-columns: 1fr; }
+  .prog-missed { grid-template-columns: 1fr; }
+  .prog-missed-mantra { border-radius: var(--r-md); }
+  .prog-view-switch { width: 100%; justify-content: center; }
 
   .prog-ssmart-row { grid-template-columns: 1fr; gap: 2px; padding: 10px 0; }
 
