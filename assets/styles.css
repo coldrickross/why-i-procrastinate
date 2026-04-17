@@ -3237,6 +3237,9 @@ textarea.iaw-problem-input { min-height: 64px; }
 .tracker-editor {
   z-index: 100;
   width: min(320px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--r-md);

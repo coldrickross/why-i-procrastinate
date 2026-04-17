@@ -429,21 +429,31 @@
 
   function positionPopover(popover, anchor) {
     const r = anchor.getBoundingClientRect();
-    const pageY = window.scrollY + r.bottom + 8;
+    const margin = 12;
     const pageX = window.scrollX + r.left + (r.width / 2);
     popover.style.position = "absolute";
-    popover.style.top = `${pageY}px`;
+    popover.style.top = `${window.scrollY + r.bottom + 8}px`;
     popover.style.left = `${pageX}px`;
     popover.style.transform = "translateX(-50%)";
     requestAnimationFrame(() => {
       const pr = popover.getBoundingClientRect();
-      if (pr.bottom > window.innerHeight) {
-        popover.style.top = `${window.scrollY + r.top - pr.height - 8}px`;
+      // If the popover overflows the bottom, try flipping above the anchor.
+      // If it's too tall to fit either way, pin it to the viewport top and
+      // let its internal overflow handle scrolling.
+      if (pr.bottom > window.innerHeight - margin) {
+        const flippedTop = r.top - pr.height - 8;
+        if (flippedTop >= margin) {
+          popover.style.top = `${window.scrollY + flippedTop}px`;
+        } else {
+          popover.style.top = `${window.scrollY + margin}px`;
+        }
       }
-      const margin = 12;
-      if (pr.left < margin) { popover.style.left = `${window.scrollX + margin}px`; popover.style.transform = "none"; }
-      if (pr.right > window.innerWidth - margin) {
-        popover.style.left = `${window.scrollX + window.innerWidth - pr.width - margin}px`;
+      const pr2 = popover.getBoundingClientRect();
+      if (pr2.left < margin) {
+        popover.style.left = `${window.scrollX + margin}px`;
+        popover.style.transform = "none";
+      } else if (pr2.right > window.innerWidth - margin) {
+        popover.style.left = `${window.scrollX + window.innerWidth - pr2.width - margin}px`;
         popover.style.transform = "none";
       }
     });
