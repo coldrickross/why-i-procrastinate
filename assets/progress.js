@@ -253,28 +253,28 @@
 
   function renderWhy() {
     const root = document.getElementById("progWhy");
-    const outcomes = Array.isArray(answers["positive-outcomes"]) ? answers["positive-outcomes"] : [];
-    const futures  = Array.isArray(answers["future-problems"])   ? answers["future-problems"]   : [];
-    const outcome = outcomes[0];
-    const future  = futures[0];
-    if (!outcome && !future) { root.innerHTML = ""; return; }
-    const outcomeCard = outcome ? `
+    const outcomes = (Array.isArray(answers["positive-outcomes"]) ? answers["positive-outcomes"] : [])
+      .filter((o) => (o && (o.outcome || o.allows || o.feeling)));
+    const futures  = (Array.isArray(answers["future-problems"])   ? answers["future-problems"]   : [])
+      .filter((f) => (f && (f.problem || f.impact || f.feeling)));
+    if (!outcomes.length && !futures.length) { root.innerHTML = ""; return; }
+    const outcomeCards = outcomes.map((o, i) => `
       <figure class="prog-why-card prog-why-card--pull">
-        <p class="prog-why-kicker">The pull</p>
-        <blockquote>${escapeHtml(outcome.outcome || "")}</blockquote>
-        ${outcome.allows  ? `<figcaption>${escapeHtml(outcome.allows)}</figcaption>` : ""}
-        ${outcome.feeling ? `<p class="prog-why-feel">${escapeHtml(outcome.feeling)}</p>` : ""}
-      </figure>` : "";
-    const futureCard = future ? `
+        <p class="prog-why-kicker">${i === 0 ? "The pull" : "And also"}</p>
+        <blockquote>${escapeHtml(o.outcome || "")}</blockquote>
+        ${o.allows  ? `<figcaption>${escapeHtml(o.allows)}</figcaption>` : ""}
+        ${o.feeling ? `<p class="prog-why-feel">${escapeHtml(o.feeling)}</p>` : ""}
+      </figure>`).join("");
+    const futureCards = futures.map((f, i) => `
       <figure class="prog-why-card prog-why-card--push">
-        <p class="prog-why-kicker">The cost of staying the same</p>
-        <blockquote>${escapeHtml(future.problem || "")}</blockquote>
-        ${future.impact  ? `<figcaption>${escapeHtml(future.impact)}</figcaption>` : ""}
-        ${future.feeling ? `<p class="prog-why-feel">${escapeHtml(future.feeling)}</p>` : ""}
-      </figure>` : "";
+        <p class="prog-why-kicker">${i === 0 ? "The cost of staying the same" : "And also"}</p>
+        <blockquote>${escapeHtml(f.problem || "")}</blockquote>
+        ${f.impact  ? `<figcaption>${escapeHtml(f.impact)}</figcaption>` : ""}
+        ${f.feeling ? `<p class="prog-why-feel">${escapeHtml(f.feeling)}</p>` : ""}
+      </figure>`).join("");
     root.innerHTML = `
       <h2 class="prog-section-title">Why this matters</h2>
-      <div class="prog-why-grid">${outcomeCard}${futureCard}</div>
+      <div class="prog-why-grid">${outcomeCards}${futureCards}</div>
     `;
   }
 
@@ -329,6 +329,134 @@
     `;
   }
 
+  function renderStart() {
+    const root = document.getElementById("progStart");
+    const facts = (answers.facts || "").trim();
+    const forgive = (answers.forgive || "").trim();
+    if (!facts && !forgive) { root.innerHTML = ""; return; }
+    const paragraphs = (text) =>
+      text.split(/\n{2,}|\n/).map((p) => p.trim()).filter(Boolean)
+        .map((p) => `<p>${escapeHtml(p)}</p>`).join("");
+    const factsBlock = facts ? `
+      <article class="prog-start-block prog-start-block--facts">
+        <p class="prog-start-kicker">The facts</p>
+        ${paragraphs(facts)}
+      </article>` : "";
+    const forgiveBlock = forgive ? `
+      <article class="prog-start-block prog-start-block--forgive">
+        <p class="prog-start-kicker">Forgiving past me</p>
+        ${paragraphs(forgive)}
+      </article>` : "";
+    root.innerHTML = `
+      <h2 class="prog-section-title">Where you started</h2>
+      <div class="prog-start-grid">${factsBlock}${forgiveBlock}</div>
+    `;
+  }
+
+  function renderCurrent() {
+    const root = document.getElementById("progCurrent");
+    const list = (Array.isArray(answers["current-problems"]) ? answers["current-problems"] : [])
+      .filter((p) => p && (p.problem || p.stops || p.duration || p.feeling));
+    if (!list.length) { root.innerHTML = ""; return; }
+    const items = list.map((p) => `
+      <li class="prog-current-item">
+        ${p.problem ? `<p class="prog-current-problem">${escapeHtml(p.problem)}</p>` : ""}
+        ${p.stops   ? `<p class="prog-current-row"><span class="prog-current-label">What it stops</span><span>${escapeHtml(p.stops)}</span></p>` : ""}
+        ${p.duration? `<p class="prog-current-row"><span class="prog-current-label">How long</span><span>${escapeHtml(p.duration)}</span></p>` : ""}
+        ${p.feeling ? `<p class="prog-current-feel">${escapeHtml(p.feeling)}</p>` : ""}
+      </li>`).join("");
+    root.innerHTML = `
+      <h2 class="prog-section-title">The cost of now</h2>
+      <p class="prog-section-sub">What staying the same actually costs — today, not someday.</p>
+      <ul class="prog-current-list">${items}</ul>
+    `;
+  }
+
+  function renderDistractions() {
+    const root = document.getElementById("progDistractions");
+    const list = (Array.isArray(answers.distractions) ? answers.distractions : [])
+      .filter((d) => d && (d.what || "").trim());
+    if (!list.length) { root.innerHTML = ""; return; }
+    const tacticLabels = {
+      remove:   "Remove",
+      block:    "Block",
+      mute:     "Mute",
+      hide:     "Hide",
+      relocate: "Relocate",
+    };
+    const items = list.map((d) => `
+      <li class="prog-distraction">
+        <span class="prog-distraction-what">${escapeHtml(d.what)}</span>
+        <span class="prog-distraction-tactic">${escapeHtml(tacticLabels[d.tactic] || "—")}</span>
+      </li>`).join("");
+    root.innerHTML = `
+      <h2 class="prog-section-title">Distractions, defused</h2>
+      <ul class="prog-distractions">${items}</ul>
+    `;
+  }
+
+  function renderResistance() {
+    const root = document.getElementById("progResistance");
+    const state = answers.resistance || {};
+    const tactics = [
+      { key: "prepare", title: "Prepare the night before" },
+      { key: "cue",     title: "Put the cue in plain sight" },
+      { key: "stack",   title: "Stack it on an existing habit" },
+      { key: "shrink",  title: "Shrink the starting step" },
+      { key: "default", title: "Make it the default" },
+      { key: "commit",  title: "Pre-commit so future-you can't wriggle out" },
+    ];
+    const active = tactics.filter((t) => state[t.key] && state[t.key].on);
+    if (!active.length) { root.innerHTML = ""; return; }
+    const items = active.map((t) => {
+      const detail = ((state[t.key] && state[t.key].detail) || "").trim();
+      return `
+        <li class="prog-resistance">
+          <h3 class="prog-resistance-title">${escapeHtml(t.title)}</h3>
+          ${detail ? `<p class="prog-resistance-detail">${escapeHtml(detail)}</p>` : ""}
+        </li>`;
+    }).join("");
+    root.innerHTML = `
+      <h2 class="prog-section-title">Friction, engineered out</h2>
+      <ul class="prog-resistance-list">${items}</ul>
+    `;
+  }
+
+  function renderAccountability() {
+    const root = document.getElementById("progAccountability");
+    const text = (answers.accountability || "").trim();
+    if (!text) { root.innerHTML = ""; return; }
+    const paragraphs = text.split(/\n{2,}|\n/).map((p) => p.trim()).filter(Boolean)
+      .map((p) => `<p>${escapeHtml(p)}</p>`).join("");
+    root.innerHTML = `
+      <h2 class="prog-section-title">Who sees your effort</h2>
+      <div class="prog-accountability">${paragraphs}</div>
+    `;
+  }
+
+  function renderMissedDay() {
+    const root = document.getElementById("progMissedDay");
+    const m = answers["missed-day"] || {};
+    const mantra = (m.mantra || "").trim();
+    const restart = (m.restart || "").trim();
+    if (!mantra && !restart) { root.innerHTML = ""; return; }
+    root.innerHTML = `
+      <h2 class="prog-section-title">If you miss a day</h2>
+      <div class="prog-missed">
+        ${mantra ? `
+          <blockquote class="prog-missed-mantra">
+            <p>&ldquo;${escapeHtml(mantra)}&rdquo;</p>
+            <footer>Your self-forgiveness line</footer>
+          </blockquote>` : ""}
+        ${restart ? `
+          <div class="prog-missed-restart">
+            <p class="prog-missed-label">Tomorrow's restart</p>
+            <p>${escapeHtml(restart)}</p>
+          </div>` : ""}
+      </div>
+    `;
+  }
+
   function renderLatest() {
     const root = document.getElementById("progLatest");
     if (!data.latestNote) { root.innerHTML = ""; return; }
@@ -361,11 +489,18 @@
         goal: a.goal || "",
         identity: identity,
         "identity-foundation": a["identity-foundation"] || "",
+        facts: a.facts || "",
+        forgive: a.forgive || "",
+        "current-problems":  a["current-problems"]  || [],
         "positive-outcomes": a["positive-outcomes"] || [],
         "future-problems":   a["future-problems"]   || [],
         ssmart: a.ssmart || null,
+        distractions: Array.isArray(a.distractions) ? a.distractions : [],
+        resistance: a.resistance || null,
+        accountability: a.accountability || "",
         stakes: a.stakes || null,
         roadblocks: a.roadblocks || null,
+        "missed-day": a["missed-day"] || null,
       },
       checkins: journey.checkins || {},
       reflections: reflections,
@@ -441,9 +576,15 @@
   renderStrip();
   renderCommitment();
   renderTracker();
+  renderStart();
   renderWhy();
+  renderCurrent();
   renderStakes();
+  renderDistractions();
+  renderResistance();
+  renderAccountability();
   renderFallbacks();
+  renderMissedDay();
   renderLatest();
 
   if (isPersonal) {
