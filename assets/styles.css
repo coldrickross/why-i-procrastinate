@@ -3212,11 +3212,14 @@ textarea.iaw-problem-input { min-height: 64px; }
 
 /* ---------- Editable tracker cells ---------- */
 .prog-tracker.is-editable .tracker-cell,
-#progTracker.is-editable .tracker-cell {
+#progTracker.is-editable .tracker-cell,
+#techTracker.is-editable .tracker-cell {
   cursor: pointer;
 }
 .prog-tracker.is-editable .tracker-cell:focus-visible,
-#progTracker.is-editable .tracker-cell:hover {
+#progTracker.is-editable .tracker-cell:hover,
+#techTracker.is-editable .tracker-cell:hover,
+#techTracker.is-editable .tracker-cell:focus-visible {
   box-shadow: 0 0 0 2px var(--gold-deep);
 }
 .tracker-cell--pending {
