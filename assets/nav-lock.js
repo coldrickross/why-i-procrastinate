@@ -14,8 +14,7 @@
       const lock = document.createElement("span");
       lock.className = "nav-lock-icon";
       lock.setAttribute("aria-hidden", "true");
-      lock.textContent = "\u{1F512}"; // 🔒
-      a.appendChild(document.createTextNode(" "));
+      lock.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12"><rect x="3" y="7" width="10" height="7" rx="2" fill="currentColor"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
       a.appendChild(lock);
     }
   });

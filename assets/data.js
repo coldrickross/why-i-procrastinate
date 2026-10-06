@@ -2,9 +2,9 @@
 // To override from a backend, set `window.__FEELING_DATA__` before emotions.js loads.
 
 const DEFAULT_FEELING_DATA = {
-  prompt: "Why Am I Not Taking Action?",
+  prompt: "Why am I not taking action?",
   helperText:
-    "Pick one feeling. Then pick the reason that fits best. You will get a simple why + next step.",
+    "Pick a feeling. Pick the reason that fits. Get a plain explanation and one small next step.",
   feelings: [
     {
       id: "overwhelmed",
