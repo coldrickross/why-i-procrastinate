@@ -1633,6 +1633,7 @@
   th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
   th { background: #f0e9dd; }
   .box { font-size: 16px; }
+  tr.is-rest td { color: #a19789; background: #faf6ec; }
   .report-problem { margin: 10px 0 14px; padding: 10px 12px; border: 1px solid #ecdfc8; border-radius: 8px; background: #fffaf0; }
   .report-problem h5 { margin: 0 0 6px; font-family: Georgia, serif; font-size: 1rem; color: #9e5447; }
   .report-problem p { margin: 4px 0; }
@@ -1776,9 +1777,9 @@
       const week = Math.floor(idx / 7) + 1;
       const dow = dayIndexFromDate(day);
       const isOn = anyScheduled ? !!scheduled[dow] : true; // if no days picked, fall back to every day
-      const cell = isOn ? "☐" : "— (rest)";
-      const rowStyle = isOn ? "" : ' style="color:#a19789;background:#faf6ec;"';
-      html += `<tr${rowStyle}><td>Week ${week}</td><td>${escapeHtml(DAY_LABELS[dow])}</td><td>${humanDate(day)}</td><td class="box">${cell}</td></tr>`;
+      const cell = isOn ? "☐" : "Rest day";
+      const rowAttr = isOn ? "" : ' class="is-rest"';
+      html += `<tr${rowAttr}><td>Week ${week}</td><td>${escapeHtml(DAY_LABELS[dow])}</td><td>${humanDate(day)}</td><td class="box">${cell}</td></tr>`;
     });
     html += "</tbody></table>";
     return html;

@@ -65,6 +65,10 @@
   const beamEl = document.getElementById("v2Beam");
   const panLeftEl = document.getElementById("v2PanLeft");
   const panRightEl = document.getElementById("v2PanRight");
+  const holderEl = document.getElementById("v2Holder");
+  const dishForEl = document.getElementById("v2DishFor");
+  const dishAgainstEl = document.getElementById("v2DishAgainst");
+  const meterForEl = document.getElementById("v2MeterFor");
   const verdictEl = document.getElementById("v2Verdict");
   const chipsForEl = document.getElementById("v2ChipsFor");
   const chipsAgainstEl = document.getElementById("v2ChipsAgainst");
@@ -166,8 +170,8 @@
       const empty = document.createElement("p");
       empty.className = "v2-empty";
       empty.textContent = side === "for"
-        ? "Nothing on this side yet. Add what pulls you toward acting."
-        : "Nothing on this side yet. Add what holds you back.";
+        ? "Nothing here yet. Add what pulls you toward acting."
+        : "Nothing here yet. Add what holds you back.";
       container.appendChild(empty);
       return;
     }
@@ -292,6 +296,10 @@
     const againstTotal = sumWeights(state.against);
     forTotalEl.textContent = forTotal;
     againstTotalEl.textContent = againstTotal;
+    dishForEl.textContent = forTotal;
+    dishAgainstEl.textContent = againstTotal;
+    const sum = forTotal + againstTotal;
+    meterForEl.style.width = `${sum ? (forTotal / sum) * 100 : 50}%`;
     updateVerdict(forTotal, againstTotal);
 
     // While the mouse is over a pan, leave the beam/pans where they are so
@@ -314,6 +322,13 @@
     const right = anchorDisplacement(ARM_X, ANCHOR_OFFSET_Y, theta);
     panLeftEl.style.transform = `translate(${left.dx}px, ${left.dy}px)`;
     panRightEl.style.transform = `translate(${right.dx}px, ${right.dy}px)`;
+
+    // The HTML pans sit over the SVG and follow the same displacement. The
+    // values are in SVG user units; CSS converts them with container units.
+    holderEl.style.setProperty("--ldx", left.dx.toFixed(2));
+    holderEl.style.setProperty("--ldy", left.dy.toFixed(2));
+    holderEl.style.setProperty("--rdx", right.dx.toFixed(2));
+    holderEl.style.setProperty("--rdy", right.dy.toFixed(2));
   }
 
   // How far an anchor point at offset (offX, offY) from the pivot moves when
@@ -328,22 +343,32 @@
 
   function updateVerdict(f, a) {
     let line;
+    let lean = "even";
     if (f === 0 && a === 0) {
       line = "Nothing on the scale yet. Start adding reasons.";
+      lean = "empty";
     } else if (f === a) {
       line = "Perfectly balanced. A nudge either way will tip it.";
     } else if (f > a) {
       const d = f - a;
-      if (d >= 8) line = "Tilted hard toward action — you'll do it.";
-      else if (d >= 3) line = "Tilted toward action — you're likely to do it.";
+      lean = "for";
+      if (d >= 8) line = "Tilted hard toward action. You'll do it.";
+      else if (d >= 3) line = "Tilted toward action. You're likely to do it.";
       else line = "Leaning toward action.";
     } else {
       const d = a - f;
-      if (d >= 8) line = "Tilted hard away from action — you won't.";
-      else if (d >= 3) line = "Tilted away from action — you probably won't.";
+      lean = "against";
+      if (d >= 8) line = "Tilted hard away from action. You won't.";
+      else if (d >= 3) line = "Tilted away from action. You probably won't.";
       else line = "Leaning away from action.";
     }
-    verdictEl.textContent = `${line}  (${f} for, ${a} against)`;
+    verdictEl.dataset.lean = lean;
+    const strong = document.createElement("strong");
+    strong.textContent = line;
+    const counts = document.createElement("span");
+    counts.className = "v2-verdict-counts";
+    counts.textContent = `${f} for \u00b7 ${a} against`;
+    verdictEl.replaceChildren(strong, counts);
   }
 
   function sumWeights(arr) {

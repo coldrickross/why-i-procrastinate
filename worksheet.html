@@ -3,36 +3,42 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Inspire Action Worksheet — Why I Procrastinate</title>
+<title>Inspire Action Worksheet | Why I Procrastinate</title>
 <meta name="description" content="A beautiful 20-minute worksheet to build structure and clarity for meaningful change." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/styles.css" />
+<meta name="theme-color" content="#f5f3ee" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#0f1012" media="(prefers-color-scheme: dark)" />
+<script>try{var t=localStorage.getItem("wip-theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}</script>
 </head>
 <body>
-  <nav class="nav" aria-label="Primary">
-    <a class="brand" href="index.html">Why I Procrastinate<span class="dot">.</span></a>
-    <div class="links">
-      <a href="index.html">Feelings</a>
-      <a href="scale.html">The Scale</a>
-      <a href="worksheet.html" class="active">Worksheet</a>
-      <a href="progress.html">Journey</a>
-      <a href="tech.html">Tech Addiction</a>
-    </div>
-  </nav>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect class="bm-bg" width="32" height="32" rx="9"/><path class="bm-stand" d="M13.2 25.5h5.6l-1.4-9.6h-2.8z"/><rect class="bm-beam" x="5" y="13.6" width="22" height="2.8" rx="1.4" transform="rotate(-13 16 15)"/><circle class="bm-pivot" cx="16" cy="15" r="2.3"/></svg><span>Why I Procrastinate<span class="dot">.</span></span></a>
+      <div class="links">
+        <a href="index.html">Feelings</a>
+        <a href="scale.html">The Scale</a>
+        <a href="worksheet.html" class="active" aria-current="page">Worksheet</a>
+        <a href="progress.html">Journey</a>
+        <a href="tech.html">Tech Addiction</a>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Toggle dark mode"><svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></svg><svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg></button>
+    </nav>
+  </header>
 
   <header class="hero iaw-hero">
-    <p class="iaw-eyebrow">Inspire Action</p>
-    <h1>The <em>Inspire Action</em> Worksheet</h1>
-    <p class="sub">Approx. 20 minutes. By the end you'll have the structure and clarity to maximise the chances you make meaningful change.</p>
+    <p class="eyebrow">About 20 minutes</p>
+    <h1>The <em>Inspire&nbsp;Action</em> Worksheet</h1>
+    <p class="sub">By the end you'll have the structure and clarity to give meaningful change its best possible chance.</p>
   </header>
 
   <main class="wrap iaw-wrap">
 
     <!-- Intro: four predictable reasons -->
     <section class="iaw-intro" aria-label="Why people stall">
-      <h2 class="iaw-intro-title">The most predictable reasons people haven't made meaningful change</h2>
+      <h2 class="iaw-intro-title">Why change usually stalls, and how this fixes it</h2>
       <ol class="iaw-reasons">
         <li>
           <span class="iaw-reason-num">1</span>
@@ -45,7 +51,7 @@
           <span class="iaw-reason-num">2</span>
           <div>
             <h3>They haven't explored the emotional depth of the problems and outcomes</h3>
-            <p>So we sit with it &mdash; honestly &mdash; until the feelings become fuel.</p>
+            <p>So we sit with it honestly, until the feelings become fuel.</p>
           </div>
         </li>
         <li>
@@ -59,7 +65,7 @@
           <span class="iaw-reason-num">4</span>
           <div>
             <h3>They haven't planned for when life gets in the way</h3>
-            <p>So we build fallback plans before you need them &mdash; in calm mind, not crisis mode.</p>
+            <p>So we build fallback plans before you need them: in a calm mind, not crisis mode.</p>
           </div>
         </li>
       </ol>
@@ -88,9 +94,13 @@
   </main>
 
   <footer class="page-foot">
-    <p>Small steps count. <a href="scale.html">Use the action scale</a> too.</p>
+    <div class="foot-inner">
+      <p class="foot-brand">Why I Procrastinate<span class="dot">.</span></p>
+      <p class="foot-note">Small steps count. <a href="scale.html">Use the action scale</a> too.</p>
+    </div>
   </footer>
 
+  <script src="assets/site.js"></script>
   <script src="assets/nav-lock.js"></script>
   <script src="assets/worksheet.js"></script>
 </body>
