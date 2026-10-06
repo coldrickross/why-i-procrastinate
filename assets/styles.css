@@ -2905,11 +2905,16 @@ textarea.iaw-problem-input { min-height: 64px; }
   .v2-item-controls { display: grid; grid-auto-columns: 38px; }
 }
 
-/* Narrow screens: the drawing becomes a compact gauge with totals in the
-   dishes, and the pans become ordinary stacked cards underneath. */
 @media (max-width: 760px) {
   .v2-toolbar-header { flex-direction: column; align-items: stretch; gap: 18px; }
   .v2-action-bar { flex-basis: auto; }
+}
+
+/* Narrow screens and touch screens: the drawing becomes a compact gauge with
+   totals in the dishes, and the pans become ordinary cards underneath. Touch
+   screens of any width get this layout, because their always-visible weight
+   controls don't fit inside a pan hanging from the beam. */
+@media (max-width: 760px), (hover: none) {
   .v2-board { padding: 16px 12px 20px; }
   .v2-scale-big { aspect-ratio: 1000 / 700; margin-bottom: 8px; }
   .v2-scale-big .dish { display: block; }
@@ -2925,6 +2930,8 @@ textarea.iaw-problem-input { min-height: 64px; }
   .v2-pans {
     position: static;
     display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    align-items: start;
     gap: 12px;
     pointer-events: auto;
     margin-top: 4px;
